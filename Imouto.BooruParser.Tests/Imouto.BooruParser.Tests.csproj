@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Booru\Imouto.BooruParser.csproj" />
+    <ProjectReference Include="..\Imouto.BooruParser\Imouto.BooruParser.csproj" />
   </ItemGroup>
 
 </Project>
