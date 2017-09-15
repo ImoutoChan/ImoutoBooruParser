@@ -24,7 +24,7 @@ namespace Imouto.BooruParser.Model.Yandere
                 var historyType = data[0].InnerHtml;
                 if (historyType != "Post")
                 {
-                    break;
+                    continue;
                 }
 
                 var postid = Int32.Parse(data[2].ChildNodes[0].InnerHtml);
