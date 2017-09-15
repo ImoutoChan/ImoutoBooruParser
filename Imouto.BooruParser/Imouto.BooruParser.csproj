@@ -14,6 +14,7 @@ The library can receive information about individual posts, tags and notes histo
     <PackageLicenseUrl>https://github.com/ImoutoChan/ImoutoBooruParser/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/ImoutoChan/ImoutoBooruParser</RepositoryUrl>
     <PackageTags>booru search parser danbooru sankakuchannel yande.re</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
