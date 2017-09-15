@@ -59,5 +59,23 @@ namespace Imouto.BooruParser.Tests.Loaders
                 firstPage.Should().NotBeEmpty();
             }
         }
+        
+        public class LoadSearchResultAsyncMethod : SankakuLoaderTests
+        {
+            public LoadSearchResultAsyncMethod(SankakuLoaderFixture loaderFixture) : base(loaderFixture)
+            {
+            }
+
+            [Fact]
+            public async Task ShouldFind()
+            {
+                var ibal = _loaderFixture.GetLoaderWithoutAuth();
+
+                var serachResult = await ibal.LoadSearchResultAsync("1girl");
+                serachResult.Results.Should().NotBeEmpty();
+                serachResult.NotEmpty.Should().BeTrue();
+                serachResult.SearchCount.Should().BeGreaterThan(1);
+            }
+        }
     }
 }

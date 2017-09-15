@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Imouto.BooruParser.Tests.Loaders.Fixtures;
@@ -33,7 +34,8 @@ namespace Imouto.BooruParser.Tests.Loaders
 
         public class LoadFirstTagHistoryPageAsyncMethod : DanbooruLoaderTests
         {
-            public LoadFirstTagHistoryPageAsyncMethod(DanbooruLoaderFixture danbooruLoaderFixture) : base(danbooruLoaderFixture)
+            public LoadFirstTagHistoryPageAsyncMethod(DanbooruLoaderFixture danbooruLoaderFixture) 
+                : base(danbooruLoaderFixture)
             {
             }
 
@@ -56,6 +58,25 @@ namespace Imouto.BooruParser.Tests.Loaders
                 var firstPage = await ibal.LoadFirstTagHistoryPageAsync();
 
                 firstPage.Should().NotBeEmpty();
+            }
+        }
+        
+        public class LoadSearchResultAsyncMethod : DanbooruLoaderTests
+        {
+            public LoadSearchResultAsyncMethod(DanbooruLoaderFixture danbooruLoaderFixture) 
+                : base(danbooruLoaderFixture)
+            {
+            }
+
+            [Fact]
+            public async Task ShouldFind()
+            {
+                var ibal = _danbooruLoaderFixture.GetLoaderWithoutAuth();
+
+                var serachResult = await ibal.LoadSearchResultAsync("1girl");
+                serachResult.Results.Should().NotBeEmpty();
+                serachResult.NotEmpty.Should().BeTrue();
+                serachResult.SearchCount.Should().BeGreaterThan(1);
             }
         }
     }
