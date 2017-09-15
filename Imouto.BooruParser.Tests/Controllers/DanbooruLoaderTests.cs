@@ -1,54 +1,62 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using Imouto.BooruParser.Controllers;
+using Imouto.BooruParser.Tests.Controllers.Fixtures;
 using Xunit;
 
 namespace Imouto.BooruParser.Tests.Controllers
 {
-    public class DanbooruLoaderTests
+    public class DanbooruLoaderTests : IClassFixture<DanbooruLoaderFixture>
     {
+        private readonly DanbooruLoaderFixture _danbooruLoaderFixture;
+
+        public DanbooruLoaderTests(DanbooruLoaderFixture danbooruLoaderFixture)
+        {
+            _danbooruLoaderFixture = danbooruLoaderFixture;
+        }
+
         public class LoadPostAsyncMethod : DanbooruLoaderTests
         {
+            public LoadPostAsyncMethod(DanbooruLoaderFixture danbooruLoaderFixture) : base(danbooruLoaderFixture)
+            {
+            }
+
             [Fact]
             public async Task ShouldReturnPostWithoutCreditnails()
             {
-                IBooruAsyncLoader ibal = new DanbooruLoader(null, null, 5000);
+                var ibal = _danbooruLoaderFixture.GetLoaderWithoutAuth();
 
                 var post = await ibal.LoadPostAsync(1);
 
                 post.Should().NotBe(null);
             }
         }
-    }
 
-    public class SankakuLoaderTests
-    {
-        public class LoadPostAsyncMethod : SankakuLoaderTests
+        public class LoadFirstTagHistoryPageAsyncMethod : DanbooruLoaderTests
         {
-            [Fact]
-            public async Task ShouldReturnPostWithoutCreditnails()
+            public LoadFirstTagHistoryPageAsyncMethod(DanbooruLoaderFixture danbooruLoaderFixture) : base(danbooruLoaderFixture)
             {
-                IBooruAsyncLoader ibal = new SankakuLoader(null, null, 5000);
-
-                var post = await ibal.LoadPostAsync(5735331);
-
-                post.Should().NotBe(null);
             }
-        }
-    }
 
-    public class YandereLoaderTests
-    {
-        public class LoadPostAsyncMethod : YandereLoaderTests
-        {
             [Fact]
-            public async Task ShouldReturnPostWithoutCreditnails()
+            public async Task ShouldNotReturnWithoutCreditnails()
             {
-                IBooruAsyncLoader ibal = new YandereLoader();
+                var ibal = _danbooruLoaderFixture.GetLoaderWithoutAuth();
 
-                var post = await ibal.LoadPostAsync(408517);
+                var firstPage = await ibal.LoadFirstTagHistoryPageAsync();
 
-                post.Should().NotBe(null);
+                firstPage.Should().BeEmpty();
+            }
+
+
+            [Fact]
+            public async Task ShouldReturnWithCreditnails()
+            {
+                var ibal = _danbooruLoaderFixture.GetLoaderWithAuth();
+
+                var firstPage = await ibal.LoadFirstTagHistoryPageAsync();
+
+                firstPage.Should().NotBeEmpty();
             }
         }
     }

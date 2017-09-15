@@ -97,7 +97,6 @@ namespace Imouto.BooruParser.Controllers
                 Logger.Error(ex, $"Load page '{url}' threw exception");
                 throw;
             }
-
         }
 
         private string GetCookie(HttpResponseMessage httpResponse)
