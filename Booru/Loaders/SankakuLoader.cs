@@ -10,7 +10,7 @@ using Imouto.BooruParser.Model.Base;
 using Imouto.BooruParser.Model.Sankaku;
 using NLog;
 
-namespace Imouto.BooruParser.Controllers
+namespace Imouto.BooruParser.Loaders
 {
     public class SankakuLoader : IBooruAsyncLoader
     {

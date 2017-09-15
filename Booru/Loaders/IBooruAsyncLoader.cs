@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Imouto.BooruParser.Model.Base;
 
-namespace Imouto.BooruParser.Controllers
+namespace Imouto.BooruParser.Loaders
 {
     public interface IBooruAsyncLoader
     {

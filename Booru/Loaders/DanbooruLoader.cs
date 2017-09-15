@@ -10,7 +10,7 @@ using Imouto.BooruParser.Model.Danbooru;
 using Newtonsoft.Json;
 using NLog;
 
-namespace Imouto.BooruParser.Controllers
+namespace Imouto.BooruParser.Loaders
 {
     public class DanbooruLoader: IBooruLoader, IBooruAsyncLoader
     {

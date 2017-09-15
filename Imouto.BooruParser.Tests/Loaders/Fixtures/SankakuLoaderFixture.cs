@@ -1,6 +1,6 @@
-﻿using Imouto.BooruParser.Controllers;
+﻿using Imouto.BooruParser.Loaders;
 
-namespace Imouto.BooruParser.Tests.Controllers.Fixtures
+namespace Imouto.BooruParser.Tests.Loaders.Fixtures
 {
     public class SankakuLoaderFixture
     {

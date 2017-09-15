@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Imouto.BooruParser.Model.Base;
 
-namespace Imouto.BooruParser.Controllers
+namespace Imouto.BooruParser.Loaders
 {
     /// <summary>
     /// Interface provide booru parce logic.

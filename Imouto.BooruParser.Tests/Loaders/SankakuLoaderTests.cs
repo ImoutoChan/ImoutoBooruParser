@@ -2,10 +2,10 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Imouto.BooruParser.Tests.Controllers.Fixtures;
+using Imouto.BooruParser.Tests.Loaders.Fixtures;
 using Xunit;
 
-namespace Imouto.BooruParser.Tests.Controllers
+namespace Imouto.BooruParser.Tests.Loaders
 {
     public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
     {

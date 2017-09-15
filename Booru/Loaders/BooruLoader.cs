@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Imouto.BooruParser.Helpers;
 using NLog;
 
-namespace Imouto.BooruParser.Controllers
+namespace Imouto.BooruParser.Loaders
 {
     public class BooruLoader
     {
