@@ -1,6 +1,6 @@
+using System;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Imouto.BooruParser.Model.Base;
 using Imouto.BooruParser.Tests.Loaders.Fixtures;
 using Xunit;
 
@@ -67,6 +67,23 @@ namespace Imouto.BooruParser.Tests.Loaders
                 serachResult.Results.Should().NotBeEmpty();
                 serachResult.NotEmpty.Should().BeTrue();
                 serachResult.SearchCount.Should().BeGreaterThan(1);
+            }
+        }
+
+        public class LoadNotesHistoryAsyncMethod : YandereLoaderTests
+        {
+            public LoadNotesHistoryAsyncMethod(YandereLoaderFixture yandereLoaderFixture) 
+                : base(yandereLoaderFixture)
+            {
+            }
+
+            [Fact]
+            public async Task ShouldLoadNotesHistory()
+            {
+                var ibal = _yandereLoaderFixture.GetLoader();
+
+                var notesHistory = await ibal.LoadNotesHistoryAsync(DateTime.Now.AddHours(-1));
+                notesHistory.Should().NotBeEmpty();
             }
         }
     }

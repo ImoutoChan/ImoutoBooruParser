@@ -77,5 +77,21 @@ namespace Imouto.BooruParser.Tests.Loaders
                 serachResult.SearchCount.Should().BeGreaterThan(1);
             }
         }
+
+        public class LoadNotesHistoryAsyncMethod : SankakuLoaderTests
+        {
+            public LoadNotesHistoryAsyncMethod(SankakuLoaderFixture loaderFixture) : base(loaderFixture)
+            {
+            }
+
+            [Fact]
+            public async Task ShouldLoadNotesHistory()
+            {
+                var ibal = _loaderFixture.GetLoaderWithoutAuth();
+
+                var notesHistory = await ibal.LoadNotesHistoryAsync(DateTime.Now.AddHours(-1));
+                notesHistory.Should().NotBeEmpty();
+            }
+        }
     }
 }
