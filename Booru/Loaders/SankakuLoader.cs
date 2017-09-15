@@ -206,6 +206,7 @@ namespace Imouto.BooruParser.Loaders
 
             int? nextLoad = null;
             var failedCounter = 0;
+            var lastResultUpdateDateTime = DateTime.MaxValue;
             do
             {
                 try
@@ -214,6 +215,8 @@ namespace Imouto.BooruParser.Loaders
                     result.AddRange(historyPack);
 
                     nextLoad = result.Last().UpdateId;
+
+                    lastResultUpdateDateTime = result.Last().UpdateDateTime;
                 }
                 catch (Exception e)
                 {
@@ -221,11 +224,12 @@ namespace Imouto.BooruParser.Loaders
 
                     if (failedCounter > 5)
                     {
-                        throw new Exception("LoadFailed: " + e.Message, e);
+                        Logger.Error(e, $"Tag history loading failed after {failedCounter} tries");
+                        throw;
                     }
                 }
             }
-            while (result.Last().UpdateDateTime > toDate);
+            while (lastResultUpdateDateTime > toDate);
 
             return result;
         }
