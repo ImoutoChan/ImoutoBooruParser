@@ -6,9 +6,9 @@
     <Company>ImoutoChan</Company>
     <PackageId>Imouto.BooruParser</PackageId>
     <Product>Imouto.BooruParser</Product>
-    <Description>.net standart library for parsing data from booru sites (chan.sankakucomplex.com, danbooru.donmai.us, yande.re).
+    <Description>The .net standart library for parsing data from booru sites (chan.sankakucomplex.com, danbooru.donmai.us, yande.re).
 
-The library can receive information about individual posts, tags and notes history and can search on this sites by tags.</Description>
+The library can parse information about individual posts, tags and notes history and can perform a search on this sites.</Description>
     <Copyright>(c) ImoutoChan</Copyright>
     <PackageProjectUrl>https://github.com/ImoutoChan/ImoutoBooruParser</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/ImoutoChan/ImoutoBooruParser/blob/master/LICENSE</PackageLicenseUrl>
