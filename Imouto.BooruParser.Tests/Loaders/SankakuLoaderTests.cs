@@ -5,7 +5,7 @@ using FluentAssertions;
 using Imouto.BooruParser.Tests.Loaders.Fixtures;
 using Xunit;
 
-namespace Imouto.BooruParser.Tests.Loaders
+namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
 {
     public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
     {
