@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Imouto.BooruParser.Tests.Loaders.Fixtures;
@@ -93,6 +94,50 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
                 var ibal = _danbooruLoaderFixture.GetLoaderWithoutAuth();
 
                 var notesHistory = await ibal.LoadNotesHistoryAsync(DateTime.Now.AddHours(-1));
+                notesHistory.Should().NotBeEmpty();
+            }
+        }
+        public class LoadTagHistoryUpToAsyncMethod : DanbooruLoaderTests
+        {
+            public LoadTagHistoryUpToAsyncMethod(DanbooruLoaderFixture danbooruLoaderFixture) 
+                : base(danbooruLoaderFixture)
+            {
+            }
+
+            [Fact]
+            public async Task ShouldThrowWithoutAuth()
+            {
+                var ibal = _danbooruLoaderFixture.GetLoaderWithoutAuth();
+
+                Func<Task> action  =async () => await ibal.LoadTagHistoryUpToAsync(DateTime.Now.AddHours(-1));
+                action.ShouldThrow<Exception>();
+            }
+
+            [Fact]
+            public async Task ShouldLoadWithAuth()
+            {
+                var ibal = _danbooruLoaderFixture.GetLoaderWithAuth();
+
+                var notesHistory = await ibal.LoadTagHistoryUpToAsync(DateTime.Now.AddHours(-1));
+                notesHistory.Should().NotBeEmpty();
+            }
+        }
+
+        public class LoadTagHistoryFromAsynMethodc : DanbooruLoaderTests
+        {
+            public LoadTagHistoryFromAsynMethodc(DanbooruLoaderFixture danbooruLoaderFixture) 
+                : base(danbooruLoaderFixture)
+            {
+            }
+
+            [Fact]
+            public async Task ShouldLoadTagsHistoryFromId()
+            {
+                var ibal = _danbooruLoaderFixture.GetLoaderWithAuth();
+                var firstTagHistoryPage = await ibal.LoadFirstTagHistoryPageAsync();
+
+                var notesHistory = await ibal.LoadTagHistoryFromAsync(firstTagHistoryPage.Last().UpdateId);
+
                 notesHistory.Should().NotBeEmpty();
             }
         }

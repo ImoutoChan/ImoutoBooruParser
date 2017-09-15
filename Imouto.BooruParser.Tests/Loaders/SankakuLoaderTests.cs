@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -18,7 +19,8 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
 
         public class LoadPostAsyncMethod : SankakuLoaderTests
         {
-            public LoadPostAsyncMethod(SankakuLoaderFixture loaderFixture) : base(loaderFixture)
+            public LoadPostAsyncMethod(SankakuLoaderFixture loaderFixture) 
+                : base(loaderFixture)
             {
             }
 
@@ -35,12 +37,13 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
 
         public class LoadFirstTagHistoryPageAsyncMethod : SankakuLoaderTests
         {
-            public LoadFirstTagHistoryPageAsyncMethod(SankakuLoaderFixture loaderFixture) : base(loaderFixture)
+            public LoadFirstTagHistoryPageAsyncMethod(SankakuLoaderFixture loaderFixture) 
+                : base(loaderFixture)
             {
             }
 
             [Fact]
-            public async Task ShouldThrowWithoutCreditnails()
+            public void ShouldThrowWithoutCreditnails()
             {
                 var ibal = _loaderFixture.GetLoaderWithoutAuth();
 
@@ -62,7 +65,8 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
         
         public class LoadSearchResultAsyncMethod : SankakuLoaderTests
         {
-            public LoadSearchResultAsyncMethod(SankakuLoaderFixture loaderFixture) : base(loaderFixture)
+            public LoadSearchResultAsyncMethod(SankakuLoaderFixture loaderFixture) 
+                : base(loaderFixture)
             {
             }
 
@@ -80,7 +84,8 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
 
         public class LoadNotesHistoryAsyncMethod : SankakuLoaderTests
         {
-            public LoadNotesHistoryAsyncMethod(SankakuLoaderFixture loaderFixture) : base(loaderFixture)
+            public LoadNotesHistoryAsyncMethod(SankakuLoaderFixture loaderFixture) 
+                : base(loaderFixture)
             {
             }
 
@@ -90,6 +95,53 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
                 var ibal = _loaderFixture.GetLoaderWithoutAuth();
 
                 var notesHistory = await ibal.LoadNotesHistoryAsync(DateTime.Now.AddHours(-1));
+                notesHistory.Should().NotBeEmpty();
+            }
+        }
+
+        public class LoadTagHistoryUpToAsyncMethod : SankakuLoaderTests
+        {
+            public LoadTagHistoryUpToAsyncMethod(SankakuLoaderFixture loaderFixture) 
+                : base(loaderFixture)
+            {
+            }
+
+            [Fact]
+            public void ShouldNotLoadTagsHistoryToDateWithoutCreditnails()
+            {
+                var ibal = _loaderFixture.GetLoaderWithoutAuth();
+
+                Func<Task> action = async ()
+                    => await ibal.LoadTagHistoryUpToAsync(DateTime.Now.AddHours(-1));
+
+                action.ShouldThrow<HttpRequestException>();
+            }
+
+            [Fact]
+            public async Task ShouldLoadTagsHistoryToDateWithCreditnails()
+            {
+                var ibal = _loaderFixture.GetLoaderWithAuth();
+
+                var notesHistory = await ibal.LoadTagHistoryUpToAsync(DateTime.Now.AddHours(-1));
+                notesHistory.Should().NotBeEmpty();
+            }
+        }
+
+        public class LoadTagHistoryFromAsynMethodc : SankakuLoaderTests
+        {
+            public LoadTagHistoryFromAsynMethodc(SankakuLoaderFixture loaderFixture) 
+                : base(loaderFixture)
+            {
+            }
+
+            [Fact]
+            public async Task ShouldLoadTagsHistoryFromIdWithCreditnails()
+            {
+                var ibal = _loaderFixture.GetLoaderWithAuth();
+                var firstTagHistoryPage = await ibal.LoadFirstTagHistoryPageAsync();
+
+                var notesHistory = await ibal.LoadTagHistoryFromAsync(firstTagHistoryPage.Last().UpdateId);
+
                 notesHistory.Should().NotBeEmpty();
             }
         }

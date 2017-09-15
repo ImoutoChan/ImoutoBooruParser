@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Imouto.BooruParser.Tests.Loaders.Fixtures;
@@ -83,6 +84,42 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
                 var ibal = _yandereLoaderFixture.GetLoader();
 
                 var notesHistory = await ibal.LoadNotesHistoryAsync(DateTime.Now.AddHours(-1));
+                notesHistory.Should().NotBeEmpty();
+            }
+        }
+
+        public class LoadTagHistoryUpToAsyncMethod : YandereLoaderTests
+        {
+            public LoadTagHistoryUpToAsyncMethod(YandereLoaderFixture yandereLoaderFixture)
+                : base(yandereLoaderFixture)
+            {
+            }
+
+            [Fact]
+            public async Task ShouldLoadTagsHistoryToDate()
+            {
+                var ibal = _yandereLoaderFixture.GetLoader();
+
+                var notesHistory = await ibal.LoadTagHistoryUpToAsync(DateTime.Now.AddHours(-1));
+                notesHistory.Should().NotBeEmpty();
+            }
+        }
+
+        public class LoadTagHistoryFromAsynMethodc : YandereLoaderTests
+        {
+            public LoadTagHistoryFromAsynMethodc(YandereLoaderFixture yandereLoaderFixture)
+                : base(yandereLoaderFixture)
+            {
+            }
+
+            [Fact]
+            public async Task ShouldLoadTagsHistoryFromId()
+            {
+                var ibal = _yandereLoaderFixture.GetLoader();
+                var firstTagHistoryPage = await ibal.LoadFirstTagHistoryPageAsync();
+
+                var notesHistory = await ibal.LoadTagHistoryFromAsync(firstTagHistoryPage.Last().UpdateId);
+
                 notesHistory.Should().NotBeEmpty();
             }
         }
