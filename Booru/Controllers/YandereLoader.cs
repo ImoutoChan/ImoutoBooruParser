@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Imouto.BooruParser.Model.Base;
@@ -14,8 +12,10 @@ using NLog;
 
 namespace Imouto.BooruParser.Controllers
 {
-    public class YandereLoader : AbstractBooruLoader, IBooruAsyncLoader
+    public class YandereLoader : IBooruAsyncLoader
     {
+        private readonly BooruLoader _booruLoader;
+
         #region Consts
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
@@ -32,15 +32,16 @@ namespace Imouto.BooruParser.Controllers
 
         #endregion Consts
 
-        public YandereLoader(HttpClient httpClient, int loadDelay) : base(httpClient, loadDelay)
+        public YandereLoader(HttpClient httpClient = null, BooruLoader booruLoader = null)
         {
+            _booruLoader = booruLoader ?? new BooruLoader(httpClient, 0);
         }
 
         #region Methods
 
         private async Task<SearchResult> LoadSearchResultAsync(string tagsString, int? limit)
         {
-            var pageHtml = await LoadPageAsync(SEARCH_JSON + WebUtility.UrlEncode(tagsString) + (limit.HasValue
+            var pageHtml = await _booruLoader.LoadPageAsync(SEARCH_JSON + WebUtility.UrlEncode(tagsString) + (limit.HasValue
                                                                                        ? $"&limit={limit.Value}"
                                                                                        : string.Empty));
 
@@ -56,7 +57,7 @@ namespace Imouto.BooruParser.Controllers
             var url = (page == null)
                       ? POSTHISTORY_URL
                       : POSTHISTORY_PAGE_URL + (page.Value);
-            var pageHtml = await LoadPageAsync(url);
+            var pageHtml = await _booruLoader.LoadPageAsync(url);
 
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(pageHtml);
@@ -72,8 +73,8 @@ namespace Imouto.BooruParser.Controllers
 
         public async Task<Post> LoadPostAsync(int postId)
         {
-            var postHtml = await LoadPageAsync(POST_URL + postId);
-            var postJson = JsonConvert.DeserializeObject<List<Model.Yandere.Json.Post>>(await LoadPageAsync(POST_JSON + postId)).FirstOrDefault();
+            var postHtml = await _booruLoader.LoadPageAsync(POST_URL + postId);
+            var postJson = JsonConvert.DeserializeObject<List<Model.Yandere.Json.Post>>(await _booruLoader.LoadPageAsync(POST_JSON + postId)).FirstOrDefault();
 
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(postHtml);
@@ -90,7 +91,7 @@ namespace Imouto.BooruParser.Controllers
         private async Task<List<NoteUpdateEntry>> LoadNoteHistoryPageAsync(int page = 1)
         {
             var url = NOTEHISTORY_PAGE_URL + page;
-            var pageHtml = await LoadPageAsync(url);
+            var pageHtml = await _booruLoader.LoadPageAsync(url);
 
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(pageHtml);
@@ -138,16 +139,16 @@ namespace Imouto.BooruParser.Controllers
         {
             var result = new List<PostUpdateEntry>();
 
-            var nextLoadPageAsync = 1;
+            var nextLoadPage = 1;
             var failedCounter = 0;
             do
             {
                 try
                 {
-                    var historyPack = await LoadTagHistoryPageAsync(nextLoadPageAsync);
+                    var historyPack = await LoadTagHistoryPageAsync(nextLoadPage);
                     result.AddRange(historyPack);
 
-                    nextLoadPageAsync++;
+                    nextLoadPage++;
                 }
                 catch (Exception e)
                 {
@@ -208,10 +209,5 @@ namespace Imouto.BooruParser.Controllers
         }
 
         #endregion IBooruLoader members
-
-
-        protected override string RootUrl => "yande.re";
-
-        protected override string AddAuth(string url) => url;
     }
 }

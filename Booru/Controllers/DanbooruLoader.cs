@@ -8,11 +8,14 @@ using HtmlAgilityPack;
 using Imouto.BooruParser.Model.Base;
 using Imouto.BooruParser.Model.Danbooru;
 using Newtonsoft.Json;
+using NLog;
 
 namespace Imouto.BooruParser.Controllers
 {
-    public class DanbooruLoader : AbstractBooruLoader, IBooruLoader, IBooruAsyncLoader
+    public class DanbooruLoader: IBooruLoader, IBooruAsyncLoader
     {
+        protected static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         #region Consts
 
         private const string HOST = "danbooru.donmai.us";
@@ -33,22 +36,22 @@ namespace Imouto.BooruParser.Controllers
         
         private readonly string _login;
         private readonly string _apiKey;
+        private readonly BooruLoader _booruLoader;
 
         #region Constructors
 
-        public DanbooruLoader(string login, string apiKey, int loadDelay, HttpClient httpClient = null) : base(httpClient, loadDelay)
+        public DanbooruLoader(string login, string apiKey, int loadDelay, HttpClient httpClient = null, BooruLoader booruLoader = null)
         {
             _login = login;
             _apiKey = apiKey;
+            _booruLoader = booruLoader ?? new BooruLoader(httpClient, loadDelay, customUrlTramsform: AddAuth);
         }
 
         #endregion Constructors
-
-        protected override string RootUrl => ROOT_URL;
-
+        
         #region Methods
 
-        protected override string AddAuth(string url)
+        private string AddAuth(string url)
         {
             if (!url.Contains("?"))
             {
@@ -60,7 +63,7 @@ namespace Imouto.BooruParser.Controllers
         
         private async Task<SearchResult> LoadSearchResultAsync(string tagsString, int? limit)
         {
-            var pageHtml = await LoadPageAsync(SEARCH_JSON 
+            var pageHtml = await _booruLoader.LoadPageAsync(SEARCH_JSON 
                 + WebUtility.UrlEncode(tagsString) 
                 + (limit.HasValue? $"&limit={limit.Value}" : string.Empty));
 
@@ -76,7 +79,7 @@ namespace Imouto.BooruParser.Controllers
             var url = (page == null)
                       ? POSTHISTORY_URL
                       : POSTHISTORY_PAGE_URL + (page.Value);
-            var pageHtml = await LoadPageAsync(url);
+            var pageHtml = await _booruLoader.LoadPageAsync(url);
 
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(pageHtml);
@@ -89,7 +92,7 @@ namespace Imouto.BooruParser.Controllers
         private async Task<List<PostUpdateEntry>> LoadTagHistoryAfterAsync(int id)
         {
             var url = POSTHISTORY_AFTER_URL + id;
-            var pageHtml = await LoadPageAsync(url);
+            var pageHtml = await _booruLoader.LoadPageAsync(url);
 
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(pageHtml);
@@ -102,7 +105,7 @@ namespace Imouto.BooruParser.Controllers
         private async Task<List<NoteUpdateEntry>> LoadNoteHistoryPageAsync(string page)
         {
             var url = NOTEHISTORY_PAGE_JSON_URL + page;
-            var pageHtml = await LoadPageAsync(url).ConfigureAwait(false);
+            var pageHtml = await _booruLoader.LoadPageAsync(url).ConfigureAwait(false);
 
             var updates = JsonConvert.DeserializeObject<List<Model.Danbooru.Json.Version>>(pageHtml);
 
@@ -118,8 +121,9 @@ namespace Imouto.BooruParser.Controllers
 
         public async Task<Post> LoadPostAsync(int postId)
         {
-            var postHtml = await LoadPageAsync(POST_URL + postId).ConfigureAwait(false);
-            var postJson = JsonConvert.DeserializeObject<Model.Danbooru.Json.Post>(await LoadPageAsync(string.Format(POST_JSON, postId)).ConfigureAwait(false));
+            var postHtml = await _booruLoader.LoadPageAsync(POST_URL + postId).ConfigureAwait(false);
+            var postJsonString = await _booruLoader.LoadPageAsync(string.Format(POST_JSON, postId)).ConfigureAwait(false);
+            var postJson = JsonConvert.DeserializeObject<Model.Danbooru.Json.Post>(postJsonString);
 
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(postHtml);

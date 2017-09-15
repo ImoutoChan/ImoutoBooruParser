@@ -5,13 +5,14 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
+using Imouto.BooruParser.Helpers;
 using Imouto.BooruParser.Model.Base;
 using Imouto.BooruParser.Model.Sankaku;
 using NLog;
 
 namespace Imouto.BooruParser.Controllers
 {
-    public class SankakuLoader : AbstractBooruLoader, IBooruAsyncLoader
+    public class SankakuLoader : IBooruAsyncLoader
     {
         #region Consts
 
@@ -30,31 +31,48 @@ namespace Imouto.BooruParser.Controllers
         
         private readonly string _login;
         private readonly string _passwordhash;
-        
+        private readonly BooruLoader _booruLoader;
+
         #region Constructors
 
-        public SankakuLoader(string login, string passHash, int loadDelay, HttpClient httpClient = null) 
-            : base(httpClient, loadDelay)
+        public SankakuLoader(string login, string passHash, int loadDelay, HttpClient httpClient = null, BooruLoader booruLoader = null) 
         {
             _login = login;
             _passwordhash = passHash;
-            LoginCookie = $"login={_login};pass_hash={_passwordhash}";
+            _booruLoader = booruLoader 
+                ?? new BooruLoader(httpClient, 
+                                    loadDelay, 
+                                    loginCookie: $"login={_login};pass_hash={_passwordhash};", 
+                                    customMessageBuilder: BuildRequestMessage);
         }
 
         #endregion Constructors
-        
-        protected override string RootUrl => SANKAKU_ROOT_URL;
-
-        protected override string AddAuth(string url) => url;
 
         #region Methods
 
+        private HttpRequestMessage BuildRequestMessage(string url)
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
+
+            requestMessage.Version = Version.Parse("1.1");
+            requestMessage.Headers.Set("Connection: keep-alive");
+            requestMessage.Headers.Set("Cache-Control: max-age=0");
+            requestMessage.Headers.Set("Upgrade-Insecure-Requests: 1");
+            requestMessage.Headers.Set("User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36");
+            requestMessage.Headers.Set("Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+            requestMessage.Headers.Set("DNT: 1");
+            requestMessage.Headers.Set($"Referer: {SANKAKU_HOST}");
+            requestMessage.Headers.Set("Accept-Encoding: gzip, deflate");
+            requestMessage.Headers.Set("Accept-Language: en-US,en;q=0.8,ru;q=0.6");
+
+            return requestMessage;
+        }
         private async Task<List<PostUpdateEntry>> LoadTagHistoryPageAsync(int? beforeId = null)
         {
             var url = (beforeId == null)
                       ? SANKAKU_POSTHISTORY_URL
                       : SANKAKU_POSTHISTORY_BEFORE_URL + (beforeId.Value);
-            var pageHtml = await LoadPageAsync(url);
+            var pageHtml = await _booruLoader.LoadPageAsync(url);
 
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(pageHtml);
@@ -70,7 +88,7 @@ namespace Imouto.BooruParser.Controllers
 
         public async Task<Post> LoadPostAsync(int postId)
         {
-            var pageHtml = await LoadPageAsync(SANKAKU_POST_URL + postId);
+            var pageHtml = await _booruLoader.LoadPageAsync(SANKAKU_POST_URL + postId);
 
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(pageHtml);
@@ -81,7 +99,7 @@ namespace Imouto.BooruParser.Controllers
 
         public async Task<SearchResult> LoadSearchResultAsync(string tagsString)
         {
-            var pageHtml = await LoadPageAsync(SANKAKU_SEARCH_URL + WebUtility.UrlEncode(tagsString));
+            var pageHtml = await _booruLoader.LoadPageAsync(SANKAKU_SEARCH_URL + WebUtility.UrlEncode(tagsString));
 
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(pageHtml);
@@ -138,7 +156,7 @@ namespace Imouto.BooruParser.Controllers
         private async Task<List<NoteUpdateEntry>> LoadNoteHistoryPageAsync(int page = 1)
         {
             var url = SANKAKU_NOTEHISTORY_PAGE_URL + page;
-            var pageHtml = await LoadPageAsync(url);
+            var pageHtml = await _booruLoader.LoadPageAsync(url);
 
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(pageHtml);
