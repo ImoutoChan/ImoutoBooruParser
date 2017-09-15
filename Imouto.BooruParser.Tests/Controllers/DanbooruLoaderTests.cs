@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using FluentAssertions;
-using Imouto.BooruParser.Controllers;
 using Imouto.BooruParser.Tests.Controllers.Fixtures;
 using Xunit;
 
