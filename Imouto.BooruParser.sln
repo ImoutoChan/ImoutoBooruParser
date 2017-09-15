@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.15
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imouto.BooruParser", "Booru\Imouto.BooruParser.csproj", "{B2E24C20-E5DE-40B2-A25F-247272782E84}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imouto.BooruParser", "Imouto.BooruParser\Imouto.BooruParser.csproj", "{B2E24C20-E5DE-40B2-A25F-247272782E84}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imouto.BooruParser.Tests", "Imouto.BooruParser.Tests\Imouto.BooruParser.Tests.csproj", "{B9CC9691-5E9A-477B-AE2C-2AFDCEE498E2}"
 EndProject

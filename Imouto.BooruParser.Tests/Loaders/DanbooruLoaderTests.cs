@@ -105,11 +105,11 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
             }
 
             [Fact]
-            public async Task ShouldThrowWithoutAuth()
+            public void ShouldThrowWithoutAuth()
             {
                 var ibal = _danbooruLoaderFixture.GetLoaderWithoutAuth();
 
-                Func<Task> action  =async () => await ibal.LoadTagHistoryUpToAsync(DateTime.Now.AddHours(-1));
+                Func<Task> action = async () => await ibal.LoadTagHistoryUpToAsync(DateTime.Now.AddHours(-1));
                 action.ShouldThrow<Exception>();
             }
 
