@@ -188,14 +188,23 @@ namespace Imouto.BooruParser.Loaders
 
             var nextLoadPage = 1;
             var failedCounter = 0;
+            var lastResultUpdateDateTime = DateTime.MaxValue;
             do
             {
                 try
                 {
                     var historyPack = await LoadTagHistoryPageAsync(nextLoadPage).ConfigureAwait(false);
+
+                    if (!historyPack.Any())
+                    {
+                        throw new Exception("Empty results were received");
+                    }
+
                     result.AddRange(historyPack);
 
                     nextLoadPage++;
+
+                    lastResultUpdateDateTime = result.Last().UpdateDateTime;
                 }
                 catch (Exception e)
                 {
@@ -203,11 +212,12 @@ namespace Imouto.BooruParser.Loaders
 
                     if (failedCounter > 5)
                     {
-                        throw new Exception("LoadFailed: " + e.Message, e);
+                        Logger.Error(e, $"Tag history loading failed after {failedCounter} tries.");
+                        throw;
                     }
                 }
             }
-            while (result.Last().UpdateDateTime > toDate);
+            while (lastResultUpdateDateTime > toDate);
 
             return result;
         }

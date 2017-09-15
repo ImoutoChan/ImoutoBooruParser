@@ -224,7 +224,7 @@ namespace Imouto.BooruParser.Loaders
 
                     if (failedCounter > 5)
                     {
-                        Logger.Error(e, $"Tag history loading failed after {failedCounter} tries");
+                        Logger.Error(e, $"Tag history loading failed after {failedCounter} tries.");
                         throw;
                     }
                 }
