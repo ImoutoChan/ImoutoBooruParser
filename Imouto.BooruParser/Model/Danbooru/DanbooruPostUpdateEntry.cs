@@ -28,7 +28,7 @@ namespace Imouto.BooruParser.Model.Danbooru
 
                 var data = node.SelectNodes("td");
 
-                var postid = int.Parse(data[0].ChildNodes[0].InnerHtml.Split('.').First());
+                var postid = int.Parse(data[0].SelectNodes("a").First().InnerHtml.Split('.').First());
                 var date = DateTime.Parse(data[1].ChildNodes[0].Attributes["datetime"].Value);
                 var user = WebUtility.HtmlDecode(data[2].SelectSingleNode("a").InnerHtml);
 
