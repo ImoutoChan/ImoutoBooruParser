@@ -64,7 +64,7 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
             {
                 var ibal = _yandereLoaderFixture.GetLoader();
 
-                var serachResult = await ibal.LoadSearchResultAsync("1girl");
+                var serachResult = await ibal.LoadSearchResultAsync("no_bra");
                 serachResult.Results.Should().NotBeEmpty();
                 serachResult.NotEmpty.Should().BeTrue();
                 serachResult.SearchCount.Should().BeGreaterThan(1);

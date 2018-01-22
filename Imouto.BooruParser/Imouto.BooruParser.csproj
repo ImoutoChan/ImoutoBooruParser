@@ -15,12 +15,13 @@ The library can parse information about individual posts, tags and notes history
     <RepositoryUrl>https://github.com/ImoutoChan/ImoutoBooruParser</RepositoryUrl>
     <PackageTags>booru search parser danbooru sankakuchannel yande.re</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HtmlAgilityPack" Version="1.5.5" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.6.15" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="NLog" Version="5.0.0-beta10" />
+    <PackageReference Include="NLog" Version="4.5.0-rc04" />
   </ItemGroup>
 
 </Project>

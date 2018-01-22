@@ -127,9 +127,9 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
             }
         }
 
-        public class LoadTagHistoryFromAsynMethodc : SankakuLoaderTests
+        public class LoadTagHistoryFromAsyncMethod : SankakuLoaderTests
         {
-            public LoadTagHistoryFromAsynMethodc(SankakuLoaderFixture loaderFixture) 
+            public LoadTagHistoryFromAsyncMethod(SankakuLoaderFixture loaderFixture) 
                 : base(loaderFixture)
             {
             }
