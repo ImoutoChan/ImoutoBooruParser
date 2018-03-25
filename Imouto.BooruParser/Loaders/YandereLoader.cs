@@ -25,6 +25,7 @@ namespace Imouto.BooruParser.Loaders
         private const string POST_URL = ROOT_URL + "/post/show/";
         private const string POST_JSON = ROOT_URL + "/post.json?tags=id:";
         private const string SEARCH_JSON = ROOT_URL + "/post.json?tags=";
+        private const string POPULAR_JSON = ROOT_URL + "/post/popular_recent.json?period=";
         private const string POSTHISTORY_URL = ROOT_URL + "/history";
         private const string POSTHISTORY_PAGE_URL = POSTHISTORY_URL + "?page=";
         private const string NOTEHISTORY_URL = ROOT_URL + "/note/history";
@@ -208,6 +209,34 @@ namespace Imouto.BooruParser.Loaders
             return LoadTagHistoryPageAsync();
         }
 
+        public async Task<SearchResult> LoadPopularAsync(PopularType type)
+        {
+            var param = GetPopularTypeParam(type);
+
+            var pageHtml = await _booruLoader.LoadPageAsync(POPULAR_JSON + param);
+
+            var results = JsonConvert.DeserializeObject<List<Model.Yandere.Json.Post>>(pageHtml);
+
+            var searchResult = new YandereSearchResult(results);
+
+            return searchResult;
+        }
+
         #endregion IBooruLoader members
+
+        private string GetPopularTypeParam(PopularType type)
+        {
+            switch (type)
+            {
+                case PopularType.Day:
+                    return "1d";
+                case PopularType.Week:
+                    return "1w";
+                case PopularType.Month:
+                    return "1m";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
     }
 }

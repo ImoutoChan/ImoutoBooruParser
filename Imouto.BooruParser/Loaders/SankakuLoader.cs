@@ -153,6 +153,11 @@ namespace Imouto.BooruParser.Loaders
             return LoadTagHistoryPageAsync();
         }
 
+        public Task<SearchResult> LoadPopularAsync(PopularType type)
+        {
+            throw new NotImplementedException();
+        }
+
         private async Task<List<NoteUpdateEntry>> LoadNoteHistoryPageAsync(int page = 1)
         {
             var url = SANKAKU_NOTEHISTORY_PAGE_URL + page;

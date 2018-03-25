@@ -278,6 +278,11 @@ namespace Imouto.BooruParser.Loaders
             return await LoadTagHistoryPageAsync().ConfigureAwait(false);
         }
 
+        public Task<SearchResult> LoadPopularAsync(PopularType type)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion IBooruLoader members
     }
 }

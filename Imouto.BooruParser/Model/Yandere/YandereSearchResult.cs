@@ -23,7 +23,12 @@ namespace Imouto.BooruParser.Model.Yandere
         {
             foreach (var jsonPost in jsonPosts)
             {
-                Results.Add(new PreviewEntry { Id = jsonPost.id, Md5 = jsonPost.md5, Title = jsonPost.tags });
+                Results.Add(new PreviewEntry
+                {
+                    Id = jsonPost.id,
+                    Md5 = jsonPost.md5,
+                    Title = jsonPost.tags
+                });
             }
         }
     }
