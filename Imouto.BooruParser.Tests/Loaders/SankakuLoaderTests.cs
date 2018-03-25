@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Imouto.BooruParser.Loaders;
 using Imouto.BooruParser.Tests.Loaders.Fixtures;
 using Xunit;
 
@@ -143,6 +144,50 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
                 var notesHistory = await ibal.LoadTagHistoryFromAsync(firstTagHistoryPage.Last().UpdateId);
 
                 notesHistory.Should().NotBeEmpty();
+            }
+        }
+
+        public class LoadPopularAsyncMethod : SankakuLoaderTests
+        {
+            public LoadPopularAsyncMethod(SankakuLoaderFixture sankakuLoaderFixture)
+                : base(sankakuLoaderFixture)
+            {
+            }
+
+            [Fact]
+            public async Task ShouldLoadPopularForDay()
+            {
+                var loader = _loaderFixture.GetLoaderWithoutAuth();
+
+                var serachResult = await loader.LoadPopularAsync(PopularType.Day);
+
+                serachResult.Results.Should().NotBeEmpty();
+                serachResult.NotEmpty.Should().BeTrue();
+                serachResult.SearchCount.Should().BeGreaterThan(1);
+            }
+
+            [Fact]
+            public async Task ShouldLoadPopularForWeek()
+            {
+                var loader = _loaderFixture.GetLoaderWithoutAuth();
+
+                var serachResult = await loader.LoadPopularAsync(PopularType.Week);
+
+                serachResult.Results.Should().NotBeEmpty();
+                serachResult.NotEmpty.Should().BeTrue();
+                serachResult.SearchCount.Should().BeGreaterThan(1);
+            }
+
+            [Fact]
+            public async Task ShouldLoadPopularForMonth()
+            {
+                var loader = _loaderFixture.GetLoaderWithoutAuth();
+
+                var serachResult = await loader.LoadPopularAsync(PopularType.Month);
+
+                serachResult.Results.Should().NotBeEmpty();
+                serachResult.NotEmpty.Should().BeTrue();
+                serachResult.SearchCount.Should().BeGreaterThan(1);
             }
         }
     }

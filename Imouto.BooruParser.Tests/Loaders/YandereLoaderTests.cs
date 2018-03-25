@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Imouto.BooruParser.Loaders;
 using Imouto.BooruParser.Tests.Loaders.Fixtures;
 using Xunit;
 
@@ -105,9 +106,9 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
             }
         }
 
-        public class LoadTagHistoryFromAsynMethodc : YandereLoaderTests
+        public class LoadTagHistoryFromAsyncMethod : YandereLoaderTests
         {
-            public LoadTagHistoryFromAsynMethodc(YandereLoaderFixture yandereLoaderFixture)
+            public LoadTagHistoryFromAsyncMethod(YandereLoaderFixture yandereLoaderFixture)
                 : base(yandereLoaderFixture)
             {
             }
@@ -121,6 +122,48 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
                 var notesHistory = await ibal.LoadTagHistoryFromAsync(firstTagHistoryPage.Last().UpdateId);
 
                 notesHistory.Should().NotBeEmpty();
+            }
+        }
+
+
+        public class LoadPopularAsyncMethod : YandereLoaderTests
+        {
+            public LoadPopularAsyncMethod(YandereLoaderFixture yandereLoaderFixture)
+                : base(yandereLoaderFixture)
+            {
+            }
+
+            [Fact]
+            public async Task ShouldLoadPopularForDay()
+            {
+                var ibal = _yandereLoaderFixture.GetLoader();
+
+                var serachResult = await ibal.LoadPopularAsync(PopularType.Day);
+                serachResult.Results.Should().NotBeEmpty();
+                serachResult.NotEmpty.Should().BeTrue();
+                serachResult.SearchCount.Should().BeGreaterThan(1);
+            }
+
+            [Fact]
+            public async Task ShouldLoadPopularForWeek()
+            {
+                var ibal = _yandereLoaderFixture.GetLoader();
+
+                var serachResult = await ibal.LoadPopularAsync(PopularType.Week);
+                serachResult.Results.Should().NotBeEmpty();
+                serachResult.NotEmpty.Should().BeTrue();
+                serachResult.SearchCount.Should().BeGreaterThan(1);
+            }
+
+            [Fact]
+            public async Task ShouldLoadPopularForMonth()
+            {
+                var ibal = _yandereLoaderFixture.GetLoader();
+
+                var serachResult = await ibal.LoadPopularAsync(PopularType.Month);
+                serachResult.Results.Should().NotBeEmpty();
+                serachResult.NotEmpty.Should().BeTrue();
+                serachResult.SearchCount.Should().BeGreaterThan(1);
             }
         }
     }

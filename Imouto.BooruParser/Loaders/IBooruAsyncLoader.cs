@@ -18,5 +18,7 @@ namespace Imouto.BooruParser.Loaders
         Task<List<PostUpdateEntry>> LoadTagHistoryFromAsync(int fromId);
 
         Task<List<PostUpdateEntry>> LoadFirstTagHistoryPageAsync();
+
+        Task<SearchResult> LoadPopularAsync(PopularType type);
     }
 }
