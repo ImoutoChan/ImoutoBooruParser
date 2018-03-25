@@ -81,6 +81,17 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
                 serachResult.NotEmpty.Should().BeTrue();
                 serachResult.SearchCount.Should().BeGreaterThan(1);
             }
+
+            [Fact]
+            public async Task ShouldFindWithMultipleTags()
+            {
+                var ibal = _loaderFixture.GetLoaderWithoutAuth();
+
+                var serachResult = await ibal.LoadSearchResultAsync("1girl long_hair");
+                serachResult.Results.Should().NotBeEmpty();
+                serachResult.NotEmpty.Should().BeTrue();
+                serachResult.SearchCount.Should().BeGreaterThan(1);
+            }
         }
 
         public class LoadNotesHistoryAsyncMethod : SankakuLoaderTests
@@ -163,7 +174,6 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
 
                 serachResult.Results.Should().NotBeEmpty();
                 serachResult.NotEmpty.Should().BeTrue();
-                serachResult.SearchCount.Should().BeGreaterThan(1);
             }
 
             [Fact]
@@ -175,7 +185,6 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
 
                 serachResult.Results.Should().NotBeEmpty();
                 serachResult.NotEmpty.Should().BeTrue();
-                serachResult.SearchCount.Should().BeGreaterThan(1);
             }
 
             [Fact]
@@ -187,7 +196,6 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
 
                 serachResult.Results.Should().NotBeEmpty();
                 serachResult.NotEmpty.Should().BeTrue();
-                serachResult.SearchCount.Should().BeGreaterThan(1);
             }
         }
     }

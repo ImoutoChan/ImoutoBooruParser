@@ -38,38 +38,6 @@ namespace Imouto.BooruParser.Loaders
             _booruLoader = booruLoader ?? new BooruLoader(httpClient, 0);
         }
 
-        #region Methods
-
-        private async Task<SearchResult> LoadSearchResultAsync(string tagsString, int? limit)
-        {
-            var pageHtml = await _booruLoader.LoadPageAsync(SEARCH_JSON + WebUtility.UrlEncode(tagsString) + (limit.HasValue
-                                                                                       ? $"&limit={limit.Value}"
-                                                                                       : string.Empty));
-
-            var results = JsonConvert.DeserializeObject<List<Model.Yandere.Json.Post>>(pageHtml);
-
-            var searchResult = new YandereSearchResult(results);
-
-            return searchResult;
-        }
-
-        private async Task<List<PostUpdateEntry>> LoadTagHistoryPageAsync(int? page = null)
-        {
-            var url = (page == null)
-                      ? POSTHISTORY_URL
-                      : POSTHISTORY_PAGE_URL + (page.Value);
-            var pageHtml = await _booruLoader.LoadPageAsync(url);
-
-            var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(pageHtml);
-
-            var updates = YanderePostUpdateEntry.Parse(htmlDoc);
-
-            return updates;
-        }
-
-        #endregion Methods
-
         #region IBooruLoader members
 
         public async Task<Post> LoadPostAsync(int postId)
@@ -237,6 +205,34 @@ namespace Imouto.BooruParser.Loaders
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
+        }
+
+        private async Task<SearchResult> LoadSearchResultAsync(string tagsString, int? limit)
+        {
+            var pageHtml = await _booruLoader.LoadPageAsync(SEARCH_JSON + WebUtility.UrlEncode(tagsString) + (limit.HasValue
+                                                                ? $"&limit={limit.Value}"
+                                                                : string.Empty));
+
+            var results = JsonConvert.DeserializeObject<List<Model.Yandere.Json.Post>>(pageHtml);
+
+            var searchResult = new YandereSearchResult(results);
+
+            return searchResult;
+        }
+
+        private async Task<List<PostUpdateEntry>> LoadTagHistoryPageAsync(int? page = null)
+        {
+            var url = (page == null)
+                ? POSTHISTORY_URL
+                : POSTHISTORY_PAGE_URL + (page.Value);
+            var pageHtml = await _booruLoader.LoadPageAsync(url);
+
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(pageHtml);
+
+            var updates = YanderePostUpdateEntry.Parse(htmlDoc);
+
+            return updates;
         }
     }
 }

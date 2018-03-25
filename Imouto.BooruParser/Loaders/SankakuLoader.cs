@@ -35,7 +35,11 @@ namespace Imouto.BooruParser.Loaders
 
         #region Constructors
 
-        public SankakuLoader(string login, string passHash, int loadDelay, HttpClient httpClient = null, BooruLoader booruLoader = null) 
+        public SankakuLoader(string login,
+                             string passHash,
+                             int loadDelay,
+                             HttpClient httpClient = null,
+                             BooruLoader booruLoader = null)
         {
             _login = login;
             _passwordhash = passHash;
@@ -47,43 +51,7 @@ namespace Imouto.BooruParser.Loaders
         }
 
         #endregion Constructors
-
-        #region Methods
-
-        private HttpRequestMessage BuildRequestMessage(string url)
-        {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
-
-            requestMessage.Version = Version.Parse("1.1");
-            requestMessage.Headers.Set("Connection: keep-alive");
-            requestMessage.Headers.Set("Cache-Control: max-age=0");
-            requestMessage.Headers.Set("Upgrade-Insecure-Requests: 1");
-            requestMessage.Headers.Set("User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36");
-            requestMessage.Headers.Set("Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
-            requestMessage.Headers.Set("DNT: 1");
-            requestMessage.Headers.Set($"Referer: {SANKAKU_HOST}");
-            requestMessage.Headers.Set("Accept-Encoding: gzip, deflate");
-            requestMessage.Headers.Set("Accept-Language: en-US,en;q=0.8,ru;q=0.6");
-
-            return requestMessage;
-        }
-        private async Task<List<PostUpdateEntry>> LoadTagHistoryPageAsync(int? beforeId = null)
-        {
-            var url = (beforeId == null)
-                      ? SANKAKU_POSTHISTORY_URL
-                      : SANKAKU_POSTHISTORY_BEFORE_URL + (beforeId.Value);
-            var pageHtml = await _booruLoader.LoadPageAsync(url);
-
-            var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(pageHtml);
-
-            var updates = SankakuPostUpdateEntry.Parse(htmlDoc);
-
-            return updates;
-        }
-
-        #endregion Methods
-
+        
         #region IBooruLoader members
 
         public async Task<Post> LoadPostAsync(int postId)
@@ -105,7 +73,7 @@ namespace Imouto.BooruParser.Loaders
             htmlDoc.LoadHtml(pageHtml);
 
             var searchResult = new SankakuSearchResult(htmlDoc.DocumentNode);
-
+            
             return searchResult;
         }
 
@@ -155,7 +123,9 @@ namespace Imouto.BooruParser.Loaders
 
         public Task<SearchResult> LoadPopularAsync(PopularType type)
         {
-            throw new NotImplementedException();
+            var popularTagString = GetPopularTagString(type);
+
+            return LoadSearchResultAsync(popularTagString);
         }
 
         private async Task<List<NoteUpdateEntry>> LoadNoteHistoryPageAsync(int page = 1)
@@ -240,5 +210,62 @@ namespace Imouto.BooruParser.Loaders
         }
 
         #endregion IBooruLoader members
+
+        private HttpRequestMessage BuildRequestMessage(string url)
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
+
+            requestMessage.Version = Version.Parse("1.1");
+            requestMessage.Headers.Set("Connection: keep-alive");
+            requestMessage.Headers.Set("Cache-Control: max-age=0");
+            requestMessage.Headers.Set("Upgrade-Insecure-Requests: 1");
+            requestMessage.Headers.Set("User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36");
+            requestMessage.Headers.Set("Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8");
+            requestMessage.Headers.Set("DNT: 1");
+            requestMessage.Headers.Set($"Referer: {SANKAKU_HOST}");
+            requestMessage.Headers.Set("Accept-Encoding: gzip, deflate");
+            requestMessage.Headers.Set("Accept-Language: en-US,en;q=0.8,ru;q=0.6");
+
+            return requestMessage;
+        }
+
+        private async Task<List<PostUpdateEntry>> LoadTagHistoryPageAsync(int? beforeId = null)
+        {
+            var url = (beforeId == null)
+                ? SANKAKU_POSTHISTORY_URL
+                : SANKAKU_POSTHISTORY_BEFORE_URL + (beforeId.Value);
+            var pageHtml = await _booruLoader.LoadPageAsync(url);
+
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(pageHtml);
+
+            var updates = SankakuPostUpdateEntry.Parse(htmlDoc);
+
+            return updates;
+        }
+
+        private string GetPopularTagString(PopularType type)
+        {
+            var end = DateTime.Now.Date;
+            DateTime start;
+            switch (type)
+            {
+                case PopularType.Day:
+                    start = end.AddDays(-1);
+                    break;
+                case PopularType.Week:
+                    start = end.AddDays(-7);
+                    break;
+                case PopularType.Month:
+                    start = end.AddMonths(-1);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+
+            var dateFromat = "yyyy-MM-dd";
+
+            return $"date:{start.ToString(dateFromat)}..{end.ToString(dateFromat)} order:quality";
+        }
     }
 }

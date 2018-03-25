@@ -14,7 +14,7 @@ namespace Imouto.BooruParser.Loaders
 {
     public class DanbooruLoader: IBooruLoader, IBooruAsyncLoader
     {
-        protected static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         #region Consts
 
@@ -23,6 +23,7 @@ namespace Imouto.BooruParser.Loaders
         private const string POST_URL = ROOT_URL + "/posts/";
         private const string POST_JSON = ROOT_URL + "/posts/{0}.json";
         private const string SEARCH_JSON = ROOT_URL + "/posts.json?utf8=✓&tags=";
+        private const string POPULAR_JSON = ROOT_URL + "/explore/posts/popular.json?date=";
 
         private const string POSTHISTORY_URL = ROOT_URL + "/post_versions";
         private const string POSTHISTORY_PAGE_URL = POSTHISTORY_URL + "?page=";
@@ -49,70 +50,6 @@ namespace Imouto.BooruParser.Loaders
 
         #endregion Constructors
         
-        #region Methods
-
-        private string AddAuth(string url)
-        {
-            if (!url.Contains("?"))
-            {
-                url = url + "?";
-            }
-
-            return url + $"&login={_login}&api_key={_apiKey}";
-        }
-        
-        private async Task<SearchResult> LoadSearchResultAsync(string tagsString, int? limit)
-        {
-            var pageHtml = await _booruLoader.LoadPageAsync(SEARCH_JSON 
-                + WebUtility.UrlEncode(tagsString) 
-                + (limit.HasValue? $"&limit={limit.Value}" : string.Empty));
-
-            var results = JsonConvert.DeserializeObject<List<Model.Danbooru.Json.Post>>(pageHtml);
-
-            var searchResult = new DanbooruSearchResult(results);
-
-            return searchResult;
-        }
-
-        private async Task<List<PostUpdateEntry>> LoadTagHistoryPageAsync(int? page = null)
-        {
-            var url = (page == null)
-                      ? POSTHISTORY_URL
-                      : POSTHISTORY_PAGE_URL + (page.Value);
-            var pageHtml = await _booruLoader.LoadPageAsync(url);
-
-            var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(pageHtml);
-
-            var updates = DanbooruPostUpdateEntry.Parse(htmlDoc);
-
-            return updates;
-        }
-
-        private async Task<List<PostUpdateEntry>> LoadTagHistoryAfterAsync(int id)
-        {
-            var url = POSTHISTORY_AFTER_URL + id;
-            var pageHtml = await _booruLoader.LoadPageAsync(url);
-
-            var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(pageHtml);
-
-            var updates = DanbooruPostUpdateEntry.Parse(htmlDoc);
-
-            return updates;
-        }
-
-        private async Task<List<NoteUpdateEntry>> LoadNoteHistoryPageAsync(string page)
-        {
-            var url = NOTEHISTORY_PAGE_JSON_URL + page;
-            var pageHtml = await _booruLoader.LoadPageAsync(url).ConfigureAwait(false);
-
-            var updates = JsonConvert.DeserializeObject<List<Model.Danbooru.Json.Version>>(pageHtml);
-
-            return updates.Select(x => new NoteUpdateEntry { Date = DateTime.Parse(x.created_at), PostId = x.id }).ToList();
-        }
-
-        #endregion Methods
 
         #region IBooruLoader members
 
@@ -278,11 +215,100 @@ namespace Imouto.BooruParser.Loaders
             return await LoadTagHistoryPageAsync().ConfigureAwait(false);
         }
 
-        public Task<SearchResult> LoadPopularAsync(PopularType type)
+        public async Task<SearchResult> LoadPopularAsync(PopularType type)
         {
-            throw new NotImplementedException();
+            var popularString = GetPopularString(type);
+            var pageHtml = await _booruLoader.LoadPageAsync(POPULAR_JSON + WebUtility.UrlEncode(popularString));
+
+            var results = JsonConvert.DeserializeObject<List<Model.Danbooru.Json.Post>>(pageHtml);
+
+            var searchResult = new DanbooruSearchResult(results);
+
+            return searchResult;
         }
 
         #endregion IBooruLoader members
+
+        private string GetPopularString(PopularType type)
+        {
+            string scale;
+            switch (type)
+            {
+                case PopularType.Day:
+                    scale = "day";
+                    break;
+                case PopularType.Week:
+                    scale = "week";
+                    break;
+                case PopularType.Month:
+                    scale = "month";
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+
+            return $"{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss zz}00&scale={scale}";
+        }
+
+        private string AddAuth(string url)
+        {
+            if (!url.Contains("?"))
+            {
+                url = url + "?";
+            }
+
+            return url + $"&login={_login}&api_key={_apiKey}";
+        }
+
+        private async Task<SearchResult> LoadSearchResultAsync(string tagsString, int? limit)
+        {
+            var pageHtml = await _booruLoader.LoadPageAsync(SEARCH_JSON
+                + WebUtility.UrlEncode(tagsString)
+                + (limit.HasValue ? $"&limit={limit.Value}" : string.Empty));
+
+            var results = JsonConvert.DeserializeObject<List<Model.Danbooru.Json.Post>>(pageHtml);
+
+            var searchResult = new DanbooruSearchResult(results);
+
+            return searchResult;
+        }
+
+        private async Task<List<PostUpdateEntry>> LoadTagHistoryPageAsync(int? page = null)
+        {
+            var url = (page == null)
+                      ? POSTHISTORY_URL
+                      : POSTHISTORY_PAGE_URL + (page.Value);
+            var pageHtml = await _booruLoader.LoadPageAsync(url);
+
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(pageHtml);
+
+            var updates = DanbooruPostUpdateEntry.Parse(htmlDoc);
+
+            return updates;
+        }
+
+        private async Task<List<PostUpdateEntry>> LoadTagHistoryAfterAsync(int id)
+        {
+            var url = POSTHISTORY_AFTER_URL + id;
+            var pageHtml = await _booruLoader.LoadPageAsync(url);
+
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(pageHtml);
+
+            var updates = DanbooruPostUpdateEntry.Parse(htmlDoc);
+
+            return updates;
+        }
+
+        private async Task<List<NoteUpdateEntry>> LoadNoteHistoryPageAsync(string page)
+        {
+            var url = NOTEHISTORY_PAGE_JSON_URL + page;
+            var pageHtml = await _booruLoader.LoadPageAsync(url).ConfigureAwait(false);
+
+            var updates = JsonConvert.DeserializeObject<List<Model.Danbooru.Json.Version>>(pageHtml);
+
+            return updates.Select(x => new NoteUpdateEntry { Date = DateTime.Parse(x.created_at), PostId = x.id }).ToList();
+        }
     }
 }
