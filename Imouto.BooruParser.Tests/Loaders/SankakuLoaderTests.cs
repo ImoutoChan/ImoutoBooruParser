@@ -33,6 +33,7 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
                 var post = await ibal.LoadPostAsync(5735331);
 
                 post.Should().NotBe(null);
+                post.OriginalUrl.Should().NotBeNullOrWhiteSpace();
             }
         }
 

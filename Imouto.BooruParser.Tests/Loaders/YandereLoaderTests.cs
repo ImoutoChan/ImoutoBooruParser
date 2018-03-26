@@ -32,6 +32,7 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
                 var post = await ibal.LoadPostAsync(408517);
 
                 post.Should().NotBe(null);
+                post.OriginalUrl.Should().NotBeNullOrWhiteSpace();
             }
         }
 
@@ -124,7 +125,6 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
                 notesHistory.Should().NotBeEmpty();
             }
         }
-
 
         public class LoadPopularAsyncMethod : YandereLoaderTests
         {

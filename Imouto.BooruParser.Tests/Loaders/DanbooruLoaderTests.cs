@@ -31,6 +31,7 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
                 var post = await ibal.LoadPostAsync(1);
 
                 post.Should().NotBe(null);
+                post.OriginalUrl.Should().NotBeNullOrWhiteSpace();
             }
         }
 
@@ -106,12 +107,11 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
             }
 
             [Fact]
-            public void ShouldThrowWithoutAuth()
+            public async Task ShouldThrowWithoutAuth()
             {
                 var ibal = _danbooruLoaderFixture.GetLoaderWithoutAuth();
 
-                Func<Task> action = async () => await ibal.LoadTagHistoryUpToAsync(DateTime.Now.AddHours(-1));
-                action.ShouldThrow<Exception>();
+                var exception = await Assert.ThrowsAsync<Exception>(async () => await ibal.LoadTagHistoryUpToAsync(DateTime.Now.AddHours(-1)));
             }
 
             [Fact]

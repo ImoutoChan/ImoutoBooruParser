@@ -40,6 +40,8 @@ namespace Imouto.BooruParser.Model.Base
 
         #region Properties
 
+        public string OriginalUrl { get; protected set; }
+
         public int PostId { get; }
 
         public ExistState PostExistState { get; protected set; }
@@ -77,6 +79,5 @@ namespace Imouto.BooruParser.Model.Base
         public DateTime ActualDateTime { get; } = DateTime.Now;
 
         #endregion //Properties
-
     }
 }
