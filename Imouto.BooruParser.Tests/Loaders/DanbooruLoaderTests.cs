@@ -111,7 +111,8 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
             {
                 var ibal = _danbooruLoaderFixture.GetLoaderWithoutAuth();
 
-                var exception = await Assert.ThrowsAsync<Exception>(async () => await ibal.LoadTagHistoryUpToAsync(DateTime.Now.AddHours(-1)));
+                await Assert.ThrowsAsync<Exception>(async () 
+                    => await ibal.LoadTagHistoryUpToAsync(DateTime.Now.AddHours(-1)));
             }
 
             [Fact]

@@ -188,6 +188,14 @@ namespace Imouto.BooruParser.Model.Sankaku
                 this.Md5 = hash;
                 this.ByteSize = byteSize;
                 this.ImageSize = size;
+
+                var url = aOriginalNode.Attributes["href"].Value;
+                if (url.StartsWith("//"))
+                {
+                    url = $"https:{url}";
+                }
+
+                this.OriginalUrl = url;
             }
             catch (Exception ex)
             {
