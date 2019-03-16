@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using Imouto.BooruParser.Model.Base;
@@ -190,10 +191,10 @@ namespace Imouto.BooruParser.Model.Sankaku
                 this.ImageSize = size;
 
                 var url = aOriginalNode.Attributes["href"].Value;
+                url = WebUtility.HtmlDecode(url);
+
                 if (url.StartsWith("//"))
-                {
                     url = $"https:{url}";
-                }
 
                 this.OriginalUrl = url;
             }

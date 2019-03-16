@@ -35,6 +35,15 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
                 post.Should().NotBe(null);
                 post.OriginalUrl.Should().NotBeNullOrWhiteSpace();
             }
+
+            [Fact]
+            public async Task ShouldContainLinkWithoutAmp()
+            {
+                var ibal = _loaderFixture.GetLoaderWithoutAuth();
+                var post = await ibal.LoadPostAsync(5735331);
+
+                post.OriginalUrl.Should().NotContain("&amp;");
+            }
         }
 
         public class LoadFirstTagHistoryPageAsyncMethod : SankakuLoaderTests
