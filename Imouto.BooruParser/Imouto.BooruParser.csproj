@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
@@ -15,7 +15,7 @@ The library can parse information about individual posts, tags and notes history
     <RepositoryUrl>https://github.com/ImoutoChan/ImoutoBooruParser</RepositoryUrl>
     <PackageTags>booru search parser danbooru sankakuchannel yande.re</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.3.0</Version>
+    <Version>1.4.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
