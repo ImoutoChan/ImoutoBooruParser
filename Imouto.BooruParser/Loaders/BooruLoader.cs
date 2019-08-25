@@ -6,13 +6,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Imouto.BooruParser.Helpers;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace Imouto.BooruParser.Loaders
 {
     public class BooruLoader
     {
-        protected static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger Logger = LoggerAccessor.GetLogger<BooruLoader>();
 
         private readonly HttpClient _httpClient;
         private readonly SemaphoreSlim _httpClientSemaphoreSlim = new SemaphoreSlim(1);
@@ -81,20 +81,20 @@ namespace Imouto.BooruParser.Loaders
 
                 return html;
             }
-            catch (HttpException he)
+            catch (HttpException httpException)
             {
-                if (he.HttpStatusCode == (HttpStatusCode)421 
-                    || he.HttpStatusCode == (HttpStatusCode)429)
+                if (httpException.HttpStatusCode == (HttpStatusCode)421 
+                    || httpException.HttpStatusCode == (HttpStatusCode)429)
                 {
                     _lastRequestTime = DateTimeOffset.Now.AddSeconds(30);
                 }
 
-                Logger.Error(he, $"Load page '{url}' threw HttpException ({he.HttpStatusCode})");
+                Logger.LogError(httpException, "Loading page '{Url}' threw HttpException {HttpStatusCode}", url, httpException.HttpStatusCode);
                 throw;
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, $"Load page '{url}' threw exception");
+                Logger.LogError(ex, "Load page '{Url}' threw exception", url);
                 throw;
             }
         }

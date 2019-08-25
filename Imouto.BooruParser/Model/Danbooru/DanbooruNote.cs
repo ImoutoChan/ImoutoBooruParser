@@ -4,14 +4,14 @@ using System.Diagnostics;
 using System.Linq;
 using HtmlAgilityPack;
 using Imouto.BooruParser.Model.Base;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace Imouto.BooruParser.Model.Danbooru
 {
     [DebuggerDisplay("{Id} — {Label}")]
     class DanbooruNote : Note
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger Logger = LoggerAccessor.GetLogger<DanbooruNote>();
 
         public new static List<Note> GetNotes(HtmlNode rootNode)
         {
@@ -77,7 +77,7 @@ namespace Imouto.BooruParser.Model.Danbooru
                 catch (Exception ex)
                 {
                     Debug.WriteLine("Error in parsing note:\n" + ex.Message);
-                    Logger.Error($"Error in parsing note: {ex.Message}");
+                    Logger.LogError(ex, "Error in parsing note");
                 }
             }
 

@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Imouto.BooruParser.Model.Base;
 using Imouto.BooruParser.Model.Yandere;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using NLog;
 
 namespace Imouto.BooruParser.Loaders
 {
@@ -18,7 +18,7 @@ namespace Imouto.BooruParser.Loaders
 
         #region Consts
 
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger Logger = LoggerAccessor.GetLogger<DanbooruLoader>();
 
         private const string HOST = "yande.re";
         private const string ROOT_URL = "https://yande.re";
@@ -32,6 +32,8 @@ namespace Imouto.BooruParser.Loaders
         private const string NOTEHISTORY_PAGE_URL = NOTEHISTORY_URL + "?page=";
 
         #endregion Consts
+
+        private readonly string _booruName = "Yandere";
 
         public YandereLoader(HttpClient httpClient = null, BooruLoader booruLoader = null)
         {
@@ -72,34 +74,36 @@ namespace Imouto.BooruParser.Loaders
 
         public async Task<List<NoteUpdateEntry>> LoadNotesHistoryAsync(DateTime lastUpdateTime)
         {
-            var booruName = "Yandere";
-            
             var result = new List<NoteUpdateEntry>();
             int failedCounter = 0;
             int nextPage = 1;
-            do
-            {
-                try
-                {
-                    var historyPack = await LoadNoteHistoryPageAsync(nextPage);
-                    result.AddRange(historyPack);
-                    Logger.Info($"{booruName} | Parsing notes history | Status: PARSING | History page parsed #{nextPage}");
-                    nextPage++;
-                    failedCounter = 0;
-                }
-                catch (Exception e)
-                {
-                    failedCounter++;
-                    Logger.Error($"{booruName} | Parsing notes history | Status: ERROR | Exception #{failedCounter} : {e.Message}");
 
-                    if (failedCounter > 3)
+            using (Logger.BeginScope("Loading notes history for {BooruName}", _booruName))
+            {
+                do
+                {
+                    try
                     {
-                        Logger.Error($"{booruName} | Parsing notes history | Status: TERMINATE");
-                        break;
+                        var historyPack = await LoadNoteHistoryPageAsync(nextPage);
+                        result.AddRange(historyPack);
+                        Logger.LogTrace("Status: LOADING | Notes page parsed #{PageNumber}", nextPage);
+                        nextPage++;
+                        failedCounter = 0;
+                    }
+                    catch (Exception e)
+                    {
+                        failedCounter++;
+                        Logger.LogWarning(e, "Status: ERROR | Exceptions count: #{FailedCounter}", failedCounter);
+
+                        if (failedCounter > 3)
+                        {
+                            Logger.LogError(e, "Status: TERMINATED");
+                            break;
+                        }
                     }
                 }
+                while (result.LastOrDefault()?.Date > lastUpdateTime); 
             }
-            while (result.LastOrDefault()?.Date > lastUpdateTime);
 
             return result;
         }
@@ -136,39 +140,41 @@ namespace Imouto.BooruParser.Loaders
 
         public async Task<List<PostUpdateEntry>> LoadTagHistoryFromAsync(int fromId)
         {
-            var booruName = "Yandere";
-
             var currentLast = (await LoadFirstTagHistoryPageAsync()).FirstOrDefault()?.UpdateId;
 
             var result = new List<PostUpdateEntry>();
             var failedCounter = 0;
 
             var nextPage = (currentLast - fromId) / 20 + 1;
-            do
+
+            using (Logger.BeginScope("Loading tags history for {BooruName}", _booruName))
             {
-                try
+                do
                 {
-                    var historyPack = await LoadTagHistoryPageAsync(nextPage);
-                    result.InsertRange(0, historyPack);
-
-                    Logger.Info($"{booruName} | Parsing tags history | Status: PARSING | History page parsed #{nextPage}");
-
-                    nextPage--;
-                    failedCounter = 0;
-                }
-                catch (Exception e)
-                {
-                    failedCounter++;
-                    Logger.Error($"{booruName} | Parsing tags history | Status: ERROR | Exception #{failedCounter} : {e.Message}");
-
-                    if (failedCounter > 3)
+                    try
                     {
-                        Logger.Error($"{booruName} | Parsing tags history | Status: TERMINATE");
-                        break;
+                        var historyPack = await LoadTagHistoryPageAsync(nextPage);
+                        result.InsertRange(0, historyPack);
+
+                        Logger.LogTrace("Status: LOADING | Tags page parsed #{PageNumber}", nextPage);
+
+                        nextPage--;
+                        failedCounter = 0;
+                    }
+                    catch (Exception e)
+                    {
+                        failedCounter++;
+                        Logger.LogWarning(e, "Status: ERROR | Exceptions count: #{FailedCounter}", failedCounter);
+
+                        if (failedCounter > 3)
+                        {
+                            Logger.LogError(e, "Status: TERMINATED");
+                            break;
+                        }
                     }
                 }
+                while (nextPage > 0); 
             }
-            while (nextPage > 0);
             return result;
         }
 

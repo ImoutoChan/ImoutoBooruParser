@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using HtmlAgilityPack;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace Imouto.BooruParser.Model.Base
 {
     [DebuggerDisplay("{Id} — {Label}")]
     public class Note
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger Logger = LoggerAccessor.GetLogger<Note>();
 
         /// <summary>
         ///     Work for both: sankaku and yandere
@@ -84,7 +84,7 @@ namespace Imouto.BooruParser.Model.Base
                 catch (Exception ex)
                 {
                     Debug.WriteLine("Error in parsing note:\n" + ex.Message);
-                    Logger.Error($"Error in parsing note: {ex.Message}");
+                    Logger.LogError(ex, "Error in parsing note");
                 }
             }
 

@@ -4,13 +4,13 @@ using System.Diagnostics;
 using System.Linq;
 using HtmlAgilityPack;
 using Imouto.BooruParser.Model.Base;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace Imouto.BooruParser.Model.Yandere
 {
     public static class YandereTag
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger Logger = LoggerAccessor.GetLogger(nameof(YandereTag));
 
         public static List<Tag> GetTags(HtmlNode tagsNode)
         {
@@ -36,7 +36,7 @@ namespace Imouto.BooruParser.Model.Yandere
                 catch (Exception ex)
                 {
                     Debug.WriteLine("Error in parsing tag:\n" + ex.Message);
-                    Logger.Error($"Error in parsing tag:: {ex.Message}");
+                    Logger.LogError(ex, "Error in parsing tag");
                 }
             }
 

@@ -8,7 +8,7 @@ using HtmlAgilityPack;
 using Imouto.BooruParser.Helpers;
 using Imouto.BooruParser.Model.Base;
 using Imouto.BooruParser.Model.Sankaku;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace Imouto.BooruParser.Loaders
 {
@@ -16,7 +16,7 @@ namespace Imouto.BooruParser.Loaders
     {
         #region Consts
 
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger Logger = LoggerAccessor.GetLogger<SankakuLoader>();
 
         private const string SANKAKU_HOST = "chan.sankakucomplex.com";
         private const string SANKAKU_ROOT_URL = "https://chan.sankakucomplex.com";
@@ -32,6 +32,7 @@ namespace Imouto.BooruParser.Loaders
         private readonly string _login;
         private readonly string _passwordhash;
         private readonly BooruLoader _booruLoader;
+        private readonly string _booruName = "Sankaku";
 
         #region Constructors
 
@@ -79,8 +80,6 @@ namespace Imouto.BooruParser.Loaders
 
         public async Task<List<PostUpdateEntry>> LoadTagHistoryFromAsync(int fromId)
         {
-            var booruName = "Sankaku";
-
             var firstHistoryPage = await LoadFirstTagHistoryPageAsync();
             var currentLast = firstHistoryPage.FirstOrDefault()?.UpdateId;
 
@@ -89,31 +88,34 @@ namespace Imouto.BooruParser.Loaders
             var nextPageIdIncrement = firstHistoryPage.Count;
 
             int? nextLoad = fromId + nextPageIdIncrement;
-            do
+            using (Logger.BeginScope("Loading tags history for {BooruName}", _booruName))
             {
-                try
+                do
                 {
-                    var historyPack = await LoadTagHistoryPageAsync(nextLoad);
-                    result.InsertRange(0, historyPack);
-                    
-                    Logger.Info($"{booruName} | Parsing tags history | Status: PARSING | History page parsed before #{nextLoad}");
-
-                    nextLoad = result.First().UpdateId + nextPageIdIncrement;
-                    failedCounter = 0;
-                }
-                catch (Exception e)
-                {
-                    failedCounter++;
-                    Logger.Error($"{booruName} | Parsing tags history | Status: ERROR | Exception #{failedCounter} : {e.Message}");
-
-                    if (failedCounter > 3)
+                    try
                     {
-                        Logger.Error($"{booruName} | Parsing tags history | Status: TERMINATE");
-                        break;
+                        var historyPack = await LoadTagHistoryPageAsync(nextLoad);
+                        result.InsertRange(0, historyPack);
+
+                        Logger.LogTrace("Status: LOADING | Tags page parsed before #{LastId}", nextLoad);
+
+                        nextLoad = result.First().UpdateId + nextPageIdIncrement;
+                        failedCounter = 0;
+                    }
+                    catch (Exception e)
+                    {
+                        failedCounter++;
+                        Logger.LogWarning(e, "Status: ERROR | Exceptions count: #{FailedCounter}", failedCounter);
+
+                        if (failedCounter > 3)
+                        {
+                            Logger.LogError(e, "Status: TERMINATED");
+                            break;
+                        }
                     }
                 }
+                while (nextLoad < currentLast + nextPageIdIncrement);
             }
-            while (nextLoad < currentLast + nextPageIdIncrement);
             return result;
         }
 
@@ -144,34 +146,35 @@ namespace Imouto.BooruParser.Loaders
 
         public async Task<List<NoteUpdateEntry>> LoadNotesHistoryAsync(DateTime lastUpdateTime)
         {
-            var booruName = "Sankaku";
-
             var result = new List<NoteUpdateEntry>();
             int failedCounter = 0;
             int nextPage = 1;
-            do
+            using (Logger.BeginScope("Loading notes history for {BooruName}", _booruName))
             {
-                try
+                do
                 {
-                    var historyPack = await LoadNoteHistoryPageAsync(nextPage);
-                    result.AddRange(historyPack);
-                    Logger.Info($"{booruName} | Parsing notes history | Status: PARSING | History page parsed #{nextPage}");
-                    nextPage++;
-                    failedCounter = 0;
-                }
-                catch (Exception e)
-                {
-                    failedCounter++;
-                    Logger.Error($"{booruName} | Parsing notes history | Status: ERROR | Exception #{failedCounter} : {e.Message}");
-
-                    if (failedCounter > 3)
+                    try
                     {
-                        Logger.Error($"{booruName} | Parsing notes history | Status: TERMINATE");
-                        break;
+                        var historyPack = await LoadNoteHistoryPageAsync(nextPage);
+                        result.AddRange(historyPack);
+                        Logger.LogTrace("Status: LOADING | Notes page parsed #{PageNumber}", nextPage);
+                        nextPage++;
+                        failedCounter = 0;
+                    }
+                    catch (Exception e)
+                    {
+                        failedCounter++;
+                        Logger.LogWarning(e, "Status: ERROR | Exceptions count: #{FailedCounter}", failedCounter);
+
+                        if (failedCounter > 3)
+                        {
+                            Logger.LogError(e, "Status: TERMINATED");
+                            break;
+                        }
                     }
                 }
+                while (result.LastOrDefault()?.Date > lastUpdateTime);
             }
-            while (result.LastOrDefault()?.Date > lastUpdateTime);
 
             return result;
         }
@@ -200,7 +203,7 @@ namespace Imouto.BooruParser.Loaders
 
                     if (failedCounter > 5)
                     {
-                        Logger.Error(e, $"Tag history loading failed after {failedCounter} tries.");
+                        Logger.LogError(e, "Tag history loading failed after {FailedCounter} tries.", failedCounter);
                         throw;
                     }
                 }

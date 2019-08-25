@@ -4,13 +4,13 @@ using System.Diagnostics;
 using System.Linq;
 using HtmlAgilityPack;
 using Imouto.BooruParser.Model.Base;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace Imouto.BooruParser.Model.Yandere
 {
     public static class YanderePool
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger Logger = LoggerAccessor.GetLogger(nameof(YanderePool));
 
         private static readonly List<Pool> Pools = new List<Pool>();
 
@@ -58,7 +58,7 @@ namespace Imouto.BooruParser.Model.Yandere
                 catch (Exception ex)
                 {
                     Debug.WriteLine("Error in parsing pool:\n" + ex.Message);
-                    Logger.Error($"Error in parsing pool: {ex.Message}");
+                    Logger.LogError(ex, "Error in parsing pool");
                 }
             }
 

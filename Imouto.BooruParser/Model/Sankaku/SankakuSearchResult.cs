@@ -3,14 +3,14 @@ using System.Diagnostics;
 using System.Linq;
 using HtmlAgilityPack;
 using Imouto.BooruParser.Model.Base;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace Imouto.BooruParser.Model.Sankaku
 {
-    [DebuggerDisplay("Results count: {SearchCount}")]
+    [DebuggerDisplay("Results count: {" + nameof(SearchCount) + "}")]
     public class SankakuSearchResult : SearchResult
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger Logger = LoggerAccessor.GetLogger<SankakuSearchResult>();
 
         public SankakuSearchResult(HtmlNode documentNode)
         {
@@ -58,7 +58,7 @@ namespace Imouto.BooruParser.Model.Sankaku
             catch (Exception ex)
             {
                 Debug.WriteLine($"Exception while search result loading: {ex.Message}");
-                Logger.Error($"Exception while search result loading: {ex.Message}");
+                Logger.LogError(ex, "Exception while search result loading");
             }
         }
     }

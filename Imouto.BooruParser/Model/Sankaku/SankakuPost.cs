@@ -5,14 +5,14 @@ using System.Net;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using Imouto.BooruParser.Model.Base;
-using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace Imouto.BooruParser.Model.Sankaku
 {
     [DebuggerDisplay("{PostId} — {Md5}")]
     public class SankakuPost : Post
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger Logger = LoggerAccessor.GetLogger<SankakuPost>();
 
         #region Constructor
 
@@ -136,7 +136,7 @@ namespace Imouto.BooruParser.Model.Sankaku
             catch (Exception ex)
             {
                 Debug.WriteLine("Error in parsing 'rating' info:\n" + ex.Message);
-                Logger.Error($"Error in parsing 'rating' info: {ex.Message}");
+                Logger.LogError(ex, "Error in parsing 'rating' info");
             }
         }
 
@@ -163,7 +163,7 @@ namespace Imouto.BooruParser.Model.Sankaku
             catch (Exception ex)
             {
                 Debug.WriteLine("Error in parsing 'source' info:\n" + ex.Message);
-                Logger.Error($"Error in parsing 'source' info: {ex.Message}");
+                Logger.LogError(ex, "Error in parsing 'source' info");
             }
         }
 
@@ -201,7 +201,7 @@ namespace Imouto.BooruParser.Model.Sankaku
             catch (Exception ex)
             {
                 Debug.WriteLine("Error in parsing 'original' info:\n" + ex.Message);
-                Logger.Error($"Error in parsing 'original' info: {ex.Message}");
+                Logger.LogError(ex, "Error in parsing 'original' info");
             }
         }
 
@@ -231,7 +231,7 @@ namespace Imouto.BooruParser.Model.Sankaku
             catch (Exception ex)
             {
                 Debug.WriteLine("Error in parsing 'posted' info:\n" + ex.Message);
-                Logger.Error($"Error in parsing 'posted' info: {ex.Message}");
+                Logger.LogError(ex, "Error in parsing 'posted' info");
             }
         }
 
