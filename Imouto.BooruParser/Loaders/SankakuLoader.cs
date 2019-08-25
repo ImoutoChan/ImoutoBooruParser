@@ -86,8 +86,9 @@ namespace Imouto.BooruParser.Loaders
 
             var result = new List<PostUpdateEntry>();
             var failedCounter = 0;
+            var nextPageIdIncrement = firstHistoryPage.Count;
 
-            int? nextLoad = fromId + 101;
+            int? nextLoad = fromId + nextPageIdIncrement;
             do
             {
                 try
@@ -97,7 +98,7 @@ namespace Imouto.BooruParser.Loaders
                     
                     Logger.Info($"{booruName} | Parsing tags history | Status: PARSING | History page parsed before #{nextLoad}");
 
-                    nextLoad = result.First().UpdateId + 101;
+                    nextLoad = result.First().UpdateId + nextPageIdIncrement;
                     failedCounter = 0;
                 }
                 catch (Exception e)
@@ -112,7 +113,7 @@ namespace Imouto.BooruParser.Loaders
                     }
                 }
             }
-            while (nextLoad < currentLast + 101);
+            while (nextLoad < currentLast + nextPageIdIncrement);
             return result;
         }
 
