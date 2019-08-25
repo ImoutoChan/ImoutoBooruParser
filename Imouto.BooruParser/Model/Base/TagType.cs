@@ -11,6 +11,7 @@
         Studio,
         System,
         Faults,
-        Circle
+        Circle,
+        Genre // new tag from sankakucomplex
     }
 }
