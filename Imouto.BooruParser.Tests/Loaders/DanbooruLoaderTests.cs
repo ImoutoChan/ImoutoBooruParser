@@ -24,7 +24,7 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
             }
 
             [Fact]
-            public async Task ShouldReturnPostWithoutCreditnails()
+            public async Task ShouldReturnPostWithoutCredentials()
             {
                 var ibal = _danbooruLoaderFixture.GetLoaderWithoutAuth();
 
@@ -43,7 +43,7 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
             }
 
             [Fact]
-            public async Task ShouldNotReturnWithoutCreditnails()
+            public async Task ShouldNotReturnWithoutCredentials()
             {
                 var ibal = _danbooruLoaderFixture.GetLoaderWithoutAuth();
 
@@ -54,7 +54,7 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
 
 
             [Fact]
-            public async Task ShouldReturnWithCreditnails()
+            public async Task ShouldReturnWithCredentials()
             {
                 var ibal = _danbooruLoaderFixture.GetLoaderWithAuth();
 
@@ -125,9 +125,9 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
             }
         }
 
-        public class LoadTagHistoryFromAsynMethodc : DanbooruLoaderTests
+        public class LoadTagHistoryFromAsyncMethod : DanbooruLoaderTests
         {
-            public LoadTagHistoryFromAsynMethodc(DanbooruLoaderFixture danbooruLoaderFixture) 
+            public LoadTagHistoryFromAsyncMethod(DanbooruLoaderFixture danbooruLoaderFixture) 
                 : base(danbooruLoaderFixture)
             {
             }

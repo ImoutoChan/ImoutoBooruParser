@@ -21,18 +21,20 @@ namespace Imouto.BooruParser.Model.Danbooru
             {
                 return result;
             }
-
+            
             foreach (var node in historyNodes)
             {
                 var id = int.Parse(node.Attributes["id"].Value.Split('-').Last());
+                
+                var postIdString = node.SelectSingleNode("td[2]/a").InnerHtml.Split('.').First();
+                var dateString = node.SelectSingleNode("td[4]/div/time").Attributes["datetime"].Value;
+                var userString = node.SelectSingleNode("td[4]/a").InnerHtml;
 
-                var data = node.SelectNodes("td");
+                var postId = int.Parse(postIdString);
+                var date = DateTime.Parse(dateString);
+                var user = WebUtility.HtmlDecode(userString);
 
-                var postid = int.Parse(data[0].SelectNodes("a").First().InnerHtml.Split('.').First());
-                var date = DateTime.Parse(data[1].ChildNodes[0].Attributes["datetime"].Value);
-                var user = WebUtility.HtmlDecode(data[2].SelectSingleNode("a").InnerHtml);
-
-                // NonImplement
+                // Not implemented
                 //var tagNodes = data[5].SelectNodes("span");
                 //var addedTags = SankakuTag.GetTagsFromList(tagNodes[0]);
                 //var removedTags = SankakuTag.GetTagsFromList(tagNodes[1]);
@@ -41,7 +43,7 @@ namespace Imouto.BooruParser.Model.Danbooru
                 result.Add(new DanbooruPostUpdateEntry
                 {
                     UpdateId = id,
-                    PostId = postid,
+                    PostId = postId,
                     UpdateDateTime = date,
                     User = user
                 });
