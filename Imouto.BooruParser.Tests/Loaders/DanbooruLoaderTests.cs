@@ -5,6 +5,7 @@ using FluentAssertions;
 using Imouto.BooruParser.Loaders;
 using Imouto.BooruParser.Tests.Loaders.Fixtures;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
 {
@@ -41,17 +42,6 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
                 : base(danbooruLoaderFixture)
             {
             }
-
-            [Fact]
-            public async Task ShouldNotReturnWithoutCredentials()
-            {
-                var ibal = _danbooruLoaderFixture.GetLoaderWithoutAuth();
-
-                var firstPage = await ibal.LoadFirstTagHistoryPageAsync();
-
-                firstPage.Should().BeEmpty();
-            }
-
 
             [Fact]
             public async Task ShouldReturnWithCredentials()
@@ -104,15 +94,6 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
             public LoadTagHistoryUpToAsyncMethod(DanbooruLoaderFixture danbooruLoaderFixture) 
                 : base(danbooruLoaderFixture)
             {
-            }
-
-            [Fact]
-            public async Task ShouldThrowWithoutAuth()
-            {
-                var ibal = _danbooruLoaderFixture.GetLoaderWithoutAuth();
-
-                await Assert.ThrowsAsync<Exception>(async () 
-                    => await ibal.LoadTagHistoryUpToAsync(DateTime.Now.AddHours(-1)));
             }
 
             [Fact]
