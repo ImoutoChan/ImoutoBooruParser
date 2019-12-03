@@ -8,11 +8,6 @@ using Xunit;
 
 namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
 {
-    // This line will skip all tests in file
-    // xUnit doesn't support skipping all tests in class
-    // Comment this line to enable tests
-    using FactAttribute = System.Runtime.CompilerServices.CompilerGeneratedAttribute;
-
     public class YandereLoaderTests : IClassFixture<YandereLoaderFixture>
     {
         private readonly YandereLoaderFixture _yandereLoaderFixture;
