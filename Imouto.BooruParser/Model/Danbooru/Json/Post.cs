@@ -82,7 +82,7 @@
 
         public string uploader_name { get; set; }
 
-        public bool has_large { get; set; }
+        public bool? has_large { get; set; }
 
         public string tag_string_artist { get; set; }
 
