@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Imouto.BooruParser.Loaders;
+using Imouto.BooruParser.Model.Danbooru;
 using Imouto.BooruParser.Tests.Loaders.Fixtures;
 using Xunit;
 using Xunit.Sdk;
@@ -149,11 +150,11 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
             {
                 var loader = _danbooruLoaderFixture.GetLoaderWithoutAuth();
 
-                var serachResult = await loader.LoadPopularAsync(PopularType.Week);
+                var searchResult = await loader.LoadPopularAsync(PopularType.Week);
 
-                serachResult.Results.Should().NotBeEmpty();
-                serachResult.NotEmpty.Should().BeTrue();
-                serachResult.SearchCount.Should().BeGreaterThan(1);
+                searchResult.Results.Should().NotBeEmpty();
+                searchResult.NotEmpty.Should().BeTrue();
+                searchResult.SearchCount.Should().BeGreaterThan(1);
             }
 
             [Fact]
@@ -166,6 +167,61 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
                 serachResult.Results.Should().NotBeEmpty();
                 serachResult.NotEmpty.Should().BeTrue();
                 serachResult.SearchCount.Should().BeGreaterThan(1);
+            }
+        }
+
+        public class LoadPostMetadataAsyncMethod : DanbooruLoaderTests
+        {
+            public LoadPostMetadataAsyncMethod(DanbooruLoaderFixture danbooruLoaderFixture)
+                : base(danbooruLoaderFixture)
+            {
+            }
+
+            [Fact]
+            public async Task ShouldLoadParentsAndChildren()
+            {
+                var loader = _danbooruLoaderFixture.GetLoaderWithoutAuth();
+
+                var searchResult = await loader.LoadSearchResultAsync("md5:46cce564e9b43a4c69c132840dca1252");
+
+                searchResult.NotEmpty.Should().BeTrue();
+                var result = searchResult.Results.First();
+
+                var post = await loader.LoadPostAsync(result.Id);
+
+                post.Tags.Count.Should().BeGreaterThan(30);
+                post.ChildrenIds.Count.Should().NotBe(0);
+                post.ParentId.Should().NotBeNullOrWhiteSpace();
+            }
+
+            [Fact]
+            public async Task ShouldLoadNotes()
+            {
+                var loader = _danbooruLoaderFixture.GetLoaderWithoutAuth();
+
+                var searchResult = await loader.LoadSearchResultAsync("md5:59b8ac9d3fe23a315f4468623ea7609a");
+
+                searchResult.NotEmpty.Should().BeTrue();
+                var result = searchResult.Results.First();
+
+                var post = await loader.LoadPostAsync(result.Id);
+
+                post.Notes.Count.Should().BeGreaterThan(6);
+            }
+
+            [Fact]
+            public async Task ShouldLoadPools()
+            {
+                var loader = _danbooruLoaderFixture.GetLoaderWithoutAuth();
+
+                var searchResult = await loader.LoadSearchResultAsync("md5:e9964274b9d09fbd365268a71ef35713");
+
+                searchResult.NotEmpty.Should().BeTrue();
+                var result = searchResult.Results.First();
+
+                var post = await loader.LoadPostAsync(result.Id);
+
+                post.Pools.Count.Should().BeGreaterOrEqualTo(2);
             }
         }
     }

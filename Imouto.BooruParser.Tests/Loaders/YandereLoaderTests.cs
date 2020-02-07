@@ -166,5 +166,59 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
                 serachResult.SearchCount.Should().BeGreaterThan(1);
             }
         }
+
+        public class LoadPostMetadataAsyncMethod : YandereLoaderTests
+        {
+            public LoadPostMetadataAsyncMethod(YandereLoaderFixture fixture)
+                : base(fixture)
+            {
+            }
+
+            [Fact]
+            public async Task ShouldLoadParentsAndChildren()
+            {
+                var loader = _yandereLoaderFixture.GetLoader();
+
+                var searchResult = await loader.LoadSearchResultAsync("md5:17a281b47c5baf18e4c9f6d85cc83285");
+
+                searchResult.NotEmpty.Should().BeTrue();
+                var result = searchResult.Results.First();
+
+                var post = await loader.LoadPostAsync(result.Id);
+
+                post.ChildrenIds.Count.Should().NotBe(0);
+                post.ParentId.Should().NotBeNullOrWhiteSpace();
+            }
+
+            [Fact]
+            public async Task ShouldLoadNotes()
+            {
+                var loader = _yandereLoaderFixture.GetLoader();
+
+                var searchResult = await loader.LoadSearchResultAsync("md5:caedf1c6957a956fcbd1f8bb17effb73");
+
+                searchResult.NotEmpty.Should().BeTrue();
+                var result = searchResult.Results.First();
+
+                var post = await loader.LoadPostAsync(result.Id);
+
+                post.Notes.Count.Should().BeGreaterThan(0);
+            }
+
+            [Fact]
+            public async Task ShouldLoadPools()
+            {
+                var loader = _yandereLoaderFixture.GetLoader();
+
+                var searchResult = await loader.LoadSearchResultAsync("md5:2bb1833a5a12852d186d4fcf86bf9020");
+
+                searchResult.NotEmpty.Should().BeTrue();
+                var result = searchResult.Results.First();
+
+                var post = await loader.LoadPostAsync(result.Id);
+
+                post.Pools.Count.Should().BeGreaterOrEqualTo(1);
+            }
+        }
     }
 }

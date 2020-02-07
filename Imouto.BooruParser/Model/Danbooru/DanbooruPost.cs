@@ -123,8 +123,8 @@ namespace Imouto.BooruParser.Model.Danbooru
         private void ParseRelations(HtmlNode postNode)
         {
             var childrenNodes =
-                postNode.SelectSingleNode(@"//div[@class='ui-corner-all ui-state-highlight notice notice-parent']")?
-                        .SelectNodes(@"div/article");
+                postNode.SelectSingleNode(@"//div[@id='has-children-relationship-preview']")?
+                        .SelectNodes(@"article");
             if (childrenNodes != null)
             {
                 foreach (var child in childrenNodes)
@@ -142,8 +142,8 @@ namespace Imouto.BooruParser.Model.Danbooru
 
 
             var parentNodes =
-                postNode.SelectSingleNode(@"//div[@class='ui-corner-all ui-state-highlight notice notice-child']")?
-                        .SelectNodes(@"div/article");
+                postNode.SelectSingleNode(@"//div[@id='has-parent-relationship-preview']")?
+                        .SelectNodes(@"article");
             if (parentNodes != null)
             {
                 var parent = parentNodes[0];

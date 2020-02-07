@@ -65,7 +65,7 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
 
                 Func<Task> action = async () => await ibal.LoadFirstTagHistoryPageAsync();
 
-                action.ShouldThrow<HttpRequestException>();
+                action.Should().Throw<HttpRequestException>();
             }
 
             [Fact]
@@ -141,7 +141,7 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
                 Func<Task> action = async ()
                     => await ibal.LoadTagHistoryUpToAsync(DateTime.Now.AddHours(-1));
 
-                action.ShouldThrow<HttpRequestException>();
+                action.Should().Throw<HttpRequestException>();
             }
 
             [Fact]
@@ -224,6 +224,46 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
 
                 serachResult.Results.Should().NotBeEmpty();
                 serachResult.NotEmpty.Should().BeTrue();
+            }
+        }
+
+        public class LoadPostMetadataAsyncMethod : SankakuLoaderTests
+        {
+            public LoadPostMetadataAsyncMethod(SankakuLoaderFixture sankakuLoaderFixture)
+                : base(sankakuLoaderFixture)
+            {
+            }
+
+            [Fact]
+            public async Task ShouldLoadParentsAndChildren()
+            {
+                var loader = _loaderFixture.GetLoaderWithoutAuth();
+
+                var searchResult = await loader.LoadSearchResultAsync("md5:46cce564e9b43a4c69c132840dca1252");
+
+                searchResult.NotEmpty.Should().BeTrue();
+                var result = searchResult.Results.First();
+
+                var post = await loader.LoadPostAsync(result.Id);
+
+                post.Tags.Count.Should().BeGreaterThan(30);
+                post.ChildrenIds.Count.Should().NotBe(0);
+                post.ParentId.Should().NotBeNullOrWhiteSpace();
+            }
+
+            [Fact]
+            public async Task ShouldLoadNotes()
+            {
+                var loader = _loaderFixture.GetLoaderWithoutAuth();
+
+                var searchResult = await loader.LoadSearchResultAsync("md5:54787e0a60a24960bde55093a8ada0ca");
+
+                searchResult.NotEmpty.Should().BeTrue();
+                var result = searchResult.Results.First();
+
+                var post = await loader.LoadPostAsync(result.Id);
+
+                post.Notes.Count.Should().BeGreaterThan(4);
             }
         }
     }
