@@ -70,10 +70,14 @@ namespace Imouto.BooruParser.Model.Sankaku
 
         private void ParseRelations(HtmlNode postNode)
         {
-            var childrenRootNode = postNode.SelectNodes(@"//*[@id='right-col']/div[@class='status-notice']/div")?.FirstOrDefault(x => x.Attributes["id"]?.Value.Substring(0, 4) == "chil");
-            if (childrenRootNode != null)
+            var childrenNodes
+                = postNode
+                    .SelectNodes(@"//*[@id='right-col']/div[@class='status-notice']/div")
+                    ?.FirstOrDefault(x => x.Attributes["id"]?.Value.Substring(0, 4) == "chil")
+                    ?.SelectNodes(@"span");
+
+            if (childrenNodes != null)
             {
-                var childrenNodes = childrenRootNode.SelectNodes(@"span");
                 foreach (var child in childrenNodes)
                 {
                     var childId = child.Attributes["id"].Value;

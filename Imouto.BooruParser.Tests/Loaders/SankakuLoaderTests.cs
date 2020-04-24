@@ -252,6 +252,19 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
             }
 
             [Fact]
+            public async Task ShouldLoadPostWithEmptyChildren()
+            {
+                var loader = _loaderFixture.GetLoaderWithoutAuth();
+                var searchResult = await loader.LoadSearchResultAsync("md5:692078f4b19d8a7992bc361baac39650");
+                var result = searchResult.Results.First();
+
+                var post = await loader.LoadPostAsync(result.Id);
+
+                post.Tags.Count.Should().BeGreaterThan(30);
+                post.ChildrenIds.Count.Should().Be(0);
+            }
+
+            [Fact]
             public async Task ShouldLoadNotes()
             {
                 var loader = _loaderFixture.GetLoaderWithoutAuth();
