@@ -138,11 +138,11 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
             {
                 var loader = _danbooruLoaderFixture.GetLoaderWithoutAuth();
 
-                var serachResult = await loader.LoadPopularAsync(PopularType.Day);
+                var searchResult = await loader.LoadPopularAsync(PopularType.Day);
 
-                serachResult.Results.Should().NotBeEmpty();
-                serachResult.NotEmpty.Should().BeTrue();
-                serachResult.SearchCount.Should().BeGreaterThan(1);
+                searchResult.Results.Should().NotBeEmpty();
+                searchResult.NotEmpty.Should().BeTrue();
+                searchResult.SearchCount.Should().BeGreaterThan(1);
             }
 
             [Fact]

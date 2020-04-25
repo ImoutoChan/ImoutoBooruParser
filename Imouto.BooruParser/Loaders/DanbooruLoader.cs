@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Imouto.BooruParser.Model.Base;
 using Imouto.BooruParser.Model.Danbooru;
+using Imouto.BooruParser.Model.Danbooru.Json;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Post = Imouto.BooruParser.Model.Base.Post;
 
 namespace Imouto.BooruParser.Loaders
 {
@@ -26,8 +28,11 @@ namespace Imouto.BooruParser.Loaders
         private const string POPULAR_JSON = ROOT_URL + "/explore/posts/popular.json?date=";
 
         private const string POSTHISTORY_URL = ROOT_URL + "/post_versions";
+        private const string POSTHISTORY_JSON_URL = ROOT_URL + "/post_versions.json";
         private const string POSTHISTORY_PAGE_URL = POSTHISTORY_URL + "?page=";
+        private const string POSTHISTORY_PAGE_JSON_URL = POSTHISTORY_JSON_URL + "?page=";
         private const string POSTHISTORY_AFTER_URL = POSTHISTORY_URL + "?page=a";
+        private const string POSTHISTORY_AFTER_JSON_URL = POSTHISTORY_JSON_URL + "?page=a";
 
         private const string NOTEHISTORY_URL = ROOT_URL + "/note_versions";
         private const string NOTEHISTORY_PAGE_URL = NOTEHISTORY_URL + "?page=";
@@ -38,7 +43,7 @@ namespace Imouto.BooruParser.Loaders
         private readonly string _login;
         private readonly string _apiKey;
         private readonly BooruLoader _booruLoader;
-        private readonly string _booruName = "Danbooru";
+        private const string BooruName = "Danbooru";
 
         #region Constructors
 
@@ -88,7 +93,7 @@ namespace Imouto.BooruParser.Loaders
             int failedCounter = 0;
             int lastId = Int32.MaxValue;
 
-            using (Logger.BeginScope("Loading notes history for {BooruName}", _booruName))
+            using (Logger.BeginScope("Loading notes history for {BooruName}", BooruName))
             {
                 do
                 {
@@ -170,7 +175,7 @@ namespace Imouto.BooruParser.Loaders
             var result = new List<PostUpdateEntry>();
             var continueFlag = true;
 
-            using (Logger.BeginScope("Loading tags history for {BooruName}", _booruName))
+            using (Logger.BeginScope("Loading tags history for {BooruName}", BooruName))
             {
                 do
                 {
@@ -220,7 +225,7 @@ namespace Imouto.BooruParser.Loaders
         public async Task<SearchResult> LoadPopularAsync(PopularType type)
         {
             var popularString = GetPopularString(type);
-            var pageHtml = await _booruLoader.LoadPageAsync(POPULAR_JSON + WebUtility.UrlEncode(popularString));
+            var pageHtml = await _booruLoader.LoadPageAsync(POPULAR_JSON + popularString);
 
             var results = JsonConvert.DeserializeObject<List<Model.Danbooru.Json.Post>>(pageHtml);
 
@@ -249,7 +254,8 @@ namespace Imouto.BooruParser.Loaders
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
 
-            return $"{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss zz}00&scale={scale}";
+            return WebUtility.UrlEncode($"{DateTimeOffset.Now.ToUniversalTime():yyyy-MM-ddTHH:mm:ss.fffzzz}") 
+                   + $"&scale={scale}";
         }
 
         private string AddAuth(string url)
@@ -278,29 +284,23 @@ namespace Imouto.BooruParser.Loaders
         private async Task<List<PostUpdateEntry>> LoadTagHistoryPageAsync(int? page = null)
         {
             var url = (page == null)
-                      ? POSTHISTORY_URL
-                      : POSTHISTORY_PAGE_URL + (page.Value);
-            var pageHtml = await _booruLoader.LoadPageAsync(url);
+                      ? POSTHISTORY_JSON_URL
+                      : POSTHISTORY_PAGE_JSON_URL + (page.Value);
+            var json = await _booruLoader.LoadPageAsync(url);
 
-            var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(pageHtml);
-
-            var updates = DanbooruPostUpdateEntry.Parse(htmlDoc);
-
-            return updates;
+            var versions = JsonConvert.DeserializeObject<IReadOnlyCollection<PostVersion>>(json);
+            
+            return DanbooruPostUpdateEntry.GetFromJson(versions);
         }
 
         private async Task<List<PostUpdateEntry>> LoadTagHistoryAfterAsync(int id)
         {
-            var url = POSTHISTORY_AFTER_URL + id;
-            var pageHtml = await _booruLoader.LoadPageAsync(url);
+            var url = POSTHISTORY_AFTER_JSON_URL + id;
+            var json = await _booruLoader.LoadPageAsync(url);
 
-            var htmlDoc = new HtmlDocument();
-            htmlDoc.LoadHtml(pageHtml);
-
-            var updates = DanbooruPostUpdateEntry.Parse(htmlDoc);
-
-            return updates;
+            var versions = JsonConvert.DeserializeObject<IReadOnlyCollection<PostVersion>>(json);
+            
+            return DanbooruPostUpdateEntry.GetFromJson(versions);
         }
 
         private async Task<List<NoteUpdateEntry>> LoadNoteHistoryPageAsync(string page)
@@ -310,7 +310,11 @@ namespace Imouto.BooruParser.Loaders
 
             var updates = JsonConvert.DeserializeObject<List<Model.Danbooru.Json.Version>>(pageHtml);
 
-            return updates.Select(x => new NoteUpdateEntry { Date = DateTime.Parse(x.created_at), PostId = x.id }).ToList();
+            return updates.Select(x => new NoteUpdateEntry
+            {
+                Date = DateTime.Parse(x.created_at), 
+                PostId = x.id
+            }).ToList();
         }
     }
 }
