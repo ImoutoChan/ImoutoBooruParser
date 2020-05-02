@@ -15,7 +15,7 @@ It's able to parse information about individual posts, tags/notes history and co
     <RepositoryUrl>https://github.com/ImoutoChan/ImoutoBooruParser</RepositoryUrl>
     <PackageTags>booru search parser danbooru sankakuchannel yande.re yandere imageboard</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.10.0</Version>
+    <Version>1.11.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
