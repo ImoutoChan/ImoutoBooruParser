@@ -62,6 +62,10 @@ namespace Imouto.BooruParser.Model.Danbooru
             {
                 Tags.Add(Tag.CreateOrGetTag(TagType.General, tag.Replace('_', ' '), null));
             }
+            foreach (var tag in postJson.tag_string_meta.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                Tags.Add(Tag.CreateOrGetTag(TagType.Meta, tag.Replace('_', ' '), null));
+            }
         }
 
         private void ParseStats(Json.Post postJson)

@@ -91,6 +91,8 @@
         public string tag_string_copyright { get; set; }
 
         public string tag_string_general { get; set; }
+        
+        public string tag_string_meta { get; set; }
 
         public bool has_visible_children { get; set; }
 

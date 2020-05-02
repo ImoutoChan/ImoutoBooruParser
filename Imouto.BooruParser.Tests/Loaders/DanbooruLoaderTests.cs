@@ -210,6 +210,19 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
             }
 
             [Fact]
+            public async Task ShouldLoadMetaTags()
+            {
+                var loader = _danbooruLoaderFixture.GetLoaderWithoutAuth();
+                var searchResult = await loader.LoadSearchResultAsync("md5:43d3f7154d9612aaaf7ce0fa585887b2");
+                searchResult.NotEmpty.Should().BeTrue();
+                var result = searchResult.Results.First();
+                
+                var post = await loader.LoadPostAsync(result.Id);
+
+                post.Tags.Should().Contain(x => x.Name == "paid reward");
+            }
+
+            [Fact]
             public async Task ShouldLoadPools()
             {
                 var loader = _danbooruLoaderFixture.GetLoaderWithoutAuth();
