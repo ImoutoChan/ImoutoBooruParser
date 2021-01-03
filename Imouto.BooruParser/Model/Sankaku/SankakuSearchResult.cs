@@ -35,6 +35,10 @@ namespace Imouto.BooruParser.Model.Sankaku
             foreach (var spanNode in previewNodes)
             {
                 var idStr = spanNode.ChildNodes[0].Attributes["href"].Value.Split('/').Last();
+
+                if (string.IsNullOrEmpty(idStr))
+                    continue;
+
                 var id = Int32.Parse(idStr);
 
                 var md5 = spanNode.ChildNodes[0]?.ChildNodes[0]?.Attributes["src"]?.Value.Split('/')?.LastOrDefault()?.Split('.')?.FirstOrDefault();

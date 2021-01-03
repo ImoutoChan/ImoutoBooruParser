@@ -261,7 +261,9 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
                 var post = await loader.LoadPostAsync(result.Id);
 
                 post.Tags.Count.Should().BeGreaterThan(30);
-                post.ChildrenIds.Count.Should().Be(0);
+
+                // no longer empty, but inaccessible
+                post.ChildrenIds.Count.Should().Be(2);
             }
 
             [Fact]
