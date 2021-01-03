@@ -38,6 +38,8 @@ namespace Imouto.BooruParser.Loaders
         private const string NOTEHISTORY_PAGE_URL = NOTEHISTORY_URL + "?page=";
         private const string NOTEHISTORY_PAGE_JSON_URL = NOTEHISTORY_URL + ".json?page=";
 
+        private const string POST_JSON_UGOIRA_META = POST_JSON + "?only=pixiv_ugoira_frame_data";
+
         #endregion Consts
         
         private readonly string _login;
@@ -72,7 +74,30 @@ namespace Imouto.BooruParser.Loaders
             htmlDoc.LoadHtml(postHtml);
 
             var post = new DanbooruPost(postId, htmlDoc.DocumentNode, postJson);
+
+            if (post.IsUgoira)
+            {
+                await LoadUgoiraMeta(post);
+            }
+
             return post;
+        }
+
+        private async Task LoadUgoiraMeta(Post post)
+        {
+            try
+            {
+                var postJsonString = await _booruLoader
+                    .LoadPageAsync(string.Format(POST_JSON_UGOIRA_META, post.PostId))
+                    .ConfigureAwait(false);
+
+                var postJson = JsonConvert.DeserializeObject<PostUgoiraInfo>(postJsonString);
+                post.UgoiraFrameData = postJson.FrameData;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, "An error occurred while loading ugoira info");
+            }
         }
 
         public SearchResult LoadSearchResult(string tagsString) 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using HtmlAgilityPack;
 using Imouto.BooruParser.Model.Base;
 
@@ -27,6 +28,8 @@ namespace Imouto.BooruParser.Model.Danbooru
 
         #endregion Constructor
 
+        public bool IsUgoira => OriginalUrl?.EndsWith(".zip") ?? false;
+
         #region Methods
 
         private void ParsePost(Json.Post postJson, HtmlNode documentNode)
@@ -42,6 +45,8 @@ namespace Imouto.BooruParser.Model.Danbooru
             }
 
             ParseRelations(documentNode);
+
+
         }
 
         private void ParseTags(Json.Post postJson)

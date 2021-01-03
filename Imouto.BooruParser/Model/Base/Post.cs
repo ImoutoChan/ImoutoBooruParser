@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Imouto.BooruParser.Model.Danbooru.Json;
 
 namespace Imouto.BooruParser.Model.Base
 {
@@ -59,6 +60,8 @@ namespace Imouto.BooruParser.Model.Base
         public int ByteSize { get; protected set; }
 
         public Rating ImageRating { get; protected set; }
+
+        public UgoiraFrameData UgoiraFrameData { get; set; }
 
         /// <summary>
         /// String format: "{postId:md5}", sample: "4323700:974e0e7a11c5a713834e61cf6a33efcf"

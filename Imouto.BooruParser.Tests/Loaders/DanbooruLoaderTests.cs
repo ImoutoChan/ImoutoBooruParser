@@ -236,6 +236,25 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
 
                 post.Pools.Count.Should().BeGreaterOrEqualTo(2);
             }
+
+            [Fact]
+            public async Task ShouldLoadUgoiraMetadata()
+            {
+                var loader = _danbooruLoaderFixture.GetLoaderWithoutAuth();
+
+                var searchResult = await loader.LoadSearchResultAsync("md5:0802b6180ff110aa1055a5b9ef0d8b0a");
+
+                searchResult.NotEmpty.Should().BeTrue();
+                var result = searchResult.Results.First();
+
+                var post = await loader.LoadPostAsync(result.Id);
+
+                post.UgoiraFrameData.Should().NotBeNull();
+                post.UgoiraFrameData.ContentType.Should().Be("image/jpeg");
+                post.UgoiraFrameData.Data.Should().HaveCount(411);
+                post.UgoiraFrameData.Data.Last().Delay.Should().Be(2800);
+                post.UgoiraFrameData.Data.Last().File.Should().Be("000410.jpg");
+            }
         }
     }
 }
