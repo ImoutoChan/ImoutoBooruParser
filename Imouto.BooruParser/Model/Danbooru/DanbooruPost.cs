@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using Imouto.BooruParser.Model.Base;
 
@@ -131,10 +132,10 @@ namespace Imouto.BooruParser.Model.Danbooru
 
         private void ParseRelations(HtmlNode postNode)
         {
-            var childrenNodes 
+            var childrenNodes
                 = postNode
                     .SelectSingleNode(@"//div[@id='has-children-relationship-preview']")
-                    ?.SelectNodes(@"article");
+                    ?.SelectNodes(@"//article");
 
             if (childrenNodes != null)
             {
@@ -146,7 +147,9 @@ namespace Imouto.BooruParser.Model.Danbooru
                         continue;
                     }
 
-                    var md5 = child.Attributes["data-md5"].Value;
+                    var url = child.SelectSingleNode("//img").Attributes["src"].Value;
+
+                    var md5 = new Regex("[a-fA-F0-9]{32}").Match(url).Value;
                     ChildrenIds.Add($"{childId}:{md5}");
                 }
             }
@@ -154,12 +157,15 @@ namespace Imouto.BooruParser.Model.Danbooru
 
             var parentNodes =
                 postNode.SelectSingleNode(@"//div[@id='has-parent-relationship-preview']")?
-                        .SelectNodes(@"article");
+                        .SelectNodes(@"//article");
             if (parentNodes != null)
             {
                 var parent = parentNodes[0];
                 var parentId = int.Parse(parent.Attributes["id"].Value.Substring(5));
-                var md5 = parent.Attributes["data-md5"].Value;
+
+                var url = parent.SelectSingleNode("//img").Attributes["src"].Value;
+
+                var md5 = new Regex("[a-fA-F0-9]{32}").Match(url).Value;
 
                 ParentId = $"{parentId}:{md5}";
             }
