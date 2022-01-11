@@ -19,7 +19,7 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
 
         public class LoadPostAsyncMethod : YandereLoaderTests
         {
-            public LoadPostAsyncMethod(YandereLoaderFixture yandereLoaderFixture) 
+            public LoadPostAsyncMethod(YandereLoaderFixture yandereLoaderFixture)
                 : base(yandereLoaderFixture)
             {
             }
@@ -38,7 +38,7 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
 
         public class LoadFirstTagHistoryPageAsyncMethod : YandereLoaderTests
         {
-            public LoadFirstTagHistoryPageAsyncMethod(YandereLoaderFixture yandereLoaderFixture) 
+            public LoadFirstTagHistoryPageAsyncMethod(YandereLoaderFixture yandereLoaderFixture)
                 : base(yandereLoaderFixture)
             {
             }
@@ -53,10 +53,10 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
                 firstPage.Should().NotBeEmpty();
             }
         }
-        
+
         public class LoadSearchResultAsyncMethod : YandereLoaderTests
         {
-            public LoadSearchResultAsyncMethod(YandereLoaderFixture yandereLoaderFixture) 
+            public LoadSearchResultAsyncMethod(YandereLoaderFixture yandereLoaderFixture)
                 : base(yandereLoaderFixture)
             {
             }
@@ -75,7 +75,7 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
 
         public class LoadNotesHistoryAsyncMethod : YandereLoaderTests
         {
-            public LoadNotesHistoryAsyncMethod(YandereLoaderFixture yandereLoaderFixture) 
+            public LoadNotesHistoryAsyncMethod(YandereLoaderFixture yandereLoaderFixture)
                 : base(yandereLoaderFixture)
             {
             }
@@ -218,6 +218,21 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
                 var post = await loader.LoadPostAsync(result.Id);
 
                 post.Pools.Count.Should().BeGreaterOrEqualTo(1);
+            }
+        }
+
+        public class FavoritePostAsyncMethod : YandereLoaderTests
+        {
+            public FavoritePostAsyncMethod(YandereLoaderFixture loaderFixture)
+                : base(loaderFixture)
+            {
+            }
+
+            [Fact]
+            public async Task ShouldFavoritePost()
+            {
+                var api = _yandereLoaderFixture.GetApiAccessorWithAuth();
+                await api.FavoritePostAsync(883843);
             }
         }
     }

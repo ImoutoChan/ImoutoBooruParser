@@ -19,7 +19,7 @@ namespace Imouto.BooruParser.Loaders
         private readonly int _waitMilliseconds;
         private readonly string _loginCookie;
         private readonly Func<string, HttpRequestMessage> _customMessageBuilder;
-        private readonly Func<string, string> _customUrlTramsform;
+        private readonly Func<string, string> _customUrlTransform;
         private DateTimeOffset _lastRequestTime = DateTimeOffset.Now.AddDays(-1);
         private string _lastRequestCookie;
 
@@ -27,16 +27,16 @@ namespace Imouto.BooruParser.Loaders
                                 int loadDelay,
                                 string loginCookie = null,
                                 Func<string, HttpRequestMessage> customMessageBuilder = null,
-                                Func<string, string> customUrlTramsform = null)
+                                Func<string, string> customUrlTransform = null)
         {
             _httpClient = httpClient ?? new HttpClient();
             _waitMilliseconds = loadDelay;
             _loginCookie = loginCookie;
             _customMessageBuilder = customMessageBuilder;
-            _customUrlTramsform = customUrlTramsform;
+            _customUrlTransform = customUrlTransform;
         }
 
-        private async Task<T> UseClient<T>(Func<HttpClient, CancellationToken, Task<T>> action, 
+        private async Task<T> UseClient<T>(Func<HttpClient, CancellationToken, Task<T>> action,
                                            CancellationToken cancellationToken = default(CancellationToken))
         {
             await _httpClientSemaphoreSlim.WaitAsync(cancellationToken);
@@ -65,7 +65,7 @@ namespace Imouto.BooruParser.Loaders
         {
             try
             {
-                url = _customUrlTramsform?.Invoke(url) ?? url;
+                url = _customUrlTransform?.Invoke(url) ?? url;
 
                 var requestMessage = _customMessageBuilder?.Invoke(url) ?? new HttpRequestMessage(HttpMethod.Get, url);
                 SetCookie(requestMessage);
@@ -83,7 +83,51 @@ namespace Imouto.BooruParser.Loaders
             }
             catch (HttpException httpException)
             {
-                if (httpException.HttpStatusCode == (HttpStatusCode)421 
+                if (httpException.HttpStatusCode == (HttpStatusCode)421
+                    || httpException.HttpStatusCode == (HttpStatusCode)429)
+                {
+                    _lastRequestTime = DateTimeOffset.Now.AddSeconds(30);
+                }
+
+                Logger.LogError(httpException, "Loading page '{Url}' threw HttpException {HttpStatusCode}", url, httpException.HttpStatusCode);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Load page '{Url}' threw exception", url);
+                throw;
+            }
+        }
+
+        public async Task<string> PostAsync(
+            string url,
+            MultipartFormDataContent formData = null,
+            CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                url = _customUrlTransform?.Invoke(url) ?? url;
+
+                var requestMessage = _customMessageBuilder?.Invoke(url) ?? new HttpRequestMessage(HttpMethod.Post, url);
+                SetCookie(requestMessage);
+
+                if (formData != null)
+                    requestMessage.Content = formData;
+
+                var httpResponse = await UseClient(async (httpClient, cT)
+                    => await httpClient.SendAsync(requestMessage, cT), cancellationToken);
+
+                await httpResponse.EnsureSuccessStatusCodeWithResponce();
+
+                _lastRequestCookie = GetCookie(httpResponse);
+
+                var html = await httpResponse.Content.ReadAsStringAsync();
+
+                return html;
+            }
+            catch (HttpException httpException)
+            {
+                if (httpException.HttpStatusCode == (HttpStatusCode)421
                     || httpException.HttpStatusCode == (HttpStatusCode)429)
                 {
                     _lastRequestTime = DateTimeOffset.Now.AddSeconds(30);

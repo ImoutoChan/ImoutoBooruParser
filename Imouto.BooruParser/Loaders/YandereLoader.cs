@@ -12,9 +12,12 @@ using Newtonsoft.Json;
 
 namespace Imouto.BooruParser.Loaders
 {
-    public class YandereLoader : IBooruAsyncLoader
+    public class YandereLoader : IBooruAsyncLoader, IBooruApiAccessor
     {
         private readonly BooruLoader _booruLoader;
+        private readonly string _booruName = "Yandere";
+        private readonly string _login;
+        private readonly string _passwordHash;
 
         #region Consts
 
@@ -30,13 +33,18 @@ namespace Imouto.BooruParser.Loaders
         private const string POSTHISTORY_PAGE_URL = POSTHISTORY_URL + "?page=";
         private const string NOTEHISTORY_URL = ROOT_URL + "/note/history";
         private const string NOTEHISTORY_PAGE_URL = NOTEHISTORY_URL + "?page=";
+        private const string FAVORITE_POST_JSON_URL = ROOT_URL + "/post/vote.json";
 
         #endregion Consts
 
-        private readonly string _booruName = "Yandere";
-
-        public YandereLoader(HttpClient httpClient = null, BooruLoader booruLoader = null)
+        public YandereLoader(
+            HttpClient httpClient = null,
+            BooruLoader booruLoader = null,
+            string login = null,
+            string passwordHash = null)
         {
+            _login = login;
+            _passwordHash = passwordHash;
             _booruLoader = booruLoader ?? new BooruLoader(httpClient, 0);
         }
 
@@ -102,7 +110,7 @@ namespace Imouto.BooruParser.Loaders
                         }
                     }
                 }
-                while (result.LastOrDefault()?.Date > lastUpdateTime); 
+                while (result.LastOrDefault()?.Date > lastUpdateTime);
             }
 
             return result;
@@ -173,7 +181,7 @@ namespace Imouto.BooruParser.Loaders
                         }
                     }
                 }
-                while (nextPage > 0); 
+                while (nextPage > 0);
             }
             return result;
         }
@@ -239,6 +247,27 @@ namespace Imouto.BooruParser.Loaders
             var updates = YanderePostUpdateEntry.Parse(htmlDoc);
 
             return updates;
+        }
+
+        private string AddAuth(string url)
+        {
+            if (!url.Contains("?"))
+            {
+                url += "?";
+            }
+
+            return url + $"&login={_login}&password_hash={_passwordHash}";
+        }
+
+        public async Task FavoritePostAsync(int postId)
+        {
+            var url = AddAuth(FAVORITE_POST_JSON_URL);
+
+            var content = new MultipartFormDataContent();
+            content.Add(new StringContent(postId.ToString()), "id");
+            content.Add(new StringContent("3"), "score");
+
+            await _booruLoader.PostAsync(url, content);
         }
     }
 }

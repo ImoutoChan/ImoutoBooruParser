@@ -6,13 +6,15 @@ namespace Imouto.BooruParser.Tests.Loaders.Fixtures
     {
         private IBooruAsyncLoader _danbooruWithAuth;
         private IBooruAsyncLoader _danbooruWithoutAuth;
+        private IBooruApiAccessor _danbooruApiAccessor;
 
-        public IBooruAsyncLoader GetLoaderWithAuth() 
-            => _danbooruWithAuth
-                ?? (_danbooruWithAuth = new DanbooruLoader("testuser159", "t77cOKpOMV5I4HN3r3gfOooG5hrh3sAqgsD_YDQCZGc", 1240));
+        public IBooruAsyncLoader GetLoaderWithAuth()
+            => _danbooruWithAuth ??= new DanbooruLoader("testuser159", "t77cOKpOMV5I4HN3r3gfOooG5hrh3sAqgsD_YDQCZGc", 1240);
+
+        public IBooruApiAccessor GetApiAccessorWithAuth()
+            => _danbooruApiAccessor ??= new DanbooruLoader("testuser159", "t77cOKpOMV5I4HN3r3gfOooG5hrh3sAqgsD_YDQCZGc", 1240);
 
         public IBooruAsyncLoader GetLoaderWithoutAuth()
-            => _danbooruWithoutAuth
-               ?? (_danbooruWithoutAuth = new DanbooruLoader(null, null, 5000));
+            => _danbooruWithoutAuth ??= new DanbooruLoader(null, null, 5000);
     }
 }

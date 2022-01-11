@@ -39,7 +39,7 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
 
         public class LoadFirstTagHistoryPageAsyncMethod : DanbooruLoaderTests
         {
-            public LoadFirstTagHistoryPageAsyncMethod(DanbooruLoaderFixture danbooruLoaderFixture) 
+            public LoadFirstTagHistoryPageAsyncMethod(DanbooruLoaderFixture danbooruLoaderFixture)
                 : base(danbooruLoaderFixture)
             {
             }
@@ -54,10 +54,10 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
                 firstPage.Should().NotBeEmpty();
             }
         }
-        
+
         public class LoadSearchResultAsyncMethod : DanbooruLoaderTests
         {
-            public LoadSearchResultAsyncMethod(DanbooruLoaderFixture danbooruLoaderFixture) 
+            public LoadSearchResultAsyncMethod(DanbooruLoaderFixture danbooruLoaderFixture)
                 : base(danbooruLoaderFixture)
             {
             }
@@ -73,10 +73,10 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
                 serachResult.SearchCount.Should().BeGreaterThan(1);
             }
         }
-        
+
         public class LoadNotesHistoryAsyncMethod : DanbooruLoaderTests
         {
-            public LoadNotesHistoryAsyncMethod(DanbooruLoaderFixture danbooruLoaderFixture) 
+            public LoadNotesHistoryAsyncMethod(DanbooruLoaderFixture danbooruLoaderFixture)
                 : base(danbooruLoaderFixture)
             {
             }
@@ -92,7 +92,7 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
         }
         public class LoadTagHistoryUpToAsyncMethod : DanbooruLoaderTests
         {
-            public LoadTagHistoryUpToAsyncMethod(DanbooruLoaderFixture danbooruLoaderFixture) 
+            public LoadTagHistoryUpToAsyncMethod(DanbooruLoaderFixture danbooruLoaderFixture)
                 : base(danbooruLoaderFixture)
             {
             }
@@ -109,7 +109,7 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
 
         public class LoadTagHistoryFromAsyncMethod : DanbooruLoaderTests
         {
-            public LoadTagHistoryFromAsyncMethod(DanbooruLoaderFixture danbooruLoaderFixture) 
+            public LoadTagHistoryFromAsyncMethod(DanbooruLoaderFixture danbooruLoaderFixture)
                 : base(danbooruLoaderFixture)
             {
             }
@@ -216,7 +216,7 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
                 var searchResult = await loader.LoadSearchResultAsync("md5:43d3f7154d9612aaaf7ce0fa585887b2");
                 searchResult.NotEmpty.Should().BeTrue();
                 var result = searchResult.Results.First();
-                
+
                 var post = await loader.LoadPostAsync(result.Id);
 
                 post.Tags.Should().Contain(x => x.Name == "paid reward");
@@ -254,6 +254,21 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
                 post.UgoiraFrameData.Data.Should().HaveCount(411);
                 post.UgoiraFrameData.Data.Last().Delay.Should().Be(2800);
                 post.UgoiraFrameData.Data.Last().File.Should().Be("000410.jpg");
+            }
+        }
+
+        public class FavoritePostAsyncMethod : DanbooruLoaderTests
+        {
+            public FavoritePostAsyncMethod(DanbooruLoaderFixture danbooruLoaderFixture)
+                : base(danbooruLoaderFixture)
+            {
+            }
+
+            [Fact]
+            public async Task ShouldFavoritePost()
+            {
+                var api = _danbooruLoaderFixture.GetApiAccessorWithAuth();
+                await api.FavoritePostAsync(5004994);
             }
         }
     }

@@ -8,11 +8,9 @@ namespace Imouto.BooruParser.Tests.Loaders.Fixtures
         private IBooruAsyncLoader _withoutAuth;
 
         public IBooruAsyncLoader GetLoaderWithAuth()
-            => _withAuth
-               ?? (_withAuth = new SankakuLoader("testuser159", "69f56a924a71774358c31e9233fc8e3c9a1b7d55", 4761));
+            => _withAuth ??= new SankakuLoader("testuser159", "69f56a924a71774358c31e9233fc8e3c9a1b7d55", 4761);
 
         public IBooruAsyncLoader GetLoaderWithoutAuth()
-            => _withoutAuth
-               ?? (_withoutAuth = new SankakuLoader(null, null, 5000));
+            => _withoutAuth ??= new SankakuLoader(null, null, 5000);
     }
 }

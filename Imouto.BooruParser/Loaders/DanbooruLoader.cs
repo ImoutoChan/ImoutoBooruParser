@@ -14,7 +14,7 @@ using Post = Imouto.BooruParser.Model.Base.Post;
 
 namespace Imouto.BooruParser.Loaders
 {
-    public class DanbooruLoader: IBooruLoader, IBooruAsyncLoader
+    public class DanbooruLoader: IBooruLoader, IBooruAsyncLoader, IBooruApiAccessor
     {
         private static readonly ILogger Logger = LoggerAccessor.GetLogger<DanbooruLoader>();
 
@@ -39,9 +39,10 @@ namespace Imouto.BooruParser.Loaders
         private const string NOTEHISTORY_PAGE_JSON_URL = NOTEHISTORY_URL + ".json?page=";
 
         private const string POST_JSON_UGOIRA_META = POST_JSON + "?only=pixiv_ugoira_frame_data";
+        private const string FAVORITE_POST_JSON_URL = ROOT_URL + "/favorites.json?post_id=";
 
         #endregion Consts
-        
+
         private readonly string _login;
         private readonly string _apiKey;
         private readonly BooruLoader _booruLoader;
@@ -53,15 +54,15 @@ namespace Imouto.BooruParser.Loaders
         {
             _login = login;
             _apiKey = apiKey;
-            _booruLoader = booruLoader ?? new BooruLoader(httpClient, loadDelay, customUrlTramsform: AddAuth);
+            _booruLoader = booruLoader ?? new BooruLoader(httpClient, loadDelay, customUrlTransform: AddAuth);
         }
 
         #endregion Constructors
-        
+
 
         #region IBooruLoader members
 
-        public Post LoadPost(int postId) 
+        public Post LoadPost(int postId)
             => Task.Run(async () => await LoadPostAsync(postId)).Result;
 
         public async Task<Post> LoadPostAsync(int postId)
@@ -100,15 +101,15 @@ namespace Imouto.BooruParser.Loaders
             }
         }
 
-        public SearchResult LoadSearchResult(string tagsString) 
+        public SearchResult LoadSearchResult(string tagsString)
             => LoadSearchResultAsync(tagsString).Result;
 
         public async Task<SearchResult> LoadSearchResultAsync(string tagsString)
         {
             return await LoadSearchResultAsync(tagsString, null).ConfigureAwait(false);
         }
-        
-        public List<NoteUpdateEntry> LoadNotesHistory(DateTime lastUpdateTime) 
+
+        public List<NoteUpdateEntry> LoadNotesHistory(DateTime lastUpdateTime)
             => LoadNotesHistoryAsync(lastUpdateTime).Result;
 
         public async Task<List<NoteUpdateEntry>> LoadNotesHistoryAsync(DateTime lastUpdateTime)
@@ -147,7 +148,7 @@ namespace Imouto.BooruParser.Loaders
             return result;
         }
 
-        public List<PostUpdateEntry> LoadTagHistoryUpTo(DateTime toDate) 
+        public List<PostUpdateEntry> LoadTagHistoryUpTo(DateTime toDate)
             => LoadTagHistoryUpToAsync(toDate).Result;
 
         public async Task<List<PostUpdateEntry>> LoadTagHistoryUpToAsync(DateTime toDate)
@@ -190,7 +191,7 @@ namespace Imouto.BooruParser.Loaders
             return result;
         }
 
-        public List<PostUpdateEntry> LoadTagHistoryFrom(int fromId) 
+        public List<PostUpdateEntry> LoadTagHistoryFrom(int fromId)
             => LoadTagHistoryFromAsync(fromId).Result;
 
         public async Task<List<PostUpdateEntry>> LoadTagHistoryFromAsync(int fromId)
@@ -239,7 +240,7 @@ namespace Imouto.BooruParser.Loaders
             return result;
         }
 
-        public List<PostUpdateEntry> LoadFirstTagHistoryPage() 
+        public List<PostUpdateEntry> LoadFirstTagHistoryPage()
             => LoadFirstTagHistoryPageAsync().Result;
 
         public async Task<List<PostUpdateEntry>> LoadFirstTagHistoryPageAsync()
@@ -279,7 +280,7 @@ namespace Imouto.BooruParser.Loaders
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
 
-            return WebUtility.UrlEncode($"{DateTimeOffset.Now.ToUniversalTime():yyyy-MM-ddTHH:mm:ss.fffzzz}") 
+            return WebUtility.UrlEncode($"{DateTimeOffset.Now.ToUniversalTime():yyyy-MM-ddTHH:mm:ss.fffzzz}")
                    + $"&scale={scale}";
         }
 
@@ -314,7 +315,7 @@ namespace Imouto.BooruParser.Loaders
             var json = await _booruLoader.LoadPageAsync(url);
 
             var versions = JsonConvert.DeserializeObject<IReadOnlyCollection<PostVersion>>(json);
-            
+
             return DanbooruPostUpdateEntry.GetFromJson(versions);
         }
 
@@ -324,7 +325,7 @@ namespace Imouto.BooruParser.Loaders
             var json = await _booruLoader.LoadPageAsync(url);
 
             var versions = JsonConvert.DeserializeObject<IReadOnlyCollection<PostVersion>>(json);
-            
+
             return DanbooruPostUpdateEntry.GetFromJson(versions);
         }
 
@@ -337,9 +338,17 @@ namespace Imouto.BooruParser.Loaders
 
             return updates.Select(x => new NoteUpdateEntry
             {
-                Date = DateTime.Parse(x.created_at), 
+                Date = DateTime.Parse(x.created_at),
                 PostId = x.id
             }).ToList();
+        }
+
+        public async Task FavoritePostAsync(int postId)
+        {
+            var url = AddAuth(FAVORITE_POST_JSON_URL + postId);
+
+            await _booruLoader.PostAsync(url);
+
         }
     }
 }
