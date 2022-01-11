@@ -31,7 +31,7 @@ namespace Imouto.BooruParser.Model.Danbooru
         {
             var resultCollection = new List<Pool>();
 
-            var poolRootLiNodes = docNode.SelectNodes(@"//*[@id='pool-nav']/ul/li");
+            var poolRootLiNodes = docNode.SelectNodes(@"//span[@class='pool-name']/a");
 
             if (poolRootLiNodes == null)
             {
@@ -42,14 +42,8 @@ namespace Imouto.BooruParser.Model.Danbooru
             {
                 try
                 {
-                    var id = int.Parse(liNode.Attributes["id"].Value.Split('-').Last());
-                    string name = null;
-                    var aNodes = liNode.SelectNodes("span/a");
-                    var poolNode = aNodes.LastOrDefault(x => x.Attributes["href"].Value.Substring(0, 5) == "/pool");
-                    if (poolNode != null)
-                    {
-                        name = poolNode.InnerHtml.Substring(6);
-                    }
+                    var id = int.Parse(liNode.Attributes["href"].Value.Split('/').Last());
+                    var name = liNode.InnerText.Substring(6);
 
                     resultCollection.Add(CreateOrGetPool(id, name));
                 }
