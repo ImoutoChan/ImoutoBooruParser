@@ -132,10 +132,7 @@ namespace Imouto.BooruParser.Model.Danbooru
 
         private void ParseRelations(HtmlNode postNode)
         {
-            var childrenNodes
-                = postNode
-                    .SelectSingleNode(@"//div[@id='has-children-relationship-preview']")
-                    ?.SelectNodes(@"//article");
+            var childrenNodes = postNode.SelectNodes(@"//div[@id='has-children-relationship-preview']//article");
 
             if (childrenNodes != null)
             {
@@ -155,9 +152,7 @@ namespace Imouto.BooruParser.Model.Danbooru
             }
 
 
-            var parentNodes =
-                postNode.SelectSingleNode(@"//div[@id='has-parent-relationship-preview']")?
-                        .SelectNodes(@"//article");
+            var parentNodes = postNode.SelectNodes(@"//div[@id='has-parent-relationship-preview']//article");
             if (parentNodes != null)
             {
                 var parent = parentNodes[0];

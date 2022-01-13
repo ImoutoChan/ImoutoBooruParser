@@ -72,6 +72,17 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
                 serachResult.NotEmpty.Should().BeTrue();
                 serachResult.SearchCount.Should().BeGreaterThan(1);
             }
+
+            [Fact]
+            public async Task ShouldFindMd5()
+            {
+                var ibal = _danbooruLoaderFixture.GetLoaderWithoutAuth();
+
+                var serachResult = await ibal.LoadSearchResultAsync("md5:746310ab23d72e075755fd426469e31c");
+                serachResult.Results.Should().NotBeEmpty();
+                serachResult.NotEmpty.Should().BeTrue();
+                serachResult.SearchCount.Should().BeGreaterThan(1);
+            }
         }
 
         public class LoadNotesHistoryAsyncMethod : DanbooruLoaderTests
@@ -192,6 +203,21 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
                 post.Tags.Count.Should().BeGreaterThan(30);
                 post.ChildrenIds.Count.Should().NotBe(0);
                 post.ParentId.Should().NotBeNullOrWhiteSpace();
+            }
+
+            /// <summary>
+            /// Bug with post 5032478
+            /// </summary>
+            [Fact]
+            public async Task ShouldLoadChildren()
+            {
+                var loader = _danbooruLoaderFixture.GetLoaderWithoutAuth();
+
+                var post = await loader.LoadPostAsync(5032478);
+
+                post.Tags.Count.Should().BeGreaterThan(30);
+                post.ChildrenIds.Count.Should().Be(2);
+                post.ParentId.Should().BeNull();
             }
 
             [Fact]
