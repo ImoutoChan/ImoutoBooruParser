@@ -65,23 +65,23 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
             [Fact]
             public async Task ShouldFind()
             {
-                var ibal = _danbooruLoaderFixture.GetLoaderWithoutAuth();
+                var loader = _danbooruLoaderFixture.GetLoaderWithoutAuth();
 
-                var serachResult = await ibal.LoadSearchResultAsync("1girl");
-                serachResult.Results.Should().NotBeEmpty();
-                serachResult.NotEmpty.Should().BeTrue();
-                serachResult.SearchCount.Should().BeGreaterThan(1);
+                var searchResult = await loader.LoadSearchResultAsync("1girl");
+                searchResult.Results.Should().NotBeEmpty();
+                searchResult.NotEmpty.Should().BeTrue();
+                searchResult.SearchCount.Should().BeGreaterThan(1);
             }
 
             [Fact]
             public async Task ShouldFindMd5()
             {
-                var ibal = _danbooruLoaderFixture.GetLoaderWithoutAuth();
+                var loader = _danbooruLoaderFixture.GetLoaderWithoutAuth();
 
-                var serachResult = await ibal.LoadSearchResultAsync("md5:746310ab23d72e075755fd426469e31c");
-                serachResult.Results.Should().NotBeEmpty();
-                serachResult.NotEmpty.Should().BeTrue();
-                serachResult.SearchCount.Should().BeGreaterThan(1);
+                var searchResult = await loader.LoadSearchResultAsync("md5:746310ab23d72e075755fd426469e31c");
+                searchResult.Results.Should().NotBeEmpty();
+                searchResult.NotEmpty.Should().BeTrue();
+                searchResult.SearchCount.Should().Be(1);
             }
         }
 
