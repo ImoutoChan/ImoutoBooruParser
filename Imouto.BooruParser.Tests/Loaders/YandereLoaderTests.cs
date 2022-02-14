@@ -189,6 +189,24 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
                 post.ChildrenIds.Count.Should().NotBe(0);
                 post.ParentId.Should().NotBeNullOrWhiteSpace();
             }
+            
+            [Fact]
+            public async Task ShouldLoadChildrenOf801490()
+            {
+                var loader = _yandereLoaderFixture.GetLoader();
+
+                var post = await loader.LoadPostAsync(801490);
+
+                foreach (var childrenId in post.ChildrenIds)
+                {
+                    var cpost = await loader.LoadPostAsync(Int32.Parse(childrenId.Split(':').First()));
+                    var md5 = cpost.Md5;
+
+                    md5.Should().NotBeEmpty();
+                }
+
+                post.ChildrenIds.Count.Should().Be(3);
+            }
 
             [Fact]
             public async Task ShouldLoadNotes()
