@@ -144,7 +144,7 @@ namespace Imouto.BooruParser.Model.Danbooru
                         continue;
                     }
 
-                    var url = child.SelectSingleNode("//img").Attributes["src"].Value;
+                    var url = child.SelectSingleNode("*//img").Attributes["src"].Value;
 
                     var md5 = new Regex("[a-fA-F0-9]{32}").Match(url).Value;
                     ChildrenIds.Add($"{childId}:{md5}");
@@ -158,7 +158,7 @@ namespace Imouto.BooruParser.Model.Danbooru
                 var parent = parentNodes[0];
                 var parentId = int.Parse(parent.Attributes["id"].Value.Substring(5));
 
-                var url = parent.SelectSingleNode("//img").Attributes["src"].Value;
+                var url = parent.SelectSingleNode("*//img").Attributes["src"].Value;
 
                 var md5 = new Regex("[a-fA-F0-9]{32}").Match(url).Value;
 

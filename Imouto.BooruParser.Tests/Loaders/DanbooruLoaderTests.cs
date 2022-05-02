@@ -220,6 +220,22 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
                 post.ParentId.Should().BeNull();
             }
 
+            /// <summary>
+            /// Bug with post 5314036
+            /// </summary>
+            [Fact]
+            public async Task ShouldLoadChildrenFor5314036()
+            {
+                var loader = _danbooruLoaderFixture.GetLoaderWithoutAuth();
+
+                var post = await loader.LoadPostAsync(5314036);
+
+                post.Tags.Count.Should().BeGreaterThan(30);
+                post.ChildrenIds.Count.Should().Be(1);
+                post.ChildrenIds.First().Should().Be("5318896:46dda085dc9c60dd4380ed7b4433aa41");
+                post.ParentId.Should().BeNull();
+            }
+
             [Fact]
             public async Task ShouldLoadNotes()
             {

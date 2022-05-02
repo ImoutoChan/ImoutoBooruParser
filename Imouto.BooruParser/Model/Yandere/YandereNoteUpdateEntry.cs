@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using HtmlAgilityPack;
 using Imouto.BooruParser.Model.Base;
 
@@ -18,7 +19,7 @@ namespace Imouto.BooruParser.Model.Yandere
 
                 noteUpdateEntry.PostId = int.Parse(item.SelectNodes("td")[1].SelectSingleNode("a").InnerHtml);
                 var dateString = item.SelectNodes("td")[5].InnerHtml;
-                noteUpdateEntry.Date = DateTime.Parse(dateString);
+                noteUpdateEntry.Date = DateTime.ParseExact(dateString, "MM/dd/yy", CultureInfo.InvariantCulture);
 
                 result.Add(noteUpdateEntry);
             }
