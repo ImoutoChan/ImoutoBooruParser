@@ -75,14 +75,33 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
             }
 
             [Fact]
-            public async Task ShouldFindMd5()
+            public async Task ShouldFindMd5OfDeletedPost()
             {
                 var loader = _danbooruLoaderFixture.GetLoaderWithoutAuth();
 
                 var searchResult = await loader.LoadSearchResultAsync("md5:746310ab23d72e075755fd426469e31c");
+                
+                
                 searchResult.Results.Should().NotBeEmpty();
                 searchResult.NotEmpty.Should().BeTrue();
                 searchResult.SearchCount.Should().Be(1);
+                
+                searchResult.Results.First().Id.Should().Be(0);
+            }
+
+            [Fact]
+            public async Task ShouldFindMd5OfRegularPost()
+            {
+                var loader = _danbooruLoaderFixture.GetLoaderWithoutAuth();
+
+                var searchResult = await loader.LoadSearchResultAsync("md5:4ff6bfa1745692b8eaf4ba2d2208c207");
+                
+                searchResult.Results.Should().NotBeEmpty();
+                searchResult.NotEmpty.Should().BeTrue();
+                searchResult.SearchCount.Should().Be(1);
+                
+                searchResult.Results.First().Id.Should().Be(5031817);
+                searchResult.Results.First().Md5.Should().Be("4ff6bfa1745692b8eaf4ba2d2208c207");
             }
         }
 
