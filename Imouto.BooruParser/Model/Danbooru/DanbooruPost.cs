@@ -106,10 +106,9 @@ namespace Imouto.BooruParser.Model.Danbooru
                 default:
                 case "q":
                     return Rating.Questionable;
-                    break;
                 case "s":
+                case "g":
                     return Rating.Safe;
-                    break;
                 case "e":
                     return Rating.Explicit;
             }
