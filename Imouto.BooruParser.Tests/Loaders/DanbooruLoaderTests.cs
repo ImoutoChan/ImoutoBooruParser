@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Imouto.BooruParser.Loaders;
+using Imouto.BooruParser.Model.Base;
 using Imouto.BooruParser.Model.Danbooru;
 using Imouto.BooruParser.Tests.Loaders.Fixtures;
 using Xunit;
@@ -296,6 +297,29 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
                 post.UgoiraFrameData.Data.Should().HaveCount(411);
                 post.UgoiraFrameData.Data.Last().Delay.Should().Be(2800);
                 post.UgoiraFrameData.Data.Last().File.Should().Be("000410.jpg");
+            }
+
+            [Fact]
+            public async Task ShouldSafeRatingLevelAsGeneralMetadata()
+            {
+                var loader = _danbooruLoaderFixture.GetLoaderWithoutAuth();
+
+                var generalPost = await loader.LoadPostAsync(5392476);
+                var sensitivePost = await loader.LoadPostAsync(5372463);
+                var questionablePost = await loader.LoadPostAsync(5026269);
+                var explicitPost = await loader.LoadPostAsync(236059);
+
+                generalPost.ImageRating.Should().Be(Rating.Safe);
+                generalPost.RatingSafeLevel.Should().Be(RatingSafeLevel.General);
+                
+                sensitivePost.ImageRating.Should().Be(Rating.Safe);
+                sensitivePost.RatingSafeLevel.Should().Be(RatingSafeLevel.Sensitive);
+                
+                questionablePost.ImageRating.Should().Be(Rating.Questionable);
+                questionablePost.RatingSafeLevel.Should().Be(RatingSafeLevel.None);
+                
+                explicitPost.ImageRating.Should().Be(Rating.Explicit);
+                explicitPost.RatingSafeLevel.Should().Be(RatingSafeLevel.None);
             }
         }
 

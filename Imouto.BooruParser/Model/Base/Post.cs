@@ -60,6 +60,8 @@ namespace Imouto.BooruParser.Model.Base
         public int ByteSize { get; protected set; }
 
         public Rating ImageRating { get; protected set; }
+        
+        public RatingSafeLevel RatingSafeLevel { get; protected set; }
 
         public UgoiraFrameData UgoiraFrameData { get; set; }
 

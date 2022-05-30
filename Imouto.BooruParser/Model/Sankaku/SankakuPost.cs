@@ -135,7 +135,8 @@ namespace Imouto.BooruParser.Model.Sankaku
         {
             try
             {
-                this.ImageRating = (Rating)Enum.Parse(typeof(Rating), GetStatsSeparatedValue(liNode));
+                ImageRating = (Rating)Enum.Parse(typeof(Rating), GetStatsSeparatedValue(liNode));
+                RatingSafeLevel = RatingSafeLevel.None;
             }
             catch (Exception ex)
             {

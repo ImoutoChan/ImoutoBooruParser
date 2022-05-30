@@ -68,7 +68,8 @@ namespace Imouto.BooruParser.Model.Yandere
 
             this.Source = postJson.source;
 
-            this.ImageRating = GetRatingFromChar(postJson.rating);
+            ImageRating = GetRatingFromChar(postJson.rating);
+            RatingSafeLevel = RatingSafeLevel.None;
 
             OriginalUrl = postJson.file_url;
         }

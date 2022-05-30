@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using Imouto.BooruParser.Model.Base;
@@ -94,23 +93,24 @@ namespace Imouto.BooruParser.Model.Danbooru
 
             Source = postJson.source;
 
-            ImageRating = GetRatingFromChar(postJson.rating);
+            (ImageRating, RatingSafeLevel) = GetRatingFromChar(postJson.rating);
 
             OriginalUrl = postJson.file_url;
         }
 
-        private Rating GetRatingFromChar(string rating)
+        private static (Rating, RatingSafeLevel) GetRatingFromChar(string rating)
         {
             switch (rating)
             {
                 default:
                 case "q":
-                    return Rating.Questionable;
+                    return (Rating.Questionable, RatingSafeLevel.None);
                 case "s":
+                    return (Rating.Safe, RatingSafeLevel.Sensitive);
                 case "g":
-                    return Rating.Safe;
+                    return (Rating.Safe, RatingSafeLevel.General);
                 case "e":
-                    return Rating.Explicit;
+                    return (Rating.Explicit, RatingSafeLevel.None);
             }
         }
 

@@ -239,12 +239,7 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
             {
                 var loader = _loaderFixture.GetLoaderWithoutAuth();
 
-                var searchResult = await loader.LoadSearchResultAsync("md5:46cce564e9b43a4c69c132840dca1252");
-
-                searchResult.NotEmpty.Should().BeTrue();
-                var result = searchResult.Results.First();
-
-                var post = await loader.LoadPostAsync(result.Id);
+                var post = await loader.LoadPostAsync(31143268);
 
                 post.Tags.Count.Should().BeGreaterThan(30);
                 post.ChildrenIds.Count.Should().NotBe(0);
@@ -271,14 +266,14 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
             {
                 var loader = _loaderFixture.GetLoaderWithoutAuth();
 
-                var searchResult = await loader.LoadSearchResultAsync("md5:54787e0a60a24960bde55093a8ada0ca");
+                var searchResult = await loader.LoadSearchResultAsync("md5:acea0eadcc5e8cc64100dc3bde45720c");
 
                 searchResult.NotEmpty.Should().BeTrue();
                 var result = searchResult.Results.First();
 
                 var post = await loader.LoadPostAsync(result.Id);
 
-                post.Notes.Count.Should().BeGreaterThan(4);
+                post.Notes.Count.Should().Be(4);
             }
         }
     }
