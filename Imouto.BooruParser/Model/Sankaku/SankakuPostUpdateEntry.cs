@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using HtmlAgilityPack;
 using Imouto.BooruParser.Model.Base;
 
@@ -17,41 +18,43 @@ namespace Imouto.BooruParser.Model.Sankaku
             var historyNodes = htmlDoc.DocumentNode.SelectNodes("//*[@id='history']/tbody/tr");
             foreach (var node in historyNodes)
             {
-                var id = Int32.Parse(node.Attributes["id"].Value.Substring(1));
+                var id = int.Parse(node.Attributes["id"].Value.Substring(1));
 
                 var data = node.SelectNodes("td");
 
-                var postid = Int32.Parse(data[1].ChildNodes[0].InnerHtml);
-                var date = DateTime.Parse(data[2].InnerHtml);
-                var user = data[3].ChildNodes[1].InnerHtml;
+                var postid = int.Parse(data[1].SelectNodes("a")[0].InnerHtml);
+                var date = DateTime.Parse(data[1].InnerText.Split(
+                    new [] { "\n" },
+                    StringSplitOptions.RemoveEmptyEntries).Last());
+                var user = data[2].SelectNodes("a")[1].InnerHtml;
 
 
                 Rating rating;
-                switch (data[5].InnerHtml)
+                switch (data[3].SelectSingleNode("span/a").InnerText)
                 {
-                    case "e":
+                    case "Explicit":
                         rating = Rating.Explicit;
                         break;
-                    case "s":
+                    case "Safe":
                         rating = Rating.Safe;
                         break;
-                    default:
-                    case "q":
+                    case "Questionable":
                         rating = Rating.Questionable;
                         break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(rating));
                 }
 
                 int? parent = null;
-                var parentString = data[6].InnerHtml;
-                if (!String.IsNullOrWhiteSpace(parentString))
+                var parentStrings = data[3].SelectNodes("span/a");
+                if (parentStrings.Count > 1 && !string.IsNullOrWhiteSpace(parentStrings[1].InnerText))
                 {
-                    parent = Int32.Parse(parentString);
+                    parent = int.Parse(parentStrings[1].InnerText);
                 }
 
-                var tagNodes = data[7].SelectNodes("span");
+                var tagNodes = data[4].SelectNodes("span");
                 var addedTags = SankakuTag.GetTagsFromList(tagNodes[0]);
                 var removedTags = SankakuTag.GetTagsFromList(tagNodes[1]);
-                var unchangedTags = SankakuTag.GetTagsFromList(tagNodes[2]);
 
                 result.Add(new SankakuPostUpdateEntry
                 {
@@ -63,7 +66,7 @@ namespace Imouto.BooruParser.Model.Sankaku
                     Parent = parent,
                     AddedTags = addedTags,
                     RemovedTags = removedTags,
-                    UnchangedTags = unchangedTags
+                    UnchangedTags = Array.Empty<Tag>().ToList()
                 });
             }
 

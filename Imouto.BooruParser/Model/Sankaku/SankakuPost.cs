@@ -82,8 +82,8 @@ namespace Imouto.BooruParser.Model.Sankaku
                 {
                     var childId = child.Attributes["id"].Value;
                     var childPostId = Int32.Parse(childId.Substring(1));
-                    var link = child.FirstChild.FirstChild.Attributes["src"].Value;
-                    var md5 = (new Regex(@"([abcdef\d]){32}")).Match(link).Value;
+                    var link = child.SelectSingleNode("//a/img").Attributes["src"].Value;
+                    var md5 = new Regex(@"([abcdef\d]){32}").Match(link).Value;
 
                     this.ChildrenIds.Add(String.Format("{0}:{1}", childPostId, md5));
                 }
@@ -96,7 +96,7 @@ namespace Imouto.BooruParser.Model.Sankaku
                 var parent = parentRootNode.SelectSingleNode(@"span");
                 var parentId = parent.Attributes["id"].Value;
                 var parentPostId = Int32.Parse(parentId.Substring(1));
-                var link = parent.FirstChild.FirstChild.Attributes["src"].Value;
+                var link = parent.SelectSingleNode("a/img").Attributes["src"].Value;
                 var md5 = (new Regex(@"([abcdef\d]){32}")).Match(link).Value;
 
                 this.ParentId = String.Format("{0}:{1}", parentPostId, md5);
