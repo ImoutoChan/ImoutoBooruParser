@@ -289,14 +289,14 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
             {
                 var loader = _danbooruLoaderFixture.GetLoaderWithoutAuth();
 
-                var searchResult = await loader.LoadSearchResultAsync("md5:e9964274b9d09fbd365268a71ef35713");
+                var searchResult = await loader.LoadSearchResultAsync("md5:37493f99a0e45a35f5b69f2c90b2ad39");
 
                 searchResult.NotEmpty.Should().BeTrue();
                 var result = searchResult.Results.First();
 
                 var post = await loader.LoadPostAsync(result.Id);
 
-                post.Pools.Count.Should().BeGreaterOrEqualTo(2);
+                post.Pools.Count.Should().BeGreaterOrEqualTo(1);
             }
 
             [Fact]
