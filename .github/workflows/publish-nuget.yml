@@ -57,14 +57,6 @@ jobs:
           path: TestResults/*.trx    # Path to test results
           reporter: dotnet-trx       # Format of test results
 
-      - name: Upload dotnet test results
-        uses: actions/upload-artifact@v3
-        with:
-          name: dotnet-results
-          path: TestResults
-        # Use always() to always run this step to publish test results when there are test failures
-        if: ${{ always() }}
-
       - name: Create the package
         run: dotnet pack --configuration Release Imouto.BooruParser
 
