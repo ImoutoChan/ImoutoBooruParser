@@ -43,6 +43,8 @@ namespace Imouto.BooruParser.Model.Base
 
         public string OriginalUrl { get; protected set; }
 
+        public string SampleUrl { get; protected set; }
+
         public int PostId { get; }
 
         public ExistState PostExistState { get; protected set; }

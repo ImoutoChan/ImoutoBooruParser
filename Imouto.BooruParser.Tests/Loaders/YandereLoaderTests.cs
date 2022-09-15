@@ -237,6 +237,17 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
 
                 post.Pools.Count.Should().BeGreaterOrEqualTo(1);
             }
+            
+            [Fact]
+            public async Task ShouldLoadSampleUrl()
+            {
+                var loader = _yandereLoaderFixture.GetLoader();
+
+                var post = await loader.LoadPostAsync(1021031);
+
+                post.Should().NotBeNull();
+                post.SampleUrl.Should().Contain("sample");
+            }
         }
 
         public class FavoritePostAsyncMethod : YandereLoaderTests

@@ -96,6 +96,7 @@ namespace Imouto.BooruParser.Model.Danbooru
             (ImageRating, RatingSafeLevel) = GetRatingFromChar(postJson.rating);
 
             OriginalUrl = postJson.file_url;
+            SampleUrl = postJson.large_file_url ?? postJson.preview_file_url;
         }
 
         private static (Rating, RatingSafeLevel) GetRatingFromChar(string rating)

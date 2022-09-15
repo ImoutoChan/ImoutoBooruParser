@@ -255,6 +255,21 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
                 post.ChildrenIds.First().Should().Be("5318896:46dda085dc9c60dd4380ed7b4433aa41");
                 post.ParentId.Should().BeNull();
             }
+            
+            /// <summary>
+            /// Bug with post 5666656
+            /// </summary>
+            [Fact]
+            public async Task ShouldLoadSampleUrlFor5666656()
+            {
+                var loader = _danbooruLoaderFixture.GetLoaderWithoutAuth();
+
+                var post = await loader.LoadPostAsync(5666656);
+
+                post.Should().NotBeNull();
+                post.SampleUrl.Should()
+                    .Be("https://cdn.donmai.us/sample/4a/8b/sample-4a8b6ecee31d9e66e5532f22b19ab736.webm");
+            }
 
             [Fact]
             public async Task ShouldLoadNotes()

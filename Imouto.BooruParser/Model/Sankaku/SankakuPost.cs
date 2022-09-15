@@ -44,6 +44,15 @@ namespace Imouto.BooruParser.Model.Sankaku
             }
 
             ParseRelations(postNode);
+            
+            var sample = "https:" + postNode.SelectSingleNode("//*[@id=\"image\"]")
+                ?.Attributes["src"]
+                ?.Value
+                ?.Split(new [] { "?" }, StringSplitOptions.RemoveEmptyEntries)
+                .FirstOrDefault();
+
+            SampleUrl = sample.Length > 6 ? sample : null;
+
         }
 
         private void ParseIsDeleted(HtmlNode postNode)

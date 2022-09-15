@@ -72,6 +72,7 @@ namespace Imouto.BooruParser.Model.Yandere
             RatingSafeLevel = RatingSafeLevel.None;
 
             OriginalUrl = postJson.file_url;
+            SampleUrl = postJson.sample_url;
         }
 
         private Rating GetRatingFromChar(string rating)

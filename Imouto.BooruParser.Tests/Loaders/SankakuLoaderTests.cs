@@ -275,6 +275,17 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
 
                 post.Notes.Count.Should().Be(4);
             }
+            
+            [Fact]
+            public async Task ShouldLoadSampleUrl()
+            {
+                var loader = _loaderFixture.GetLoaderWithoutAuth();
+
+                var post = await loader.LoadPostAsync(17649920);
+
+                post.Should().NotBeNull();
+                post.SampleUrl.Should().Contain("sample");
+            }
         }
     }
 }
