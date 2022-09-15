@@ -7,11 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imouto.BooruParser", "Imout
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imouto.BooruParser.Tests", "Imouto.BooruParser.Tests\Imouto.BooruParser.Tests.csproj", "{B9CC9691-5E9A-477B-AE2C-2AFDCEE498E2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{AD33678D-6A97-4B9F-992D-C8A2C75AA1B5}"
-	ProjectSection(SolutionItems) = preProject
-		appveyor.yml = appveyor.yml
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{FD85DDD1-F4AC-4BA0-801C-ABC4072F4FA7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{02C985D7-B745-4894-A7B3-57A75E9790CC}"
