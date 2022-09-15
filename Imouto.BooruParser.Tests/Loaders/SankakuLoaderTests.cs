@@ -65,7 +65,7 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
 
                 Func<Task> action = async () => await ibal.LoadFirstTagHistoryPageAsync();
 
-                action.Should().Throw<HttpRequestException>();
+                action.Should().ThrowAsync<HttpRequestException>();
             }
 
             [Fact]
@@ -141,7 +141,7 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
                 Func<Task> action = async ()
                     => await ibal.LoadTagHistoryUpToAsync(DateTime.Now.AddHours(-1));
 
-                action.Should().Throw<HttpRequestException>();
+                action.Should().ThrowAsync<HttpRequestException>();
             }
 
             [Fact]
