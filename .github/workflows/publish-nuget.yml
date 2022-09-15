@@ -36,6 +36,11 @@ jobs:
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: '6.x.x'
+
+      - name: Update project version
+        uses: roryprimrose/set-vs-sdk-project-version@v1
+        with:
+          version: ${{ steps.gitversion.outputs.majorMinorPatch }}
   
       - name: Display dotnet version
         run: dotnet --version
