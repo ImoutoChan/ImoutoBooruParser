@@ -62,8 +62,5 @@ jobs:
           path: TestResults/*.trx    # Path to test results
           reporter: dotnet-trx       # Format of test results
 
-      - name: Create the package
-        run: dotnet pack --configuration Release Imouto.BooruParser
-
       - name: Publish the package
         run: dotnet nuget push **/*.nupkg -k ${{ secrets.NUGET_ORG_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate
