@@ -82,10 +82,8 @@ namespace Imouto.BooruParser.Model.Yandere
                 default:
                 case "q":
                     return Rating.Questionable;
-                    break;
                 case "s":
                     return Rating.Safe;
-                    break;
                 case "e":
                     return Rating.Explicit;
             }

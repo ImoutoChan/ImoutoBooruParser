@@ -11,11 +11,11 @@
 It's able to parse information about individual posts, tags/notes history and could perform a search on this sites.</Description>
     <Copyright>(c) ImoutoChan</Copyright>
     <PackageProjectUrl>https://github.com/ImoutoChan/ImoutoBooruParser</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/ImoutoChan/ImoutoBooruParser/blob/master/LICENSE</PackageLicenseUrl>
     <RepositoryUrl>https://github.com/ImoutoChan/ImoutoBooruParser</RepositoryUrl>
     <PackageTags>booru search parser danbooru sankakuchannel yande.re yandere imageboard</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>1.17.0</Version>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>  
   </PropertyGroup>
 
   <ItemGroup>
