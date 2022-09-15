@@ -1,0 +1,68 @@
+name: Publish Nuget
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        dotnet-version: ['3.0', '3.1.x', '5.0.x' ]
+
+    steps:
+      - name: Install GitVersion
+        uses: GitTools/actions/gitversion/setup@v0.9.11
+        with:
+          versionSpec: '5.5.0'
+      
+      - name: Set up Docker Buildx
+        id:   buildx
+        uses: docker/setup-buildx-action@v1
+          
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Run GitVersion
+        id:   gitversion
+        uses: GitTools/actions/gitversion/execute@v0.9.11
+
+      - name: Echo version
+        run: echo ${{ steps.gitversion.outputs.majorMinorPatch }}
+      
+      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+  
+      - name: Display dotnet version
+        run: dotnet --version
+          
+      - name: Install Dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test with dotnet
+        run: dotnet test --no-restore --verbosity normal --logger trx --results-directory "TestResults-${{ matrix.dotnet-version }}"
+
+      - name: Upload dotnet test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: dotnet-results-${{ matrix.dotnet-version }}
+          path: TestResults-${{ matrix.dotnet-version }}
+        # Use always() to always run this step to publish test results when there are test failures
+        if: ${{ always() }}
+
+      - name: Create the package
+        run: dotnet pack --configuration Release Imouto.BooruParser
+
+      - name: Publish the package
+        run: dotnet nuget push Imouto.BooruParser/bin/Release/*.nupkg

@@ -12,6 +12,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		appveyor.yml = appveyor.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{FD85DDD1-F4AC-4BA0-801C-ABC4072F4FA7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{02C985D7-B745-4894-A7B3-57A75E9790CC}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\publish-nuget.yml = .github\workflows\publish-nuget.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,5 +39,8 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {85F5D2DE-1D98-446F-A186-9D1B72DBC593}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{02C985D7-B745-4894-A7B3-57A75E9790CC} = {FD85DDD1-F4AC-4BA0-801C-ABC4072F4FA7}
 	EndGlobalSection
 EndGlobal
