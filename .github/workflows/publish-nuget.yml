@@ -10,10 +10,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        dotnet-version: ['3.0', '3.1.x', '5.0.x' ]
-
     steps:
       - name: Install GitVersion
         uses: GitTools/actions/gitversion/setup@v0.9.11
@@ -36,10 +32,10 @@ jobs:
       - name: Echo version
         run: echo ${{ steps.gitversion.outputs.majorMinorPatch }}
       
-      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+      - name: Setup .NET Core SDK '6.x.x'
         uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: ${{ matrix.dotnet-version }}
+          dotnet-version: '6.x.x'
   
       - name: Display dotnet version
         run: dotnet --version
@@ -51,13 +47,13 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Test with dotnet
-        run: dotnet test --no-restore --verbosity normal --logger trx --results-directory "TestResults-${{ matrix.dotnet-version }}"
+        run: dotnet test --no-restore --verbosity normal --logger trx --results-directory "TestResults"
 
       - name: Upload dotnet test results
         uses: actions/upload-artifact@v3
         with:
-          name: dotnet-results-${{ matrix.dotnet-version }}
-          path: TestResults-${{ matrix.dotnet-version }}
+          name: dotnet-results
+          path: TestResults
         # Use always() to always run this step to publish test results when there are test failures
         if: ${{ always() }}
 
