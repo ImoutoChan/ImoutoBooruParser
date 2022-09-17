@@ -280,7 +280,7 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
             [Fact]
             public async Task ShouldLoadSampleUrlFor5666656()
             {
-                var loader = _danbooruLoaderFixture.GetLoaderWithoutAuth();
+                var loader = _loaderFixture.GetLoaderWithoutAuth();
 
                 var post = await loader.LoadPostAsync(5666656);
 

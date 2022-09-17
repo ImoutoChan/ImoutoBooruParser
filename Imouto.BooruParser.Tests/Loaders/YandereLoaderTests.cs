@@ -241,7 +241,7 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
             [Fact]
             public async Task ShouldLoadSampleUrl()
             {
-                var loader = _yandereLoaderFixture.GetLoader();
+                var loader = _loaderFixture.GetLoader();
 
                 var post = await loader.LoadPostAsync(1021031);
 
