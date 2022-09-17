@@ -10,24 +10,24 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
 {
     public class YandereLoaderTests : IClassFixture<YandereLoaderFixture>
     {
-        private readonly YandereLoaderFixture _yandereLoaderFixture;
+        private readonly YandereLoaderFixture _loaderFixture;
 
-        public YandereLoaderTests(YandereLoaderFixture yandereLoaderFixture)
+        public YandereLoaderTests(YandereLoaderFixture loaderFixture)
         {
-            _yandereLoaderFixture = yandereLoaderFixture;
+            _loaderFixture = loaderFixture;
         }
 
         public class LoadPostAsyncMethod : YandereLoaderTests
         {
-            public LoadPostAsyncMethod(YandereLoaderFixture yandereLoaderFixture)
-                : base(yandereLoaderFixture)
+            public LoadPostAsyncMethod(YandereLoaderFixture loaderFixture)
+                : base(loaderFixture)
             {
             }
 
             [Fact]
             public async Task ShouldReturnPost()
             {
-                var ibal = _yandereLoaderFixture.GetLoader();
+                var ibal = _loaderFixture.GetLoader();
 
                 var post = await ibal.LoadPostAsync(408517);
 
@@ -38,15 +38,15 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
 
         public class LoadFirstTagHistoryPageAsyncMethod : YandereLoaderTests
         {
-            public LoadFirstTagHistoryPageAsyncMethod(YandereLoaderFixture yandereLoaderFixture)
-                : base(yandereLoaderFixture)
+            public LoadFirstTagHistoryPageAsyncMethod(YandereLoaderFixture loaderFixture)
+                : base(loaderFixture)
             {
             }
 
             [Fact]
             public async Task ShouldReturnHistory()
             {
-                var ibal = _yandereLoaderFixture.GetLoader();
+                var ibal = _loaderFixture.GetLoader();
 
                 var firstPage = await ibal.LoadFirstTagHistoryPageAsync();
 
@@ -56,15 +56,15 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
 
         public class LoadSearchResultAsyncMethod : YandereLoaderTests
         {
-            public LoadSearchResultAsyncMethod(YandereLoaderFixture yandereLoaderFixture)
-                : base(yandereLoaderFixture)
+            public LoadSearchResultAsyncMethod(YandereLoaderFixture loaderFixture)
+                : base(loaderFixture)
             {
             }
 
             [Fact]
             public async Task ShouldFind()
             {
-                var ibal = _yandereLoaderFixture.GetLoader();
+                var ibal = _loaderFixture.GetLoader();
 
                 var serachResult = await ibal.LoadSearchResultAsync("no_bra");
                 serachResult.Results.Should().NotBeEmpty();
@@ -75,15 +75,15 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
 
         public class LoadNotesHistoryAsyncMethod : YandereLoaderTests
         {
-            public LoadNotesHistoryAsyncMethod(YandereLoaderFixture yandereLoaderFixture)
-                : base(yandereLoaderFixture)
+            public LoadNotesHistoryAsyncMethod(YandereLoaderFixture loaderFixture)
+                : base(loaderFixture)
             {
             }
 
             [Fact]
             public async Task ShouldLoadNotesHistory()
             {
-                var ibal = _yandereLoaderFixture.GetLoader();
+                var ibal = _loaderFixture.GetLoader();
 
                 var notesHistory = await ibal.LoadNotesHistoryAsync(DateTime.Now.AddHours(-1));
                 notesHistory.Should().NotBeEmpty();
@@ -92,15 +92,15 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
 
         public class LoadTagHistoryUpToAsyncMethod : YandereLoaderTests
         {
-            public LoadTagHistoryUpToAsyncMethod(YandereLoaderFixture yandereLoaderFixture)
-                : base(yandereLoaderFixture)
+            public LoadTagHistoryUpToAsyncMethod(YandereLoaderFixture loaderFixture)
+                : base(loaderFixture)
             {
             }
 
             [Fact]
             public async Task ShouldLoadTagsHistoryToDate()
             {
-                var ibal = _yandereLoaderFixture.GetLoader();
+                var ibal = _loaderFixture.GetLoader();
 
                 var notesHistory = await ibal.LoadTagHistoryUpToAsync(DateTime.Now.AddHours(-1));
                 notesHistory.Should().NotBeEmpty();
@@ -109,34 +109,34 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
 
         public class LoadTagHistoryFromAsyncMethod : YandereLoaderTests
         {
-            public LoadTagHistoryFromAsyncMethod(YandereLoaderFixture yandereLoaderFixture)
-                : base(yandereLoaderFixture)
+            public LoadTagHistoryFromAsyncMethod(YandereLoaderFixture loaderFixture)
+                : base(loaderFixture)
             {
             }
 
             [Fact]
             public async Task ShouldLoadTagsHistoryFromId()
             {
-                var ibal = _yandereLoaderFixture.GetLoader();
-                var firstTagHistoryPage = await ibal.LoadFirstTagHistoryPageAsync();
+                var loader = _loaderFixture.GetLoader();
+                var firstTagHistoryPage = await loader.LoadFirstTagHistoryPageAsync();
 
-                var notesHistory = await ibal.LoadTagHistoryFromAsync(firstTagHistoryPage.Last().UpdateId);
+                var tagsHistory = await loader.LoadTagHistoryFromAsync(firstTagHistoryPage.Last().UpdateId);
 
-                notesHistory.Should().NotBeEmpty();
+                tagsHistory.Should().NotBeEmpty();
             }
         }
 
         public class LoadPopularAsyncMethod : YandereLoaderTests
         {
-            public LoadPopularAsyncMethod(YandereLoaderFixture yandereLoaderFixture)
-                : base(yandereLoaderFixture)
+            public LoadPopularAsyncMethod(YandereLoaderFixture loaderFixture)
+                : base(loaderFixture)
             {
             }
 
             [Fact]
             public async Task ShouldLoadPopularForDay()
             {
-                var ibal = _yandereLoaderFixture.GetLoader();
+                var ibal = _loaderFixture.GetLoader();
 
                 var serachResult = await ibal.LoadPopularAsync(PopularType.Day);
                 serachResult.Results.Should().NotBeEmpty();
@@ -147,7 +147,7 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
             [Fact]
             public async Task ShouldLoadPopularForWeek()
             {
-                var ibal = _yandereLoaderFixture.GetLoader();
+                var ibal = _loaderFixture.GetLoader();
 
                 var serachResult = await ibal.LoadPopularAsync(PopularType.Week);
                 serachResult.Results.Should().NotBeEmpty();
@@ -158,7 +158,7 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
             [Fact]
             public async Task ShouldLoadPopularForMonth()
             {
-                var ibal = _yandereLoaderFixture.GetLoader();
+                var ibal = _loaderFixture.GetLoader();
 
                 var serachResult = await ibal.LoadPopularAsync(PopularType.Month);
                 serachResult.Results.Should().NotBeEmpty();
@@ -177,7 +177,7 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
             [Fact]
             public async Task ShouldLoadParentsAndChildren()
             {
-                var loader = _yandereLoaderFixture.GetLoader();
+                var loader = _loaderFixture.GetLoader();
 
                 var searchResult = await loader.LoadSearchResultAsync("md5:17a281b47c5baf18e4c9f6d85cc83285");
 
@@ -193,7 +193,7 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
             [Fact]
             public async Task ShouldLoadChildrenOf801490()
             {
-                var loader = _yandereLoaderFixture.GetLoader();
+                var loader = _loaderFixture.GetLoader();
 
                 var post = await loader.LoadPostAsync(801490);
 
@@ -211,7 +211,7 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
             [Fact]
             public async Task ShouldLoadNotes()
             {
-                var loader = _yandereLoaderFixture.GetLoader();
+                var loader = _loaderFixture.GetLoader();
 
                 var searchResult = await loader.LoadSearchResultAsync("md5:caedf1c6957a956fcbd1f8bb17effb73");
 
@@ -226,7 +226,7 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
             [Fact]
             public async Task ShouldLoadPools()
             {
-                var loader = _yandereLoaderFixture.GetLoader();
+                var loader = _loaderFixture.GetLoader();
 
                 var searchResult = await loader.LoadSearchResultAsync("md5:2bb1833a5a12852d186d4fcf86bf9020");
 
@@ -260,7 +260,7 @@ namespace Imouto.BooruParser.Tests.Loaders.YandereLoaderTests
             [Fact]
             public async Task ShouldFavoritePost()
             {
-                var api = _yandereLoaderFixture.GetApiAccessorWithAuth();
+                var api = _loaderFixture.GetApiAccessorWithAuth();
                 await api.FavoritePostAsync(883843);
             }
         }

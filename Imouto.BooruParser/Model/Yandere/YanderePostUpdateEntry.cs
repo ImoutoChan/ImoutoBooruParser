@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using HtmlAgilityPack;
 using Imouto.BooruParser.Model.Base;
 
@@ -15,11 +16,11 @@ namespace Imouto.BooruParser.Model.Yandere
             var result = new List<PostUpdateEntry>();
 
             var historyNodes = htmlDoc.DocumentNode.SelectNodes("//*[@id='history']/tbody/tr");
-            foreach (var node in historyNodes)
+            foreach (var trNode in historyNodes)
             {
-                var id = Int32.Parse(node.Attributes["id"].Value.Substring(1));
+                var id = Int32.Parse(trNode.Attributes["id"].Value.Substring(1));
 
-                var data = node.SelectNodes("td");
+                var data = trNode.SelectNodes("td");
 
                 var historyType = data[0].InnerHtml;
                 if (historyType != "Post")
@@ -30,6 +31,15 @@ namespace Imouto.BooruParser.Model.Yandere
                 var postid = Int32.Parse(data[2].ChildNodes[0].InnerHtml);
                 var date = DateTime.Parse(data[3].InnerHtml);
                 var user = data[4].ChildNodes[0].InnerHtml;
+
+                int? parentId = null;
+                var parentChanged = false;
+                var parentNodes = data[5].SelectNodes("span/a");
+                if (parentNodes?.Count == 1)
+                {
+                    parentId = Int32.Parse(parentNodes.First().InnerText);
+                    parentChanged = true;
+                }
                 
                 // NonImplement
                 //var tagNodes = data[5].SelectNodes("span");
@@ -42,7 +52,9 @@ namespace Imouto.BooruParser.Model.Yandere
                     UpdateId = id,
                     PostId = postid,
                     UpdateDateTime = date,
-                    User = user
+                    User = user,
+                    ParentId = parentId,
+                    ParentChanged = parentChanged
                 });
             }
 

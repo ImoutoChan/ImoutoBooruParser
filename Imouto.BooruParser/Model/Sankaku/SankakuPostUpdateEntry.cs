@@ -63,7 +63,8 @@ namespace Imouto.BooruParser.Model.Sankaku
                     UpdateDateTime = date,
                     User = user,
                     Rating = rating,
-                    Parent = parent,
+                    ParentId = parent,
+                    ParentChanged = true,
                     AddedTags = addedTags,
                     RemovedTags = removedTags,
                     UnchangedTags = Array.Empty<Tag>().ToList()

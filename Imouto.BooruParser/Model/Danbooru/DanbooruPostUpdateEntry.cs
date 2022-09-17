@@ -16,7 +16,9 @@ namespace Imouto.BooruParser.Model.Danbooru
                 {
                     UpdateId = x.Id,
                     PostId = x.PostId,
-                    UpdateDateTime = x.UpdatedAt.DateTime
+                    UpdateDateTime = x.UpdatedAt.DateTime,
+                    ParentId = x.ParentId,
+                    ParentChanged = x.ParentChanged
                 })
                 .Cast<PostUpdateEntry>()
                 .ToList();

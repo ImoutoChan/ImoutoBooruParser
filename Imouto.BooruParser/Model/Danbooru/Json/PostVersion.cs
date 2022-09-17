@@ -13,5 +13,11 @@ namespace Imouto.BooruParser.Model.Danbooru.Json
 
         [JsonProperty("updated_at")]
         public DateTimeOffset UpdatedAt { get; set; }
+
+        [JsonProperty("parent_id")]
+        public int? ParentId { get; set; }
+
+        [JsonProperty("parent_changed")]
+        public bool ParentChanged { get; set; }
     }
 }

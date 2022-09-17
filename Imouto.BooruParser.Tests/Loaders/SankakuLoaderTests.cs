@@ -33,9 +33,9 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
             [Fact]
             public async Task ShouldReturnPostWithoutCredentials()
             {
-                var ibal = _loaderFixture.GetLoaderWithoutAuth();
+                var loader = _loaderFixture.GetLoaderWithoutAuth();
 
-                var post = await ibal.LoadPostAsync(5735331);
+                var post = await loader.LoadPostAsync(5735331);
 
                 post.Should().NotBe(null);
                 post.OriginalUrl.Should().NotBeNullOrWhiteSpace();
@@ -44,8 +44,8 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
             [Fact]
             public async Task ShouldContainLinkWithoutAmp()
             {
-                var ibal = _loaderFixture.GetLoaderWithoutAuth();
-                var post = await ibal.LoadPostAsync(5735331);
+                var loader = _loaderFixture.GetLoaderWithoutAuth();
+                var post = await loader.LoadPostAsync(5735331);
 
                 post.OriginalUrl.Should().NotContain("&amp;");
             }
@@ -61,9 +61,9 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
             [Fact]
             public void ShouldThrowWithoutCredentials()
             {
-                var ibal = _loaderFixture.GetLoaderWithoutAuth();
+                var loader = _loaderFixture.GetLoaderWithoutAuth();
 
-                Func<Task> action = async () => await ibal.LoadFirstTagHistoryPageAsync();
+                Func<Task> action = async () => await loader.LoadFirstTagHistoryPageAsync();
 
                 action.Should().ThrowAsync<HttpRequestException>();
             }
@@ -71,9 +71,9 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
             [Fact]
             public async Task ShouldReturnWithCredentials()
             {
-                var ibal = _loaderFixture.GetLoaderWithAuth();
+                var loader = _loaderFixture.GetLoaderWithAuth();
 
-                var firstPage = await ibal.LoadFirstTagHistoryPageAsync();
+                var firstPage = await loader.LoadFirstTagHistoryPageAsync();
 
                 firstPage.Should().NotBeEmpty();
             }
@@ -89,9 +89,9 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
             [Fact]
             public async Task ShouldFind()
             {
-                var ibal = _loaderFixture.GetLoaderWithoutAuth();
+                var loader = _loaderFixture.GetLoaderWithoutAuth();
 
-                var serachResult = await ibal.LoadSearchResultAsync("1girl");
+                var serachResult = await loader.LoadSearchResultAsync("1girl");
                 serachResult.Results.Should().NotBeEmpty();
                 serachResult.NotEmpty.Should().BeTrue();
                 serachResult.SearchCount.Should().BeGreaterThan(1);
@@ -100,9 +100,9 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
             [Fact]
             public async Task ShouldFindWithMultipleTags()
             {
-                var ibal = _loaderFixture.GetLoaderWithoutAuth();
+                var loader = _loaderFixture.GetLoaderWithoutAuth();
 
-                var serachResult = await ibal.LoadSearchResultAsync("1girl long_hair");
+                var serachResult = await loader.LoadSearchResultAsync("1girl long_hair");
                 serachResult.Results.Should().NotBeEmpty();
                 serachResult.NotEmpty.Should().BeTrue();
                 serachResult.SearchCount.Should().BeGreaterThan(1);
@@ -119,9 +119,9 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
             [Fact]
             public async Task ShouldLoadNotesHistory()
             {
-                var ibal = _loaderFixture.GetLoaderWithoutAuth();
+                var loader = _loaderFixture.GetLoaderWithoutAuth();
 
-                var notesHistory = await ibal.LoadNotesHistoryAsync(DateTime.Now.AddHours(-1));
+                var notesHistory = await loader.LoadNotesHistoryAsync(DateTime.Now.AddHours(-1));
                 notesHistory.Should().NotBeEmpty();
             }
         }
@@ -136,10 +136,10 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
             [Fact]
             public void ShouldNotLoadTagsHistoryToDateWithoutCredentials()
             {
-                var ibal = _loaderFixture.GetLoaderWithoutAuth();
+                var loader = _loaderFixture.GetLoaderWithoutAuth();
 
                 Func<Task> action = async ()
-                    => await ibal.LoadTagHistoryUpToAsync(DateTime.Now.AddHours(-1));
+                    => await loader.LoadTagHistoryUpToAsync(DateTime.Now.AddHours(-1));
 
                 action.Should().ThrowAsync<HttpRequestException>();
             }
@@ -147,9 +147,9 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
             [Fact]
             public async Task ShouldLoadTagsHistoryToDateWithCredentials()
             {
-                var ibal = _loaderFixture.GetLoaderWithAuth();
+                var loader = _loaderFixture.GetLoaderWithAuth();
 
-                var notesHistory = await ibal.LoadTagHistoryUpToAsync(DateTime.Now.AddHours(-1));
+                var notesHistory = await loader.LoadTagHistoryUpToAsync(DateTime.Now.AddHours(-1));
                 notesHistory.Should().NotBeEmpty();
             }
         }
@@ -164,10 +164,10 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
             [Fact]
             public async Task ShouldLoadTagsHistoryFromIdWithCredentials()
             {
-                var ibal = _loaderFixture.GetLoaderWithAuth();
-                var firstTagHistoryPage = await ibal.LoadFirstTagHistoryPageAsync();
+                var loader = _loaderFixture.GetLoaderWithAuth();
+                var firstTagHistoryPage = await loader.LoadFirstTagHistoryPageAsync();
 
-                var notesHistory = await ibal.LoadTagHistoryFromAsync(firstTagHistoryPage.Last().UpdateId);
+                var notesHistory = await loader.LoadTagHistoryFromAsync(firstTagHistoryPage.Last().UpdateId);
 
                 notesHistory.Should().NotBeEmpty();
             }
@@ -175,10 +175,10 @@ namespace Imouto.BooruParser.Tests.Loaders.SankakuLoaderTests
             [Fact]
             public async Task ShouldLoadTagsHistoryFromIdAndHaveAllDataWithCredentials()
             {
-                var ibal = _loaderFixture.GetLoaderWithAuth();
-                var firstTagHistoryPage = await ibal.LoadFirstTagHistoryPageAsync();
+                var loader = _loaderFixture.GetLoaderWithAuth();
+                var firstTagHistoryPage = await loader.LoadFirstTagHistoryPageAsync();
 
-                var tagsHistory = await ibal.LoadTagHistoryFromAsync(firstTagHistoryPage.Last().UpdateId - 100);
+                var tagsHistory = await loader.LoadTagHistoryFromAsync(firstTagHistoryPage.Last().UpdateId - 100);
 
                 tagsHistory.Should().NotBeEmpty();
                 tagsHistory.Count.Should().BeGreaterOrEqualTo(firstTagHistoryPage.Count + 100);

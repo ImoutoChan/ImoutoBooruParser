@@ -17,7 +17,9 @@ namespace Imouto.BooruParser.Model.Base
 
         public Rating Rating { get; protected set; }
 
-        public int? Parent { get; protected set; }
+        public int? ParentId { get; protected set; }
+        
+        public bool ParentChanged { get; protected set; }
 
         public List<Tag> AddedTags { get; protected set; }
 
