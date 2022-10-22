@@ -10,5 +10,7 @@ namespace Imouto.BooruParser.Model.Base
         public string Md5 { get; set; }
 
         public string Title { get; set; }
+        
+        public bool IsBanned { get; set; }
     }
 }

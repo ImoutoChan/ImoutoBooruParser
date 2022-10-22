@@ -27,7 +27,8 @@ namespace Imouto.BooruParser.Model.Danbooru
                 {
                     Id = jsonPost.id,
                     Md5 = jsonPost.md5,
-                    Title = jsonPost.tag_string
+                    Title = jsonPost.tag_string,
+                    IsBanned = jsonPost.is_banned
                 });
             }
         }

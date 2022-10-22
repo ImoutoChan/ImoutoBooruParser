@@ -14,7 +14,7 @@ using Post = Imouto.BooruParser.Model.Base.Post;
 
 namespace Imouto.BooruParser.Loaders
 {
-    public class DanbooruLoader: IBooruLoader, IBooruAsyncLoader, IBooruApiAccessor
+    public class DanbooruLoader: IBooruLoader, IBooruAsyncLoader, IBooruApiAccessor, IBooruAsyncBannedLoader
     {
         private static readonly ILogger Logger = LoggerAccessor.GetLogger<DanbooruLoader>();
 
@@ -82,6 +82,21 @@ namespace Imouto.BooruParser.Loaders
             }
 
             return post;
+        }
+
+        public async Task<Post> LoadBannedPostAsync(string md5)
+        {
+            var pageJson = await _booruLoader.LoadPageAsync(
+                SEARCH_JSON + WebUtility.UrlEncode($"md5:{md5}"));
+
+            var posts = JsonConvert.DeserializeObject<List<Model.Danbooru.Json.Post>>(pageJson);
+
+            var post = posts.FirstOrDefault();
+            
+            if (post is null)
+                return null;
+
+            return new DanbooruPost(post, md5);
         }
 
         private async Task LoadUgoiraMeta(Post post)

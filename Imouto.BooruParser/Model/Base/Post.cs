@@ -28,7 +28,7 @@ namespace Imouto.BooruParser.Model.Base
 
         public Post(int postId, string md5)
         {
-            if (postId <= 0)
+            if (postId < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(postId));
             }
@@ -45,6 +45,9 @@ namespace Imouto.BooruParser.Model.Base
 
         public string SampleUrl { get; protected set; }
 
+        /// <summary>
+        /// PostId can be 0 when post is banned
+        /// </summary>
         public int PostId { get; }
 
         public ExistState PostExistState { get; protected set; }

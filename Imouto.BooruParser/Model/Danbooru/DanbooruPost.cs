@@ -26,6 +26,17 @@ namespace Imouto.BooruParser.Model.Danbooru
             ParsePost(postJson, documentNode);
         }
 
+        public DanbooruPost(Json.Post postJson, string md5 = null)
+            : base(0, md5)
+        {
+            if (postJson == null)
+            {
+                throw new ArgumentNullException(nameof(postJson));
+            }
+
+            ParsePost(postJson);
+        }
+
         #endregion Constructor
 
         public bool IsUgoira => OriginalUrl?.EndsWith(".zip") ?? false;
@@ -45,8 +56,13 @@ namespace Imouto.BooruParser.Model.Danbooru
             }
 
             ParseRelations(documentNode);
+        }
 
-
+        private void ParsePost(Json.Post postJson)
+        {
+            ParseTags(postJson);
+            ParseStats(postJson);
+            ParseIsDeleted(postJson);
         }
 
         private void ParseTags(Json.Post postJson)
@@ -83,7 +99,7 @@ namespace Imouto.BooruParser.Model.Danbooru
             };
 
 
-            Md5 = postJson.md5;
+            Md5 = postJson.md5 ?? Md5;
             ByteSize = postJson.file_size;
             ImageSize = new Size
             {

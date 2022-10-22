@@ -156,7 +156,7 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
                 tagHistory.Should().NotBeEmpty();
             }
 
-            [Fact]
+            [Fact(Skip = "Can't load exact page")]
             public async Task ShouldLoadTagsHistoryWithParentChanges()
             {
                 var loader = _loaderFixture.GetLoaderWithAuth();
@@ -356,7 +356,7 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
             {
                 var loader = _loaderFixture.GetLoaderWithoutAuth();
 
-                var generalPost = await loader.LoadPostAsync(5392476);
+                var generalPost = await loader.LoadPostAsync(5576979);
                 var sensitivePost = await loader.LoadPostAsync(5372463);
                 var questionablePost = await loader.LoadPostAsync(5026269);
                 var explicitPost = await loader.LoadPostAsync(236059);
@@ -372,6 +372,25 @@ namespace Imouto.BooruParser.Tests.Loaders.DanbooruLoaderTests
                 
                 explicitPost.ImageRating.Should().Be(Rating.Explicit);
                 explicitPost.RatingSafeLevel.Should().Be(RatingSafeLevel.None);
+            }
+
+            [Fact]
+            public async Task ShouldGetTagsFromBannedPostMetadata()
+            {
+                var md5 = "6ff425beb52e662827e962fa82f96580";
+                var loader = _loaderFixture.GetLoaderWithoutAuth();
+
+                var foundBannedPosts = await loader.LoadSearchResultAsync($"md5:{md5}");
+
+                var foundBannedPost = foundBannedPosts.Results.FirstOrDefault();
+                foundBannedPost.Should().NotBeNull();
+                foundBannedPost!.IsBanned.Should().BeTrue();
+
+                var post = await (loader as IBooruAsyncBannedLoader).LoadBannedPostAsync(md5);
+
+                post.Should().NotBeNull();
+                post.Md5.Should().Be(md5);
+                post.Tags.Count.Should().BeGreaterThan(30);
             }
         }
 

@@ -5,6 +5,11 @@ using Imouto.BooruParser.Model.Base;
 
 namespace Imouto.BooruParser.Loaders
 {
+    public interface IBooruAsyncBannedLoader
+    {
+        Task<Post> LoadBannedPostAsync(string md5);
+    }
+
     public interface IBooruAsyncLoader
     {
         Task<Post> LoadPostAsync(int postId);
