@@ -8,9 +8,9 @@ public interface IBooruApiLoader
 
     Task<SearchResult> GetPopularPostsAsync(PopularType type);
 
-    Task<HistorySearchResult<TagsHistoryEntry>> LoadTagHistoryPageAsync(SearchToken? token);
+    Task<HistorySearchResult<TagsHistoryEntry>> GetTagHistoryPageAsync(SearchToken? token);
 
-    Task<HistorySearchResult<NoteHistoryEntry>> LoadNotesHistoryPageAsync(SearchToken? token);
+    Task<HistorySearchResult<NoteHistoryEntry>> GetNotesHistoryPageAsync(SearchToken? token);
 }
 
 public interface IBooruApiAccessor

@@ -1,5 +1,8 @@
+using System.Collections.Concurrent;
 using Flurl;
 using Flurl.Http;
+using Flurl.Http.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace ImoutoRebirth.BooruParser.Implementations;
 
@@ -8,11 +11,17 @@ namespace ImoutoRebirth.BooruParser.Implementations;
 public class DanbooruApiLoader : IBooruApiLoader
 {
     private const string BaseUrl = "https://danbooru.donmai.us";
+    private readonly IFlurlClient _flurlClient;
+
+    public DanbooruApiLoader(IFlurlClientFactory factory, IOptions<DanbooruSettings> options)
+    {
+        _flurlClient = factory.Get(new Url(BaseUrl)).Configure(x => SetAuthParameters(x, options));
+    }
 
     public async Task<Post> GetPostAsync(int postId)
     {
-        var post = await BaseUrl
-            .AppendPathSegments("posts", postId + ".json")
+        var post = await _flurlClient.Request("posts", $"{postId}.json")
+            .SetQueryParam("only", "tag_string_artist,tag_string_character,tag_string_copyright,pools,tag_string_general,tag_string_meta,parent_id,md5,file_url,large_file_url,preview_file_url,file_ext,last_noted_at,is_banned,is_deleted,created_at,uploader_id,source,image_width,image_height,file_size,rating,media_metadata[metadata],parent[id,md5],children[id,md5],notes[id,x,y,width,height,body],uploader[id,name]")
             .GetJsonAsync<DanbooruPost>();
 
         return new Post(
@@ -45,12 +54,12 @@ public class DanbooruApiLoader : IBooruApiLoader
         throw new NotImplementedException();
     }
 
-    public Task<HistorySearchResult<TagsHistoryEntry>> LoadTagHistoryPageAsync(SearchToken? token)
+    public Task<HistorySearchResult<TagsHistoryEntry>> GetTagHistoryPageAsync(SearchToken? token)
     {
         throw new NotImplementedException();
     }
 
-    public Task<HistorySearchResult<NoteHistoryEntry>> LoadNotesHistoryPageAsync(SearchToken? token)
+    public Task<HistorySearchResult<NoteHistoryEntry>> GetNotesHistoryPageAsync(SearchToken? token)
     {
         throw new NotImplementedException();
     }
@@ -72,10 +81,9 @@ public class DanbooruApiLoader : IBooruApiLoader
     }
 
 
-    private static async Task<IReadOnlyCollection<Pool>> GetPoolsAsync(int postId)
+    private async Task<IReadOnlyCollection<Pool>> GetPoolsAsync(int postId)
     {
-        var pools = await BaseUrl
-            .AppendPathSegment("pools.json")
+        var pools = await _flurlClient.Request("pools.json")
             .SetQueryParam("search[post_tags_match]", $"id:{postId}")
             .SetQueryParam("only", $"id,name,post_ids")
             .GetJsonAsync<IReadOnlyCollection<DanbooruPool>>();
@@ -118,5 +126,49 @@ public class DanbooruApiLoader : IBooruApiLoader
             .Where(x => !string.IsNullOrWhiteSpace(x.Tag))
             .Select(x => new Tag(x.Type, x.Tag.Replace('_', ' ')))
             .ToList();
+
+    private static void SetAuthParameters(FlurlHttpSettings settings, IOptions<DanbooruSettings> options)
+    {
+        var login = options.Value.Login;
+        var apiKey = options.Value.ApiKey;
+        var delay = options.Value.PauseBetweenRequests;
+
+        settings.BeforeCallAsync = async call =>
+        {
+            if (options.Value.Login != null && options.Value.ApiKey != null)
+                call.Request.SetQueryParam("login", login).SetQueryParam("api_key", apiKey);
+
+            if (delay > TimeSpan.Zero)
+                await Throttler.Get("danbooru").UseAsync(delay);
+        };
+        
+        settings.AfterCall = _ => Throttler.Get("danbooru").Release();
+    }
+}
+
+public class Throttler
+{
+    private static readonly ConcurrentDictionary<string, Throttler> Throttlers = new();
+
+    public static Throttler Get(string key) => Throttlers.GetOrAdd(key, _ => new Throttler());
+
+    private readonly SemaphoreSlim _locker = new SemaphoreSlim(1);
+    private DateTimeOffset _lastAccess = new DateTimeOffset();
+    
+    public async ValueTask UseAsync(TimeSpan delay)
+    {
+        await _locker.WaitAsync();
+
+        var now = DateTimeOffset.UtcNow;
+        
+        var timePassedSinceLastCall = now - _lastAccess;
+        
+        if (timePassedSinceLastCall < delay)
+            await Task.Delay(delay - timePassedSinceLastCall);
+
+        _lastAccess = now;
+    }
+    
+    public void Release() => _locker.Release();
 }
     
