@@ -29,7 +29,19 @@ public record DanbooruParent(
     [property: JsonPropertyName("md5")] string Md5
 );
 
+/// <summary>
+/// only=id,md5,tag_string,is_banned,is_deleted
+/// </summary>
+public record DanbooruPostPreview(
+    [property: JsonPropertyName("id")] int Id,
+    [property: JsonPropertyName("md5")] string? Md5,
+    [property: JsonPropertyName("tag_string")] string TagString,
+    [property: JsonPropertyName("is_banned")] bool IsBanned,
+    [property: JsonPropertyName("is_deleted")] bool IsDeleted
+);
+
 public record DanbooruPost(
+    [property: JsonPropertyName("id")] int Id,
     [property: JsonPropertyName("created_at")] DateTimeOffset CreatedAt,
     [property: JsonPropertyName("last_noted_at")] DateTimeOffset? LastNotedAt,
     [property: JsonPropertyName("uploader_id")] int UploaderId,

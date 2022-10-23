@@ -26,6 +26,6 @@ public class DanbooruApiLoaderFixture
         => _danbooruWithoutAuth ??=
             new DanbooruApiLoader(new PerBaseUrlFlurlClientFactory(), Options.Create(new DanbooruSettings()
             {
-                PauseBetweenRequestsInMs = 5000
+                PauseBetweenRequestsInMs = 0
             }));
 }

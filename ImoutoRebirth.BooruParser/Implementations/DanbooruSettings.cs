@@ -6,7 +6,7 @@ public record DanbooruSettings
     
     public string? ApiKey { get; set; }
     
-    public int PauseBetweenRequestsInMs { get; set; } = 0;
+    public int PauseBetweenRequestsInMs { get; set; } = 1;
 
     public TimeSpan PauseBetweenRequests => TimeSpan.FromMilliseconds(PauseBetweenRequestsInMs);
 }

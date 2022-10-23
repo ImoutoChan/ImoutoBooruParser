@@ -48,55 +48,49 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>
     //         firstPage.Should().NotBeEmpty();
     //     }
     // }
-    //
-    // public class LoadSearchResultAsyncMethod : DanbooruLoaderTests
-    // {
-    //     public LoadSearchResultAsyncMethod(DanbooruApiLoaderFixture loaderFixture)
-    //         : base(loaderFixture)
-    //     {
-    //     }
-    //
-    //     [Fact]
-    //     public async Task ShouldFind()
-    //     {
-    //         var loader = _loaderFixture.GetLoaderWithoutAuth();
-    //
-    //         var searchResult = await loader.LoadSearchResultAsync("1girl");
-    //         searchResult.Results.Should().NotBeEmpty();
-    //         searchResult.NotEmpty.Should().BeTrue();
-    //         searchResult.SearchCount.Should().BeGreaterThan(1);
-    //     }
-    //
-    //     [Fact]
-    //     public async Task ShouldFindMd5OfDeletedPost()
-    //     {
-    //         var loader = _loaderFixture.GetLoaderWithoutAuth();
-    //
-    //         var searchResult = await loader.LoadSearchResultAsync("md5:746310ab23d72e075755fd426469e31c");
-    //         
-    //         
-    //         searchResult.Results.Should().NotBeEmpty();
-    //         searchResult.NotEmpty.Should().BeTrue();
-    //         searchResult.SearchCount.Should().Be(1);
-    //         
-    //         searchResult.Results.First().Id.Should().Be(0);
-    //     }
-    //
-    //     [Fact]
-    //     public async Task ShouldFindMd5OfRegularPost()
-    //     {
-    //         var loader = _loaderFixture.GetLoaderWithoutAuth();
-    //
-    //         var searchResult = await loader.LoadSearchResultAsync("md5:4ff6bfa1745692b8eaf4ba2d2208c207");
-    //         
-    //         searchResult.Results.Should().NotBeEmpty();
-    //         searchResult.NotEmpty.Should().BeTrue();
-    //         searchResult.SearchCount.Should().Be(1);
-    //         
-    //         searchResult.Results.First().Id.Should().Be(5031817);
-    //         searchResult.Results.First().Md5.Should().Be("4ff6bfa1745692b8eaf4ba2d2208c207");
-    //     }
-    // }
+    
+    public class LoadSearchResultAsyncMethod : DanbooruLoaderTests
+    {
+        public LoadSearchResultAsyncMethod(DanbooruApiLoaderFixture loaderFixture)
+            : base(loaderFixture)
+        {
+        }
+    
+        [Fact]
+        public async Task ShouldFind()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+    
+            var searchResult = await loader.SearchAsync("1girl");
+            searchResult.Results.Should().NotBeEmpty();
+        }
+    
+        [Fact]
+        public async Task ShouldFindMd5OfBannedPost()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+    
+            var searchResult = await loader.SearchAsync("md5:746310ab23d72e075755fd426469e31c");
+            
+            searchResult.Results.Should().NotBeEmpty();
+            
+            searchResult.Results.First().Id.Should().Be(3630304);
+            searchResult.Results.First().Md5Hash.Should().BeNull();
+        }
+    
+        [Fact]
+        public async Task ShouldFindMd5OfRegularPost()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+    
+            var searchResult = await loader.SearchAsync("md5:4ff6bfa1745692b8eaf4ba2d2208c207");
+            
+            searchResult.Results.Should().NotBeEmpty();
+            
+            searchResult.Results.First().Id.Should().Be(5031817);
+            searchResult.Results.First().Md5Hash.Should().Be("4ff6bfa1745692b8eaf4ba2d2208c207");
+        }
+    }
 
     // public class LoadNotesHistoryAsyncMethod : DanbooruLoaderTests
     // {
@@ -363,14 +357,53 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>
             restrictedPost.Tags.Should().NotBeEmpty();
         }
 
-        [Fact]
-        public async Task ShouldGetBannedPostWithSomeData()
+        [Fact] 
+        public async Task ShouldGetDeletedWithFullData()
+        {
+            var loader = _loaderFixture.GetLoaderWithAuth();
+
+            var restrictedPost = await loader.GetPostAsync(5707498);
+
+            restrictedPost.Tags.Should().NotBeEmpty();
+            restrictedPost.Id.Md5Hash.Should().NotBeEmpty();
+            restrictedPost.OriginalUrl.Should().NotBeEmpty();
+        }
+
+        [Theory]
+        [InlineData(5069825)]
+        [InlineData(5767795)]
+        public async Task ShouldGetBannedPostWithSomeData(int id)
         {
             var loader = _loaderFixture.GetLoaderWithoutAuth();
 
-            var restrictedPost = await loader.GetPostAsync(5069825);
+            var restrictedPost = await loader.GetPostAsync(id);
 
             restrictedPost.OriginalUrl.Should().BeNullOrEmpty();
+            restrictedPost.Tags.Should().NotBeEmpty();
+        }
+
+        [Fact] 
+        public async Task ShouldGetByMd5WithFullData()
+        {
+            var loader = _loaderFixture.GetLoaderWithAuth();
+
+            var post = await loader.GetPostByMd5Async("fcf0c189e898edcb316ea0b61096c622");
+            
+            post.Should().NotBeNull();
+            post!.Id.Id.Should().Be(5766237);
+            post!.OriginalUrl.Should().NotBeNull();
+        }
+
+        [Fact]
+        public async Task ShouldGetBannedPostByMd5WithSomeData()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+
+            var restrictedPost = await loader.GetPostByMd5Async("b9b933c1835d043ec38cbefbe78554eb");
+
+            restrictedPost.Should().NotBeNull();
+            restrictedPost!.Id.Id.Should().Be(5767795);
+            restrictedPost.OriginalUrl.Should().BeNull();
             restrictedPost.Tags.Should().NotBeEmpty();
         }
     }

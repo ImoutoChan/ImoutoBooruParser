@@ -21,7 +21,7 @@ public class DanbooruApiLoader : IBooruApiLoader
     public async Task<Post> GetPostAsync(int postId)
     {
         var post = await _flurlClient.Request("posts", $"{postId}.json")
-            .SetQueryParam("only", "tag_string_artist,tag_string_character,tag_string_copyright,pools,tag_string_general,tag_string_meta,parent_id,md5,file_url,large_file_url,preview_file_url,file_ext,last_noted_at,is_banned,is_deleted,created_at,uploader_id,source,image_width,image_height,file_size,rating,media_metadata[metadata],parent[id,md5],children[id,md5],notes[id,x,y,width,height,body],uploader[id,name]")
+            .SetQueryParam("only", "id,tag_string_artist,tag_string_character,tag_string_copyright,pools,tag_string_general,tag_string_meta,parent_id,md5,file_url,large_file_url,preview_file_url,file_ext,last_noted_at,is_banned,is_deleted,created_at,uploader_id,source,image_width,image_height,file_size,rating,media_metadata[metadata],parent[id,md5],children[id,md5],notes[id,x,y,width,height,body],uploader[id,name]")
             .GetJsonAsync<DanbooruPost>();
 
         return new Post(
@@ -44,9 +44,47 @@ public class DanbooruApiLoader : IBooruApiLoader
             GetNotes(post));
     }
 
-    public Task<SearchResult> SearchAsync(string tags)
+    public async Task<Post?> GetPostByMd5Async(string md5)
     {
-        throw new NotImplementedException();
+        var posts = await _flurlClient.Request("posts.json")
+            .SetQueryParam("only", "id,tag_string_artist,tag_string_character,tag_string_copyright,pools,tag_string_general,tag_string_meta,parent_id,md5,file_url,large_file_url,preview_file_url,file_ext,last_noted_at,is_banned,is_deleted,created_at,uploader_id,source,image_width,image_height,file_size,rating,media_metadata[metadata],parent[id,md5],children[id,md5],notes[id,x,y,width,height,body],uploader[id,name]")
+            .SetQueryParam("tags", $"md5:{md5}")
+            .GetJsonAsync<IReadOnlyCollection<DanbooruPost>>();
+
+        if (!posts.Any())
+            return null;
+
+        var post = posts.First();
+        return new Post(
+            new PostIdentity(post.Id, post.Md5),
+            post.FileUrl,
+            post.LargeFileUrl ?? post.PreviewFileUrl,
+            post.IsBanned || post.IsDeleted ? ExistState.MarkDeleted : ExistState.Exist,
+            post.CreatedAt,
+            new Uploader(post.UploaderId, post.Uploader.Name),
+            post.Source,
+            new Size(post.ImageWidth, post.ImageHeight),
+            post.FileSize,
+            GetRating(post.Rating),
+            GetRatingSafeLevel(post.Rating),
+            GetUgoiraMetadata(post),
+            GetParent(post),
+            GetChildren(post),
+            await GetPoolsAsync(post.Id),
+            GetTags(post),
+            GetNotes(post));
+    }
+
+    public async Task<SearchResult> SearchAsync(string tags)
+    {
+        var posts = await _flurlClient.Request("posts.json")
+            .SetQueryParam("tags", tags)
+            .SetQueryParam("only", "id,md5,tag_string,is_banned,is_deleted")
+            .GetJsonAsync<IReadOnlyCollection<DanbooruPostPreview>>();
+
+        return new SearchResult(posts
+            .Select(x => new PostPreview(x.Id, x.Md5, x.TagString, x.IsBanned, x.IsDeleted))
+            .ToList());
     }
 
     public Task<SearchResult> GetPopularPostsAsync(PopularType type)

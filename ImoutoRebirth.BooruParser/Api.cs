@@ -3,6 +3,8 @@
 public interface IBooruApiLoader
 {
     Task<Post> GetPostAsync(int postId);
+    
+    Task<Post?> GetPostByMd5Async(string md5);
 
     Task<SearchResult> SearchAsync(string tags);
 
@@ -21,7 +23,7 @@ public interface IBooruApiAccessor
 /// <param name="Page">For danbooru: b{lowest-history-id-on-current-page}</param>
 public record SearchToken(string Page);
 
-public record SearchResult(IReadOnlyCollection<PostPreview> Results, int? SearchCount)
+public record SearchResult(IReadOnlyCollection<PostPreview> Results)
 {
     public bool IsFound => Results.Any();
 }
@@ -33,12 +35,15 @@ public record HistorySearchResult<T>(
     public bool IsFound => Results.Any();
 }
 
-public record PostPreview(int Id, string Md5Hash, string Title);
+public record PostPreview(int Id, string? Md5Hash, string Title, bool IsBanned, bool IsDeleted);
 
+/// <summary>
+/// OriginalUrl, SampleUrl and PostIdentity.Md5 are nulls when post is banned
+/// </summary>
 public record Post(
     PostIdentity Id,
-    string OriginalUrl,
-    string SampleUrl,
+    string? OriginalUrl,
+    string? SampleUrl,
     ExistState ExistState,
     DateTimeOffset PostedAt,
     Uploader UploaderId,
