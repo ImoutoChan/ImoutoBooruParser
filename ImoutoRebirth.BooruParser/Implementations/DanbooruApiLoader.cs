@@ -1,5 +1,3 @@
-using System.Collections.Concurrent;
-using System.Web;
 using Flurl;
 using Flurl.Http;
 using Flurl.Http.Configuration;
@@ -7,9 +5,7 @@ using Microsoft.Extensions.Options;
 
 namespace ImoutoRebirth.BooruParser.Implementations;
 
-// check on loli posts
-// check on banned posts
-public class DanbooruApiLoader : IBooruApiLoader
+public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
 {
     private const string BaseUrl = "https://danbooru.donmai.us";
     private readonly IFlurlClient _flurlClient;
@@ -109,14 +105,75 @@ public class DanbooruApiLoader : IBooruApiLoader
             .ToList());
     }
 
-    public Task<HistorySearchResult<TagsHistoryEntry>> GetTagHistoryPageAsync(SearchToken? token)
+    public async Task<HistorySearchResult<TagHistoryEntry>> GetTagHistoryPageAsync(
+        SearchToken? token,
+        int limit = 100,
+        CancellationToken ct = default)
     {
-        throw new NotImplementedException();
+        var request = _flurlClient.Request("post_versions.json")
+            .SetQueryParam("limit", limit);
+        
+        if (token != null)
+            request = request.SetQueryParam("page", token.Page);
+
+        var found = await request.GetJsonAsync<IReadOnlyCollection<DanbooruTagsHistoryEntry>>(cancellationToken: ct);
+
+        if (!found.Any())
+            return new(Array.Empty<TagHistoryEntry>(), null);
+        
+        var entries = found
+            .Select(x => new TagHistoryEntry(x.Id, x.UpdatedAt, x.PostId, x.ParentId, x.ParentChanged))
+            .ToList();
+
+        var nextPage = token?.Page[0] switch
+        {
+            null => $"b{found.Min(x => x.Id)}",
+            'b' => $"b{found.Min(x => x.Id)}",
+            'a' => $"a{found.Max(x => x.Id)}",
+            var x when int.TryParse(x.ToString(), out var page) => (page + 1).ToString(),
+            _ => "1"
+        };
+
+        return new(entries, new SearchToken(nextPage));
     }
 
-    public Task<HistorySearchResult<NoteHistoryEntry>> GetNotesHistoryPageAsync(SearchToken? token)
+    public async Task<HistorySearchResult<NoteHistoryEntry>> GetNoteHistoryPageAsync(
+        SearchToken? token,
+        int limit = 100,
+        CancellationToken ct = default)
     {
-        throw new NotImplementedException();
+        var request = _flurlClient.Request("note_versions.json")
+            .SetQueryParam("limit", limit);
+        
+        if (token != null)
+            request = request.SetQueryParam("page", token.Page);
+
+        var found = await request.GetJsonAsync<IReadOnlyCollection<DanbooruNotesHistoryEntry>>(cancellationToken: ct);
+
+        if (!found.Any())
+            return new(Array.Empty<NoteHistoryEntry>(), null);
+        
+        var entries = found
+            .Select(x => new NoteHistoryEntry(x.Id, x.PostId, x.UpdatedAt))
+            .ToList();
+
+        var nextPage = token?.Page[0] switch
+        {
+            null => $"b{found.Min(x => x.Id)}",
+            'b' => $"b{found.Min(x => x.Id)}",
+            'a' => $"a{found.Max(x => x.Id)}",
+            var x when int.TryParse(x.ToString(), out var page) => (page + 1).ToString(),
+            _ => "1"
+        };
+
+        return new(entries, new SearchToken(nextPage));
+    }
+
+    public async Task FavoritePostAsync(int postId)
+    {
+        await _flurlClient.Request("favorites.json")
+            .SetQueryParam("post_id", postId)
+            .PostAsync();
     }
 
     private static PostIdentity? GetParent(DanbooruPost post)
@@ -124,7 +181,6 @@ public class DanbooruApiLoader : IBooruApiLoader
 
     private static IReadOnlyCollection<PostIdentity> GetChildren(DanbooruPost post)
         => post.Children.Select(x => new PostIdentity(x.Id, x.Md5)).ToList();
-
 
     private static IReadOnlyCollection<int> GetUgoiraMetadata(DanbooruPost post)
     {
@@ -134,7 +190,6 @@ public class DanbooruApiLoader : IBooruApiLoader
 
         return post.MediaMetadata.Metadata.UgoiraFrameDelays ?? Array.Empty<int>();
     }
-
 
     private async Task<IReadOnlyCollection<Pool>> GetPoolsAsync(int postId)
     {
@@ -200,30 +255,3 @@ public class DanbooruApiLoader : IBooruApiLoader
         settings.AfterCall = _ => Throttler.Get("danbooru").Release();
     }
 }
-
-public class Throttler
-{
-    private static readonly ConcurrentDictionary<string, Throttler> Throttlers = new();
-
-    public static Throttler Get(string key) => Throttlers.GetOrAdd(key, _ => new Throttler());
-
-    private readonly SemaphoreSlim _locker = new SemaphoreSlim(1);
-    private DateTimeOffset _lastAccess = new DateTimeOffset();
-    
-    public async ValueTask UseAsync(TimeSpan delay)
-    {
-        await _locker.WaitAsync();
-
-        var now = DateTimeOffset.UtcNow;
-        
-        var timePassedSinceLastCall = now - _lastAccess;
-        
-        if (timePassedSinceLastCall < delay)
-            await Task.Delay(delay - timePassedSinceLastCall);
-
-        _lastAccess = now;
-    }
-    
-    public void Release() => _locker.Release();
-}
-    

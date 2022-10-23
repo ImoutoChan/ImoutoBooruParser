@@ -10,9 +10,15 @@ public interface IBooruApiLoader
 
     Task<SearchResult> GetPopularPostsAsync(PopularType type);
 
-    Task<HistorySearchResult<TagsHistoryEntry>> GetTagHistoryPageAsync(SearchToken? token);
+    Task<HistorySearchResult<TagHistoryEntry>> GetTagHistoryPageAsync(
+        SearchToken? token,
+        int limit = 100,
+        CancellationToken ct = default);
 
-    Task<HistorySearchResult<NoteHistoryEntry>> GetNotesHistoryPageAsync(SearchToken? token);
+    Task<HistorySearchResult<NoteHistoryEntry>> GetNoteHistoryPageAsync(
+        SearchToken? token,
+        int limit = 100,
+        CancellationToken ct = default);
 }
 
 public interface IBooruApiAccessor
@@ -30,7 +36,7 @@ public record SearchResult(IReadOnlyCollection<PostPreview> Results)
 
 public record HistorySearchResult<T>(
     IReadOnlyCollection<T> Results, 
-    SearchToken NextToken)
+    SearchToken? NextToken)
 {
     public bool IsFound => Results.Any();
 }
@@ -82,16 +88,11 @@ public record struct Position(int Top, int Left);
 
 public record struct Size(int Width, int Height);
 
-public record TagsHistoryEntry(
+public record TagHistoryEntry(
     int HistoryId,
     DateTimeOffset UpdatedAt,
     int PostId,
-    string Username,
-    Rating Rating,
     int? ParentId,
-    bool ParentChanged,
-    IReadOnlyCollection<Tag> AddedTags,
-    IReadOnlyCollection<Tag> RemovedTags,
-    IReadOnlyCollection<Tag> UnchangedTags);
+    bool ParentChanged);
 
-public record NoteHistoryEntry(int PostId, DateTimeOffset UpdatedAt);
+public record NoteHistoryEntry(int HistoryId, int PostId, DateTimeOffset UpdatedAt);

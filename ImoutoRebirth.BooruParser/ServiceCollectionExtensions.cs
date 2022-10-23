@@ -10,6 +10,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<IFlurlClientFactory, PerBaseUrlFlurlClientFactory>();
         services.AddTransient<IBooruApiLoader, DanbooruApiLoader>();
+        services.AddTransient<IBooruApiAccessor, DanbooruApiLoader>();
 
         return services;
     }

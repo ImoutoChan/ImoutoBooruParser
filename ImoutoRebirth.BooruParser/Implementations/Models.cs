@@ -80,3 +80,17 @@ public record DanbooruPool(
     [property: JsonPropertyName("name")] string Name,
     [property: JsonPropertyName("post_ids")] int[] PostIds
 );
+
+public record DanbooruTagsHistoryEntry(
+    [property: JsonPropertyName("id")] int Id,
+    [property: JsonPropertyName("post_id")] int PostId,
+    [property: JsonPropertyName("updated_at")] DateTime UpdatedAt,
+    [property: JsonPropertyName("parent_id")] int? ParentId,
+    [property: JsonPropertyName("parent_changed")] bool ParentChanged
+);
+
+public record DanbooruNotesHistoryEntry(
+    [property: JsonPropertyName("id")] int Id,
+    [property: JsonPropertyName("post_id")] int PostId,
+    [property: JsonPropertyName("updated_at")] DateTime UpdatedAt
+);

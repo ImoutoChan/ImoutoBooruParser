@@ -1,4 +1,6 @@
 using FluentAssertions;
+using Flurl.Util;
+using ImoutoRebirth.BooruParser.Implementations;
 using ImoutoRebirth.BooruParser.Tests.Loaders.Fixtures;
 using Xunit;
 
@@ -74,93 +76,125 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>
         }
     }
 
-    // public class LoadFirstTagHistoryPageAsyncMethod : DanbooruLoaderTests
-    // {
-    //     public LoadFirstTagHistoryPageAsyncMethod(DanbooruApiLoaderFixture loaderFixture)
-    //         : base(loaderFixture)
-    //     {
-    //     }
-    //
-    //     [Fact]
-    //     public async Task ShouldReturnWithCredentials()
-    //     {
-    //         var loader = _loaderFixture.GetLoaderWithAuth();
-    //
-    //         var firstPage = await loader.LoadFirstTagHistoryPageAsync();
-    //
-    //         firstPage.Should().NotBeEmpty();
-    //     }
-    // }
+    public class LoadNotesHistoryAsyncMethod : DanbooruLoaderTests
+    {
+        public LoadNotesHistoryAsyncMethod(DanbooruApiLoaderFixture loaderFixture)
+            : base(loaderFixture)
+        {
+        }
+    
+        [Fact]
+        public async Task ShouldGetUpToDateTime()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+    
+            var result = new List<NoteHistoryEntry>();
+            await foreach (var item in loader.GetNoteHistoryToDateTimeAsync(DateTime.Now.AddHours(-1))) 
+                result.Add(item);
 
-    // public class LoadNotesHistoryAsyncMethod : DanbooruLoaderTests
-    // {
-    //     public LoadNotesHistoryAsyncMethod(DanbooruApiLoaderFixture loaderFixture)
-    //         : base(loaderFixture)
-    //     {
-    //     }
-    //
-    //     [Fact]
-    //     public async Task ShouldLoadNotesHistory()
-    //     {
-    //         var loader = _loaderFixture.GetLoaderWithoutAuth();
-    //
-    //         var notesHistory = await loader.LoadNotesHistoryAsync(DateTime.Now.AddHours(-1));
-    //         notesHistory.Should().NotBeEmpty();
-    //     }
-    // }
-    // public class LoadTagHistoryUpToAsyncMethod : DanbooruLoaderTests
-    // {
-    //     public LoadTagHistoryUpToAsyncMethod(DanbooruApiLoaderFixture loaderFixture)
-    //         : base(loaderFixture)
-    //     {
-    //     }
-    //
-    //     [Fact]
-    //     public async Task ShouldLoadWithAuth()
-    //     {
-    //         var loader = _loaderFixture.GetLoaderWithAuth();
-    //
-    //         var notesHistory = await loader.LoadTagHistoryUpToAsync(DateTime.Now.AddHours(-1));
-    //         notesHistory.Should().NotBeEmpty();
-    //     }
-    // }
-    //
-    // public class LoadTagHistoryFromAsyncMethod : DanbooruLoaderTests
-    // {
-    //     public LoadTagHistoryFromAsyncMethod(DanbooruApiLoaderFixture loaderFixture)
-    //         : base(loaderFixture)
-    //     {
-    //     }
-    //
-    //     [Fact]
-    //     public async Task ShouldLoadTagsHistoryFromId()
-    //     {
-    //         var loader = _loaderFixture.GetLoaderWithAuth();
-    //         var firstTagHistoryPage = await loader.LoadFirstTagHistoryPageAsync();
-    //
-    //         var tagHistory = await loader.LoadTagHistoryFromAsync(firstTagHistoryPage.Last().UpdateId);
-    //
-    //         tagHistory.Should().NotBeEmpty();
-    //     }
-    //
-    //     [Fact]
-    //     public async Task ShouldLoadTagsHistoryWithParentChanges()
-    //     {
-    //         var loader = _loaderFixture.GetLoaderWithAuth();
-    //
-    //         var tagsHistory = await loader.LoadTagHistoryFromAsync(43125946);
-    //
-    //         tagsHistory.Should().NotBeEmpty();
-    //         tagsHistory.First(x => x.UpdateId == 43125965).ParentChanged.Should().BeTrue();
-    //         tagsHistory.First(x => x.UpdateId == 43125965).Parent.Should().BeNull();
-    //         
-    //         tagsHistory.First(x => x.UpdateId == 43125951).ParentChanged.Should().BeFalse();
-    //         tagsHistory.First(x => x.UpdateId == 43125951).Parent.Should().BeNull();
-    //         
-    //         tagsHistory.First(x => x.UpdateId == 43125948).ParentChanged.Should().BeFalse();
-    //         tagsHistory.First(x => x.UpdateId == 43125948).Parent?.Id.Should().Be(4978487);
-    //     }
-    // }
+            result.Should().NotBeEmpty();
+            result.DistinctBy(x => x.HistoryId).Should().HaveCount(result.Count);
+        }
+        
+        [Fact]
+        public async Task ShouldGetFirstPage()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+    
+            var firstPage = await loader.GetNoteHistoryFirstPageAsync();
+    
+            firstPage.Should().NotBeEmpty();
+        }
+        
+        [Fact]
+        public async Task ShouldLoadNotesHistoryFromId()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+            var page = await loader.GetNoteHistoryPageAsync(new SearchToken("3"));
+    
+            var result = new List<NoteHistoryEntry>();
+            await foreach (var item in loader.GetNoteHistoryFromIdToPresentAsync(page.Results.Last().HistoryId))
+                result.Add(item);
+    
+            result.Should().HaveCountGreaterThanOrEqualTo(299);
+            result.DistinctBy(x => x.HistoryId).Should().HaveCount(result.Count);
+        }
+    }
+    public class LoadTagHistory : DanbooruLoaderTests
+    {
+        public LoadTagHistory(DanbooruApiLoaderFixture loaderFixture)
+            : base(loaderFixture)
+        {
+        }
+    
+        [Fact]
+        public async Task ShouldGetUpToDateTime()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+
+            var result = new List<TagHistoryEntry>();
+            await foreach (var item in loader.GetTagHistoryToDateTimeAsync(DateTime.Now.AddHours(-1))) 
+                result.Add(item);
+
+            result.Should().NotBeEmpty();
+            result.DistinctBy(x => x.HistoryId).Should().HaveCount(result.Count);
+        }
+    
+        [Fact]
+        public async Task ShouldGetFirstPage()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+    
+            var firstPage = await loader.GetTagHistoryFirstPageAsync();
+    
+            firstPage.Should().NotBeEmpty();
+            firstPage.Should().HaveCount(100);
+        }
+        
+        [Fact]
+        public async Task ShouldGetFirstPageWith1000Results()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+    
+            var firstPage = await loader.GetTagHistoryFirstPageAsync(1000);
+    
+            firstPage.Should().NotBeEmpty();
+            firstPage.Should().HaveCount(1000);
+        }
+    
+        [Fact]
+        public async Task ShouldLoadTagsHistoryFromId()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+            var page = await loader.GetTagHistoryPageAsync(new SearchToken("3"));
+    
+            var result = new List<TagHistoryEntry>();
+            await foreach (var item in loader.GetTagHistoryFromIdToPresentAsync(page.Results.Last().HistoryId))
+                result.Add(item);
+    
+            result.Should().HaveCountGreaterOrEqualTo(299);
+            result.DistinctBy(x => x.HistoryId).Should().HaveCount(result.Count);
+        }
+    
+        [Fact]
+        public async Task ShouldLoadTagsHistoryWithParentChanges()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+    
+            var page = await loader.GetTagHistoryPageAsync(new SearchToken("a43125946"));
+            var tagsHistory = page.Results;
+    
+            tagsHistory.Should().NotBeEmpty();
+            tagsHistory.First(x => x.HistoryId == 43125965).ParentChanged.Should().BeTrue();
+            tagsHistory.First(x => x.HistoryId == 43125965).ParentId.Should().BeNull();
+            
+            tagsHistory.First(x => x.HistoryId == 43125951).ParentChanged.Should().BeFalse();
+            tagsHistory.First(x => x.HistoryId == 43125951).ParentId.Should().BeNull();
+            
+            tagsHistory.First(x => x.HistoryId == 43125948).ParentChanged.Should().BeFalse();
+            tagsHistory.First(x => x.HistoryId == 43125948).ParentId.Should().Be(4978487);
+        }
+    }
     
     public class LoadPopularAsyncMethod : DanbooruLoaderTests
     {
@@ -353,7 +387,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>
         [Fact]
         public async Task ShouldGetRestrictedWithSomeData()
         {
-            var loader = _loaderFixture.GetLoaderWithAuth();
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
 
             var restrictedPost = await loader.GetPostAsync(5387246);
 
@@ -363,13 +397,25 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>
         [Fact] 
         public async Task ShouldGetDeletedWithFullData()
         {
-            var loader = _loaderFixture.GetLoaderWithAuth();
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
 
             var restrictedPost = await loader.GetPostAsync(5707498);
 
             restrictedPost.Tags.Should().NotBeEmpty();
-            restrictedPost.Id.Md5Hash.Should().NotBeEmpty();
-            restrictedPost.OriginalUrl.Should().NotBeEmpty();
+            restrictedPost.Id.Md5Hash.Should().NotBeNullOrWhiteSpace();
+            restrictedPost.OriginalUrl.Should().NotBeNullOrWhiteSpace();
+        }
+
+        [Fact(Skip = "Works only with gold accounts")] 
+        public async Task ShouldGetRestrictedByTagsWithFullData()
+        {
+            var loader = _loaderFixture.GetLoaderWithAuth();
+
+            var restrictedPost = await loader.GetPostAsync(5387246);
+
+            restrictedPost.Tags.Should().NotBeEmpty();
+            restrictedPost.Id.Md5Hash.Should().NotBeNullOrWhiteSpace();
+            restrictedPost.OriginalUrl.Should().NotBeNullOrWhiteSpace();
         }
 
         [Theory]
@@ -388,13 +434,13 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>
         [Fact] 
         public async Task ShouldGetByMd5WithFullData()
         {
-            var loader = _loaderFixture.GetLoaderWithAuth();
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
 
             var post = await loader.GetPostByMd5Async("fcf0c189e898edcb316ea0b61096c622");
             
             post.Should().NotBeNull();
             post!.Id.Id.Should().Be(5766237);
-            post!.OriginalUrl.Should().NotBeNull();
+            post!.OriginalUrl.Should().NotBeNullOrWhiteSpace();
         }
 
         [Fact]
@@ -411,18 +457,18 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>
         }
     }
 
-    // public class FavoritePostAsyncMethod : DanbooruLoaderTests
-    // {
-    //     public FavoritePostAsyncMethod(DanbooruApiLoaderFixture loaderFixture)
-    //         : base(loaderFixture)
-    //     {
-    //     }
-    //
-    //     [Fact]
-    //     public async Task ShouldFavoritePost()
-    //     {
-    //         var api = _loaderFixture.GetApiAccessorWithAuth();
-    //         await api.FavoritePostAsync(5004994);
-    //     }
-    // }
+    public class FavoritePostAsyncMethod : DanbooruLoaderTests
+    {
+        public FavoritePostAsyncMethod(DanbooruApiLoaderFixture loaderFixture)
+            : base(loaderFixture)
+        {
+        }
+    
+        [Fact]
+        public async Task ShouldFavoritePost()
+        {
+            var api = _loaderFixture.GetApiAccessorWithAuth();
+            await api.FavoritePostAsync(5768298);
+        }
+    }
 }
