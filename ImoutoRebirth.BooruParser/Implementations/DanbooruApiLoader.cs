@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Web;
 using Flurl;
 using Flurl.Http;
 using Flurl.Http.Configuration;
@@ -87,9 +88,25 @@ public class DanbooruApiLoader : IBooruApiLoader
             .ToList());
     }
 
-    public Task<SearchResult> GetPopularPostsAsync(PopularType type)
+    public async Task<SearchResult> GetPopularPostsAsync(PopularType type)
     {
-        throw new NotImplementedException();
+        var scale = type switch
+        {
+            PopularType.Day => "day",
+            PopularType.Week => "week",
+            PopularType.Month => "month",
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+        };
+        
+        var posts = await _flurlClient.Request("explore", "posts", "popular.json")
+            .SetQueryParam("date", $"{DateTimeOffset.UtcNow:yyyy-MM-ddTHH:mm:ss.fffzzz}")
+            .SetQueryParam("scale", scale)
+            .SetQueryParam("only", "id,md5,tag_string,is_banned,is_deleted")
+            .GetJsonAsync<IReadOnlyCollection<DanbooruPostPreview>>();
+
+        return new SearchResult(posts
+            .Select(x => new PostPreview(x.Id, x.Md5, x.TagString, x.IsBanned, x.IsDeleted))
+            .ToList());
     }
 
     public Task<HistorySearchResult<TagsHistoryEntry>> GetTagHistoryPageAsync(SearchToken? token)

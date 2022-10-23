@@ -30,24 +30,6 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>
             post.OriginalUrl.Should().NotBeNullOrWhiteSpace();
         }
     }
-
-    // public class LoadFirstTagHistoryPageAsyncMethod : DanbooruLoaderTests
-    // {
-    //     public LoadFirstTagHistoryPageAsyncMethod(DanbooruApiLoaderFixture loaderFixture)
-    //         : base(loaderFixture)
-    //     {
-    //     }
-    //
-    //     [Fact]
-    //     public async Task ShouldReturnWithCredentials()
-    //     {
-    //         var loader = _loaderFixture.GetLoaderWithAuth();
-    //
-    //         var firstPage = await loader.LoadFirstTagHistoryPageAsync();
-    //
-    //         firstPage.Should().NotBeEmpty();
-    //     }
-    // }
     
     public class LoadSearchResultAsyncMethod : DanbooruLoaderTests
     {
@@ -91,6 +73,24 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>
             searchResult.Results.First().Md5Hash.Should().Be("4ff6bfa1745692b8eaf4ba2d2208c207");
         }
     }
+
+    // public class LoadFirstTagHistoryPageAsyncMethod : DanbooruLoaderTests
+    // {
+    //     public LoadFirstTagHistoryPageAsyncMethod(DanbooruApiLoaderFixture loaderFixture)
+    //         : base(loaderFixture)
+    //     {
+    //     }
+    //
+    //     [Fact]
+    //     public async Task ShouldReturnWithCredentials()
+    //     {
+    //         var loader = _loaderFixture.GetLoaderWithAuth();
+    //
+    //         var firstPage = await loader.LoadFirstTagHistoryPageAsync();
+    //
+    //         firstPage.Should().NotBeEmpty();
+    //     }
+    // }
 
     // public class LoadNotesHistoryAsyncMethod : DanbooruLoaderTests
     // {
@@ -161,50 +161,53 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>
     //         tagsHistory.First(x => x.UpdateId == 43125948).Parent?.Id.Should().Be(4978487);
     //     }
     // }
-    //
-    // public class LoadPopularAsyncMethod : DanbooruLoaderTests
-    // {
-    //     public LoadPopularAsyncMethod(DanbooruApiLoaderFixture loaderFixture)
-    //         : base(loaderFixture)
-    //     {
-    //     }
-    //
-    //     [Fact]
-    //     public async Task ShouldLoadPopularForDay()
-    //     {
-    //         var loader = _loaderFixture.GetLoaderWithoutAuth();
-    //
-    //         var searchResult = await loader.LoadPopularAsync(PopularType.Day);
-    //
-    //         searchResult.Results.Should().NotBeEmpty();
-    //         searchResult.NotEmpty.Should().BeTrue();
-    //         searchResult.SearchCount.Should().BeGreaterThan(1);
-    //     }
-    //
-    //     [Fact]
-    //     public async Task ShouldLoadPopularForWeek()
-    //     {
-    //         var loader = _loaderFixture.GetLoaderWithoutAuth();
-    //
-    //         var searchResult = await loader.LoadPopularAsync(PopularType.Week);
-    //
-    //         searchResult.Results.Should().NotBeEmpty();
-    //         searchResult.NotEmpty.Should().BeTrue();
-    //         searchResult.SearchCount.Should().BeGreaterThan(1);
-    //     }
-    //
-    //     [Fact]
-    //     public async Task ShouldLoadPopularForMonth()
-    //     {
-    //         var loader = _loaderFixture.GetLoaderWithoutAuth();
-    //
-    //         var serachResult = await loader.LoadPopularAsync(PopularType.Month);
-    //
-    //         serachResult.Results.Should().NotBeEmpty();
-    //         serachResult.NotEmpty.Should().BeTrue();
-    //         serachResult.SearchCount.Should().BeGreaterThan(1);
-    //     }
-    // }
+    
+    public class LoadPopularAsyncMethod : DanbooruLoaderTests
+    {
+        public LoadPopularAsyncMethod(DanbooruApiLoaderFixture loaderFixture)
+            : base(loaderFixture)
+        {
+        }
+    
+        [Fact]
+        public async Task ShouldLoadPopularForDay()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+    
+            var result = await loader.GetPopularPostsAsync(PopularType.Day);
+    
+            result.Results.Should().NotBeEmpty();
+            result.Results.First().Id.Should().BeGreaterThan(0);
+            result.Results.First().Title.Should().NotBeNullOrWhiteSpace();
+            result.Results.First().Md5Hash.Should().NotBeNullOrWhiteSpace();
+        }
+    
+        [Fact]
+        public async Task ShouldLoadPopularForWeek()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+    
+            var result = await loader.GetPopularPostsAsync(PopularType.Week);
+    
+            result.Results.Should().NotBeEmpty();
+            result.Results.First().Id.Should().BeGreaterThan(0);
+            result.Results.First().Title.Should().NotBeNullOrWhiteSpace();
+            result.Results.First().Md5Hash.Should().NotBeNullOrWhiteSpace();
+        }
+    
+        [Fact]
+        public async Task ShouldLoadPopularForMonth()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+    
+            var result = await loader.GetPopularPostsAsync(PopularType.Month);
+    
+            result.Results.Should().NotBeEmpty();
+            result.Results.First().Id.Should().BeGreaterThan(0);
+            result.Results.First().Title.Should().NotBeNullOrWhiteSpace();
+            result.Results.First().Md5Hash.Should().NotBeNullOrWhiteSpace();
+        }
+    }
 
     public class LoadPostMetadataAsyncMethod : DanbooruLoaderTests
     {
