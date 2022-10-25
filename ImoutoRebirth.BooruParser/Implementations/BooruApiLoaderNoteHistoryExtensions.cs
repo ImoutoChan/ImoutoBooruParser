@@ -1,4 +1,6 @@
 using System.Runtime.CompilerServices;
+using ImoutoRebirth.BooruParser.Implementations.Danbooru;
+using ImoutoRebirth.BooruParser.Implementations.Yandere;
 
 namespace ImoutoRebirth.BooruParser.Implementations;
 
@@ -19,16 +21,23 @@ public static class BooruApiLoaderNoteHistoryExtensions
         int limit = 100,
         [EnumeratorCancellation] CancellationToken ct = default)
     {
-        var searchToken = new SearchToken($"a{afterHistoryId}");
-        do
+        if (loader is DanbooruApiLoader)
         {
-            var page = await loader.GetNoteHistoryPageAsync(searchToken, limit, ct);
-            searchToken = page.NextToken;
+            var searchToken = new SearchToken($"a{afterHistoryId}");
+            do
+            {
+                var page = await loader.GetNoteHistoryPageAsync(searchToken, limit, ct);
+                searchToken = page.NextToken;
 
-            foreach (var historyEntry in page.Results)
-                yield return historyEntry;
+                foreach (var historyEntry in page.Results)
+                    yield return historyEntry;
 
-        } while (searchToken != null);
+            } while (searchToken != null);
+        }
+        else if (loader is YandereApiLoader)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public static async IAsyncEnumerable<NoteHistoryEntry> GetNoteHistoryToDateTimeAsync(

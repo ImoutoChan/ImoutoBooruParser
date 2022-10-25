@@ -3,7 +3,7 @@ using Flurl.Http;
 using Flurl.Http.Configuration;
 using Microsoft.Extensions.Options;
 
-namespace ImoutoRebirth.BooruParser.Implementations;
+namespace ImoutoRebirth.BooruParser.Implementations.Danbooru;
 
 public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
 {
@@ -131,7 +131,7 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
             'b' => $"b{found.Min(x => x.Id)}",
             'a' => $"a{found.Max(x => x.Id)}",
             var x when int.TryParse(x.ToString(), out var page) => (page + 1).ToString(),
-            _ => "1"
+            _ => "2"
         };
 
         return new(entries, new SearchToken(nextPage));
@@ -162,8 +162,8 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
             null => $"b{found.Min(x => x.Id)}",
             'b' => $"b{found.Min(x => x.Id)}",
             'a' => $"a{found.Max(x => x.Id)}",
-            var x when int.TryParse(x.ToString(), out var page) => (page + 1).ToString(),
-            _ => "1"
+            var _ when int.TryParse(token.Page, out var page) => (page + 1).ToString(),
+            _ => "2"
         };
 
         return new(entries, new SearchToken(nextPage));

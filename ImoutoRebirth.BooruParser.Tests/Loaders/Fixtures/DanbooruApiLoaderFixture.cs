@@ -1,6 +1,5 @@
 ﻿using Flurl.Http.Configuration;
-using Flurl.Http.Testing;
-using ImoutoRebirth.BooruParser.Implementations;
+using ImoutoRebirth.BooruParser.Implementations.Danbooru;
 using ImoutoRebirth.BooruParser.Tests.Loaders.Fixtures.HttpCache;
 using Microsoft.Extensions.Options;
 

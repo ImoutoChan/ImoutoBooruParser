@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Flurl.Util;
 using ImoutoRebirth.BooruParser.Implementations;
 using ImoutoRebirth.BooruParser.Tests.Loaders.Fixtures;
 using Xunit;
@@ -10,10 +9,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>
 {
     private readonly DanbooruApiLoaderFixture _loaderFixture;
 
-    private DanbooruLoaderTests(DanbooruApiLoaderFixture loaderFixture)
-    {
-        _loaderFixture = loaderFixture;
-    }
+    private DanbooruLoaderTests(DanbooruApiLoaderFixture loaderFixture) => _loaderFixture = loaderFixture;
 
     public class GetPostAsyncMethod : DanbooruLoaderTests
     {

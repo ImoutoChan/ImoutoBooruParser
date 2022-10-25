@@ -1,10 +1,10 @@
-namespace ImoutoRebirth.BooruParser.Implementations;
+namespace ImoutoRebirth.BooruParser.Implementations.Yandere;
 
-public record DanbooruSettings
+public record YandereSettings
 {
     public string? Login { get; set; }
     
-    public string? ApiKey { get; set; }
+    public string? PasswordHash { get; set; }
     
     public int PauseBetweenRequestsInMs { get; set; } = 1;
 
