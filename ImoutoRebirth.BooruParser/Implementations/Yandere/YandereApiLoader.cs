@@ -305,7 +305,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             .SetQueryParam("id", poolId)
             .GetJsonAsync<YanderePool>();
 
-        return new Pool(pool.Id, pool.Name, Array.IndexOf(pool.Posts.Select(x => x.Id).ToArray(), postId));
+        return new Pool(pool.Id, pool.Name.Replace('_', ' '), Array.IndexOf(pool.Posts.Select(x => x.Id).ToArray(), postId));
     }
 
     private static IReadOnlyCollection<Note> GetNotes(YanderePost post, HtmlDocument postHtml)

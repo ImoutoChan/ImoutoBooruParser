@@ -53,6 +53,10 @@ public class HardCachingHttpMessageHandler : DelegatingHandler
 
         var result = await base.SendAsync(request, ct);
         var code = result.StatusCode;
+
+        if ((int)code > 200)
+            return result;
+        
         var content = await result.Content!.ReadAsStringAsync(ct);
 
         Cache.TryAdd(key, new CacheEntry(content, code));

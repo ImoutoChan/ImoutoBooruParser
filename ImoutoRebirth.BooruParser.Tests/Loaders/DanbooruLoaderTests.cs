@@ -22,10 +22,36 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>
         {
             var loader = _loaderFixture.GetLoaderWithoutAuth();
 
-            var post = await loader.GetPostAsync(1);
+            var post = await loader.GetPostAsync(5773061);
 
-            post.Should().NotBe(null);
-            post.OriginalUrl.Should().NotBeNullOrWhiteSpace();
+            post.Should().NotBeNull();
+            post.OriginalUrl.Should().Be("https://cdn.donmai.us/original/54/3f/543f49b2d9fd4e31d8cb10ceaff6cad7.jpg");
+            post.Id.Id.Should().Be(5773061);
+            post.Id.Md5Hash.Should().Be("543f49b2d9fd4e31d8cb10ceaff6cad7");
+            post.Notes.Should().BeEmpty();
+            post.Tags.Should().HaveCount(35);
+
+            foreach (var postTag in post.Tags)
+            {
+                postTag.Name.Should().NotBeNullOrWhiteSpace();
+                postTag.Type.Should().NotBeNullOrWhiteSpace();
+                postTag.Type.Should().BeOneOf(new[] { "meta", "general", "copyright", "character", "circle", "artist" });
+            }
+            
+            post.Parent.Should().BeNull();
+            post.Pools.Should().BeEmpty();
+            post.Rating.Should().Be(Rating.Safe);
+            post.RatingSafeLevel.Should().Be(RatingSafeLevel.Sensitive);
+            post.Source.Should().Be("https://twitter.com/jewel_milk/status/1584877432959541250");
+            post.ChildrenIds.Should().BeEmpty();
+            post.ExistState.Should().Be(ExistState.Exist);
+            post.FileResolution.Should().Be(new Size(1000, 1414));
+            post.PostedAt.Should().Be(new DateTimeOffset(2022, 10, 25, 12, 01, 24, 980, TimeSpan.Zero));
+            post.SampleUrl.Should().Be("https://cdn.donmai.us/sample/54/3f/sample-543f49b2d9fd4e31d8cb10ceaff6cad7.jpg");
+            post.UploaderId.Id.Should().Be(508969);
+            post.UploaderId.Name.Should().Be("Topsy Krett");
+            post.FileSizeInBytes.Should().Be(151135);
+            post.UgoiraFrameDelays.Should().BeEmpty();
         }
     }
     
@@ -189,6 +215,46 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>
             
             tagsHistory.First(x => x.HistoryId == 43125948).ParentChanged.Should().BeFalse();
             tagsHistory.First(x => x.HistoryId == 43125948).ParentId.Should().Be(4978487);
+        }
+        
+        [Fact]
+        public async Task ShouldReturnNextNumberToken()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+
+            var firstPage = await loader.GetTagHistoryPageAsync(null);
+
+            firstPage.NextToken?.Page.Should().StartWith("b");
+        }
+        
+        [Fact]
+        public async Task ShouldReturnNextNumberTokenFor2()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+
+            var firstPage = await loader.GetTagHistoryPageAsync(new SearchToken("2"));
+
+            firstPage.NextToken?.Page.Should().Be("3");
+        }
+        
+        [Fact]
+        public async Task ShouldReturnNextNumberTokenForA()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+
+            var firstPage = await loader.GetTagHistoryPageAsync(new SearchToken("a100"));
+
+            firstPage.NextToken?.Page.Should().StartWith("a");
+        }
+        
+        [Fact]
+        public async Task ShouldReturnNextNumberTokenForB()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+
+            var firstPage = await loader.GetTagHistoryPageAsync(new SearchToken("b10000"));
+
+            firstPage.NextToken?.Page.Should().StartWith("b");
         }
     }
     

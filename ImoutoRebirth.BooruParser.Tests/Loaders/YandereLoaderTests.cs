@@ -1,4 +1,3 @@
-using System.Drawing;
 using FluentAssertions;
 using ImoutoRebirth.BooruParser.Extensions;
 using ImoutoRebirth.BooruParser.Implementations;
@@ -27,8 +26,45 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
 
             var post = await loader.GetPostAsync(408517);
 
-            post.Should().NotBe(null);
+            post.Should().NotBeNull();
             post.OriginalUrl.Should().Be("https://files.yande.re/image/5569d245d4c85921a0da173d87391862/yande.re%20408517%20cleavage%20dakimakura%20fate_grand_order%20kimono%20mash_kyrielight%20no_bra%20nopan%20open_shirt%20yuran.png");
+            post.Id.Id.Should().Be(408517);
+            post.Id.Md5Hash.Should().Be("5569d245d4c85921a0da173d87391862");
+            post.Notes.Should().BeEmpty();
+            post.Tags.Should().HaveCount(9);
+
+            foreach (var postTag in post.Tags)
+            {
+                postTag.Name.Should().NotBeNullOrWhiteSpace();
+                postTag.Type.Should().NotBeNullOrWhiteSpace();
+                postTag.Type.Should().BeOneOf(new[] { "general", "copyright", "character", "circle", "artist" });
+            }
+            
+            post.Parent.Should().BeNull();
+            post.Pools.Should().BeEmpty();
+            post.Rating.Should().Be(Rating.Questionable);
+            post.Source.Should().Be("https://yurang92.booth.pm/items/621246");
+            post.ChildrenIds.Should().BeEmpty();
+            post.ExistState.Should().Be(ExistState.Exist);
+            post.FileResolution.Should().Be(new Size(1383, 4393));
+            post.PostedAt.Should().Be(new DateTimeOffset(2017, 09, 06, 5, 38, 17, TimeSpan.Zero));
+            post.SampleUrl.Should().Be("https://files.yande.re/sample/5569d245d4c85921a0da173d87391862/yande.re%20408517%20sample%20cleavage%20dakimakura%20fate_grand_order%20kimono%20mash_kyrielight%20no_bra%20nopan%20open_shirt%20yuran.jpg");
+            post.UploaderId.Id.Should().Be(25882);
+            post.UploaderId.Name.Should().Be("Mr_GT");
+            post.RatingSafeLevel.Should().Be(RatingSafeLevel.None);
+            post.FileSizeInBytes.Should().Be(5455985);
+            post.UgoiraFrameDelays.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task ShouldReturnPostByMd5()
+        {
+            var loader = _loaderFixture.GetLoader();
+
+            var post = await loader.GetPostByMd5Async("5569d245d4c85921a0da173d87391862");
+
+            post.Should().NotBeNull();
+            post!.OriginalUrl.Should().Be("https://files.yande.re/image/5569d245d4c85921a0da173d87391862/yande.re%20408517%20cleavage%20dakimakura%20fate_grand_order%20kimono%20mash_kyrielight%20no_bra%20nopan%20open_shirt%20yuran.png");
             post.Id.Id.Should().Be(408517);
             post.Id.Md5Hash.Should().Be("5569d245d4c85921a0da173d87391862");
             post.Notes.Should().BeEmpty();
@@ -58,9 +94,9 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
         }
     }
 
-    public class LoadSearchResultAsyncMethod : YandereLoaderTests
+    public class SearchAsyncMethod : YandereLoaderTests
     {
-        public LoadSearchResultAsyncMethod(YandereApiLoaderFixture loaderFixture)
+        public SearchAsyncMethod(YandereApiLoaderFixture loaderFixture)
             : base(loaderFixture)
         {
         }
@@ -72,6 +108,14 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
 
             var result = await loader.SearchAsync("no_bra");
             result.Results.Should().HaveCountGreaterThan(1);
+            result.Results.ToList().ForEach(x => x.IsDeleted.Should().BeFalse());
+            result.Results.ToList().ForEach(x => x.IsBanned.Should().BeFalse());
+
+            foreach (var preview in result.Results)
+            {
+                var post = await loader.GetPostAsync(preview.Id);
+                post.Tags.Select(x => x.Name).Should().Contain("no bra");
+            }
         }
     }
 
@@ -91,12 +135,33 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
 
             result.Should().NotBeEmpty();
             result.Should().HaveCountGreaterOrEqualTo(25);
+            result.ToList().ForEach(x => x.HistoryId.Should().Be(-1));
+        }
+        
+        [Fact]
+        public async Task ShouldReturnNextNumberToken()
+        {
+            var loader = _loaderFixture.GetLoader();
+
+            var firstPage = await loader.GetNoteHistoryPageAsync(null);
+
+            firstPage.NextToken?.Page.Should().Be("2");
+        }
+        
+        [Fact]
+        public async Task ShouldReturnNextNumberTokenFor2()
+        {
+            var loader = _loaderFixture.GetLoader();
+
+            var firstPage = await loader.GetNoteHistoryPageAsync(new SearchToken("2"));
+
+            firstPage.NextToken?.Page.Should().Be("3");
         }
     }
 
-    public class LoadTagHistoryUpToAsyncMethod : YandereLoaderTests
+    public class GetTagHistoryPageAsyncMethod : YandereLoaderTests
     {
-        public LoadTagHistoryUpToAsyncMethod(YandereApiLoaderFixture loaderFixture)
+        public GetTagHistoryPageAsyncMethod(YandereApiLoaderFixture loaderFixture)
             : base(loaderFixture)
         {
         }
@@ -123,6 +188,26 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
 
             firstPage.Should().NotBeEmpty();
         }
+        
+        [Fact]
+        public async Task ShouldReturnNextNumberToken()
+        {
+            var loader = _loaderFixture.GetLoader();
+
+            var firstPage = await loader.GetTagHistoryPageAsync(null);
+
+            firstPage.NextToken?.Page.Should().Be("2");
+        }
+        
+        [Fact]
+        public async Task ShouldReturnNextNumberTokenFor2()
+        {
+            var loader = _loaderFixture.GetLoader();
+
+            var firstPage = await loader.GetTagHistoryPageAsync(new SearchToken("2"));
+
+            firstPage.NextToken?.Page.Should().Be("3");
+        }
 
         [Fact]
         public async Task ShouldGetTagHistoryFromIdToPresent()
@@ -138,9 +223,9 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
         }
     }
 
-    public class LoadPopularAsyncMethod : YandereLoaderTests
+    public class GetPopularPostsAsyncMethod : YandereLoaderTests
     {
-        public LoadPopularAsyncMethod(YandereApiLoaderFixture loaderFixture)
+        public GetPopularPostsAsyncMethod(YandereApiLoaderFixture loaderFixture)
             : base(loaderFixture)
         {
         }
@@ -151,7 +236,9 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
             var loader = _loaderFixture.GetLoader();
 
             var result = await loader.GetPopularPostsAsync(PopularType.Day);
-            result.Results.Should().HaveCountGreaterThan(1);
+            result.Results.Should().HaveCountGreaterThan(20);
+            result.Results.ToList().ForEach(x => x.IsDeleted.Should().BeFalse());
+            result.Results.ToList().ForEach(x => x.IsBanned.Should().BeFalse());
         }
 
         [Fact]
@@ -160,7 +247,9 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
             var loader = _loaderFixture.GetLoader();
 
             var result = await loader.GetPopularPostsAsync(PopularType.Week);
-            result.Results.Should().HaveCountGreaterThan(1);
+            result.Results.Should().HaveCountGreaterThan(20);
+            result.Results.ToList().ForEach(x => x.IsDeleted.Should().BeFalse());
+            result.Results.ToList().ForEach(x => x.IsBanned.Should().BeFalse());
         }
 
         [Fact]
@@ -169,7 +258,9 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
             var loader = _loaderFixture.GetLoader();
 
             var result = await loader.GetPopularPostsAsync(PopularType.Month);
-            result.Results.Should().HaveCountGreaterThan(1);
+            result.Results.Should().HaveCountGreaterThan(20);
+            result.Results.ToList().ForEach(x => x.IsDeleted.Should().BeFalse());
+            result.Results.ToList().ForEach(x => x.IsBanned.Should().BeFalse());
         }
     }
 
@@ -187,9 +278,11 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
 
             var post = await loader.GetPostAsync(507625);
 
-            post.ChildrenIds.Count.Should().NotBe(0);
+            post.ChildrenIds.Select(x => x.Id).Should().BeEquivalentTo(new[] { 536313, 962046 });
+            post.ChildrenIds.Select(x => x.Md5Hash).Should().BeEquivalentTo(new[] { "9c40357dc4818f82f5d9a16a29f20b2b", "ee0578d4eba0419b2a60d934ddc7a7ac" });
             post.Parent.Should().NotBeNull();
-            post.Parent!.Id.Should().BeGreaterThan(1);
+            post.Parent!.Id.Should().Be(507843);
+            post.Parent.Md5Hash.Should().Be("6d951445ccc66bd525a9e8ec386f9b03");
         }
             
         [Fact]
@@ -232,6 +325,19 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
             var post = await loader.GetPostAsync(572039);
 
             post.Pools.Count.Should().BeGreaterOrEqualTo(1);
+        }
+        
+        [Fact]
+        public async Task ShouldLoadPoolsMetadata()
+        {
+            var loader = _loaderFixture.GetLoader();
+
+            var post = await loader.GetPostAsync(1032020);
+
+            post.Pools.Count.Should().Be(1);
+            post.Pools.First().Id.Should().Be(98410);
+            post.Pools.First().Name.Should().Be("(C100) [Tegone Spike (Senji)] kaimin shojo");
+            post.Pools.First().Position.Should().Be(1);
         }
             
         [Fact]

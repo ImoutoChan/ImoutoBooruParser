@@ -10,7 +10,7 @@ public class DanbooruApiLoaderFixture
     private IBooruApiLoader? _danbooruWithAuth;
     private IBooruApiLoader? _danbooruWithoutAuth;
     private IBooruApiAccessor? _danbooruApiAccessor;
-    private readonly bool _enableCache = false;
+    private readonly bool _enableCache = true;
 
     private readonly IOptions<DanbooruSettings> _options 
         = Options.Create(new DanbooruSettings { PauseBetweenRequestsInMs = 0 });
