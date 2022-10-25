@@ -10,6 +10,7 @@ public class DanbooruApiLoaderFixture
     private IBooruApiLoader? _danbooruWithAuth;
     private IBooruApiLoader? _danbooruWithoutAuth;
     private IBooruApiAccessor? _danbooruApiAccessor;
+    private readonly bool _enableCache = false;
 
     private readonly IOptions<DanbooruSettings> _options 
         = Options.Create(new DanbooruSettings { PauseBetweenRequestsInMs = 0 });
@@ -22,14 +23,15 @@ public class DanbooruApiLoaderFixture
             PauseBetweenRequestsInMs = 1
         });
 
-    private readonly IFlurlClientFactory _factory = new HardCachePerBaseUrlFlurlClientFactory();
+    private IFlurlClientFactory Factory =>
+        _enableCache ? new HardCachePerBaseUrlFlurlClientFactory() : new PerBaseUrlFlurlClientFactory();
 
     public IBooruApiLoader GetLoaderWithAuth()
-        => _danbooruWithAuth ??= new DanbooruApiLoader(_factory, _authorizedOptions);
+        => _danbooruWithAuth ??= new DanbooruApiLoader(Factory, _authorizedOptions);
 
     public IBooruApiLoader GetLoaderWithoutAuth()
-        => _danbooruWithoutAuth ??= new DanbooruApiLoader(_factory, _options);
+        => _danbooruWithoutAuth ??= new DanbooruApiLoader(Factory, _options);
 
     public IBooruApiAccessor GetApiAccessorWithAuth()
-        => _danbooruApiAccessor ??= new DanbooruApiLoader(_factory, _authorizedOptions);
+        => _danbooruApiAccessor ??= new DanbooruApiLoader(Factory, _authorizedOptions);
 }

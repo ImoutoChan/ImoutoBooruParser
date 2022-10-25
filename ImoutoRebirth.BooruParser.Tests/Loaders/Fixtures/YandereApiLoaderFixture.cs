@@ -9,7 +9,7 @@ public class YandereApiLoaderFixture
 {
     private IBooruApiLoader? _loader;
     private IBooruApiAccessor? _apiAccessor;
-    private readonly bool _enableCache = true;
+    private readonly bool _enableCache = false;
 
     private readonly IOptions<YandereSettings> _authorizedOptions = Options.Create(
         new YandereSettings()
