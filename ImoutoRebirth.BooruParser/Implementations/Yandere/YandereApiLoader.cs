@@ -59,7 +59,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             await GetPostIdentityAsync(post.ParentId),
             await GetChildrenAsync(postHtml),
             await GetPoolsAsync(postId, postHtml),
-            GetTags(post, postHtml),
+            GetTags(postHtml),
             GetNotes(post, postHtml));
     }
 
@@ -94,7 +94,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             await GetPostIdentityAsync(post.ParentId),
             await GetChildrenAsync(postHtml),
             await GetPoolsAsync(post.Id, postHtml),
-            GetTags(post, postHtml),
+            GetTags(postHtml),
             GetNotes(post, postHtml));
     }
 
@@ -158,7 +158,6 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
                 var data = x.data;
                 var postId = int.Parse(data[2].ChildNodes[0].InnerHtml);
                 var date = DateTime.Parse(data[3].InnerHtml);
-                var user = data[4].ChildNodes[0].InnerHtml;
 
                 int? parentId = null;
                 var parentChanged = false;
@@ -227,12 +226,12 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
                 .Add("score", new StringContent("3")));
     }
 
-    private async Task<PostIdentity?> GetPostIdentityAsync(int? parentId)
+    private async Task<PostIdentity?> GetPostIdentityAsync(int? postId)
     {
-        if (parentId == null)
+        if (postId == null)
             return null;
 
-        return await GetPostIdentityAsync(parentId.Value);
+        return await GetPostIdentityAsync(postId.Value);
     }
     
     private async Task<PostIdentity> GetPostIdentityAsync(int postId)
@@ -283,10 +282,9 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             .Select(x =>
             {
                 var id = int.Parse(x.Attributes["id"].Value[4..]);
-                string? name = null;
                 var aNodes = x.SelectNodes("div/p/a");
                 var poolNode = aNodes.Last(y => y.Attributes["href"].Value[..5] == "/pool");
-                name = poolNode.InnerHtml;
+                var  name = poolNode.InnerHtml;
 
                 return (id, name);
             }) ?? Enumerable.Empty<(int, string)>();
@@ -351,7 +349,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             _ => throw new ArgumentOutOfRangeException(nameof(rating))
         };
 
-    private static IReadOnlyCollection<Tag> GetTags(YanderePost post, HtmlDocument postHtml)
+    private static IReadOnlyCollection<Tag> GetTags(HtmlDocument postHtml)
     {
         return postHtml.DocumentNode
             .SelectSingleNode(@"//*[@id='tag-sidebar']")

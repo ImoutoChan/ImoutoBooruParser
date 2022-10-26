@@ -267,9 +267,9 @@ namespace Imouto.BooruParser.Loaders
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
 
-            var dateFromat = "yyyy-MM-dd";
+            var dateFormat = "yyyy-MM-dd";
 
-            return $"date:{start.ToString(dateFromat)}..{end.ToString(dateFromat)} order:quality";
+            return $"date:{start.ToString(dateFormat)}..{end.ToString(dateFormat)} order:quality";
         }
     }
 }

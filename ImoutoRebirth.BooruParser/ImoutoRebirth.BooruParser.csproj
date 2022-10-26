@@ -10,8 +10,10 @@
     <ItemGroup>
         <PackageReference Include="Flurl.Http" Version="4.0.0-pre2" />
         <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="7.0.0-rc.2.22472.3" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0-rc.2.22472.3" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0-rc.2.22472.3" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.24.0" />
     </ItemGroup>
 
 </Project>
