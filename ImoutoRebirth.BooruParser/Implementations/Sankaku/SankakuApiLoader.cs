@@ -8,17 +8,14 @@ namespace ImoutoRebirth.BooruParser.Implementations.Sankaku;
 
 // test
 // children: 31729492
-// for history:
-// auth with bearer, update it with refresh
-// use graphql for history
 
 public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
 {
     private const string ApiBaseUrl = "https://capi-v2.sankakucomplex.com/";
     private const string HtmlBaseUrl = "https://chan.sankakucomplex.com/";
+
     private readonly IFlurlClient _flurlClient;
     private readonly IFlurlClient _htmlFlurlClient;
-    private readonly IFlurlClient _graphqlFlurlClient;
     private readonly ISankakuAuthManager _sankakuAuthManager;
 
     public SankakuApiLoader(
@@ -45,23 +42,6 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             .Configure(x => SetAuthParameters(x, options));
         
         _htmlFlurlClient = factory.Get(new Url(HtmlBaseUrl))
-            .WithHeader("Connection", "keep-alive")
-            .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
-            .WithHeader("sec-ch-ua-mobile", "?0")
-            .WithHeader("sec-ch-ua-platform", "\"Windows\"")
-            .WithHeader("DNT", "1")
-            .WithHeader("Upgrade-Insecure-Requests", "1")
-            .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36")
-            .WithHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
-            .WithHeader("Sec-Fetch-Site", "none")
-            .WithHeader("Sec-Fetch-Mode", "navigate")
-            .WithHeader("Sec-Fetch-User", "?1")
-            .WithHeader("Sec-Fetch-Dest", "document")
-            .WithHeader("Accept-Encoding", "gzip, deflate, br")
-            .WithHeader("Accept-Language", "en")
-            .Configure(x => SetAuthParameters(x, options));
-        
-        _graphqlFlurlClient = factory.Get(new Url(ApiBaseUrl))
             .WithHeader("Connection", "keep-alive")
             .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
             .WithHeader("sec-ch-ua-mobile", "?0")
