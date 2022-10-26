@@ -14,8 +14,11 @@ namespace ImoutoRebirth.BooruParser.Implementations.Sankaku;
 
 public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
 {
-    private const string BaseUrl = "https://capi-v2.sankakucomplex.com/";
+    private const string ApiBaseUrl = "https://capi-v2.sankakucomplex.com/";
+    private const string HtmlBaseUrl = "https://chan.sankakucomplex.com/";
     private readonly IFlurlClient _flurlClient;
+    private readonly IFlurlClient _htmlFlurlClient;
+    private readonly IFlurlClient _graphqlFlurlClient;
     private readonly ISankakuAuthManager _sankakuAuthManager;
 
     public SankakuApiLoader(
@@ -24,7 +27,56 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
         ISankakuAuthManager sankakuAuthManager)
     {
         _sankakuAuthManager = sankakuAuthManager;
-        _flurlClient = factory.Get(new Url(BaseUrl)).Configure(x => SetAuthParameters(x, options));
+        _flurlClient = factory.Get(new Url(ApiBaseUrl))
+            .WithHeader("Connection", "keep-alive")
+            .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
+            .WithHeader("sec-ch-ua-mobile", "?0")
+            .WithHeader("sec-ch-ua-platform", "\"Windows\"")
+            .WithHeader("DNT", "1")
+            .WithHeader("Upgrade-Insecure-Requests", "1")
+            .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36")
+            .WithHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+            .WithHeader("Sec-Fetch-Site", "none")
+            .WithHeader("Sec-Fetch-Mode", "navigate")
+            .WithHeader("Sec-Fetch-User", "?1")
+            .WithHeader("Sec-Fetch-Dest", "document")
+            .WithHeader("Accept-Encoding", "gzip, deflate, br")
+            .WithHeader("Accept-Language", "en")
+            .Configure(x => SetAuthParameters(x, options));
+        
+        _htmlFlurlClient = factory.Get(new Url(HtmlBaseUrl))
+            .WithHeader("Connection", "keep-alive")
+            .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
+            .WithHeader("sec-ch-ua-mobile", "?0")
+            .WithHeader("sec-ch-ua-platform", "\"Windows\"")
+            .WithHeader("DNT", "1")
+            .WithHeader("Upgrade-Insecure-Requests", "1")
+            .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36")
+            .WithHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+            .WithHeader("Sec-Fetch-Site", "none")
+            .WithHeader("Sec-Fetch-Mode", "navigate")
+            .WithHeader("Sec-Fetch-User", "?1")
+            .WithHeader("Sec-Fetch-Dest", "document")
+            .WithHeader("Accept-Encoding", "gzip, deflate, br")
+            .WithHeader("Accept-Language", "en")
+            .Configure(x => SetAuthParameters(x, options));
+        
+        _graphqlFlurlClient = factory.Get(new Url(ApiBaseUrl))
+            .WithHeader("Connection", "keep-alive")
+            .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
+            .WithHeader("sec-ch-ua-mobile", "?0")
+            .WithHeader("sec-ch-ua-platform", "\"Windows\"")
+            .WithHeader("DNT", "1")
+            .WithHeader("Upgrade-Insecure-Requests", "1")
+            .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36")
+            .WithHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+            .WithHeader("Sec-Fetch-Site", "none")
+            .WithHeader("Sec-Fetch-Mode", "navigate")
+            .WithHeader("Sec-Fetch-User", "?1")
+            .WithHeader("Sec-Fetch-Dest", "document")
+            .WithHeader("Accept-Encoding", "gzip, deflate, br")
+            .WithHeader("Accept-Language", "en")
+            .Configure(x => SetAuthParameters(x, options));
     }
 
     public async Task<Post> GetPostAsync(int postId)
@@ -34,7 +86,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
         return new Post(
             new PostIdentity(postId, post.Md5),
             post.FileUrl,
-            post.PreviewUrl ?? post.FileUrl,
+            post.SampleUrl ?? post.FileUrl,
             ExistState.Exist,
             DateTimeOffset.FromUnixTimeSeconds(post.CreatedAt.S),
             new Uploader(post.Author.Id, post.Author.Name),
@@ -120,32 +172,30 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
         int limit = 100,
         CancellationToken ct = default)
     {
-        ???
-        var request = _flurlClient.Request("post_versions.json")
-            .SetQueryParam("limit", limit);
-        
-        if (token != null)
-            request = request.SetQueryParam("page", token.Page);
+        var response = await _flurlClient.Request("graphql")
+            .WithHeader("content-type", "application/json")
+            .PostAsync(new StringContent(
+                "{\"operationName\":\"PostTagHistoryConnection\",\"variables\":{},\"query\":\"query PostTagHistoryConnection {\\n  postTagHistoryConnection(\\n    first: 100\\n    after: \\\""
+                + $"{token?.Page}"
+                +
+                "\\\"\\n    before: \\\"\\\"\\n    lang: \\\"en\\\"\\n    tagNames: []\\n    userNames: []\\n    postIds: []\\n    addedTags: []\\n    removedTags: []\\n    isRatingChanged: null\\n    isSourceChanged: null\\n    isParentChanged: null\\n    negativeScoreOnly: null\\n    ipAddresses: []\\n    excludeSystemUser: null\\n    order: \\\"\\\"\\n    limit: 40\\n    sortBy: \\\"\\\"\\n    sortDirection: null\\n  ) {\\n    totalCount\\n    pageInfo {\\n      hasNextPage\\n      hasPreviousPage\\n      startCursor\\n      endCursor\\n    }\\n    edges {\\n      node {\\n        id\\n        post {\\n          id\\n        }\\n        parent\\n        createdAt\\n      }\\n    }\\n  }\\n}\\n\"}"
+                ), cancellationToken: ct)
+            .ReceiveJson<SankakuTagHistoryDocument>();
 
-        var found = await request.GetJsonAsync<IReadOnlyCollection<SankakuTagsHistoryEntry>>(cancellationToken: ct);
-
-        if (!found.Any())
-            return new(Array.Empty<TagHistoryEntry>(), null);
-        
-        var entries = found
-            .Select(x => new TagHistoryEntry(x.Id, x.UpdatedAt, x.PostId, x.ParentId, x.ParentChanged))
+        var entries = response.Data.PostTagHistoryConnection.Edges.Select(x => x.Node)
+            .Select(x => new TagHistoryEntry(
+                x.Id, 
+                DateTimeOffset.FromUnixTimeSeconds(long.Parse(x.CreatedAt)), 
+                x.Post.Id, 
+                x.Parent != null ? int.Parse(x.Parent) : null, 
+                true))
             .ToList();
 
-        var nextPage = token?.Page[0] switch
-        {
-            null => $"b{found.Min(x => x.Id)}",
-            'b' => $"b{found.Min(x => x.Id)}",
-            'a' => $"a{found.Max(x => x.Id)}",
-            var x when int.TryParse(x.ToString(), out var page) => (page + 1).ToString(),
-            _ => "2"
-        };
+        var nextPage = response.Data.PostTagHistoryConnection.PageInfo.HasNextPage
+            ? new SearchToken(response.Data.PostTagHistoryConnection.PageInfo.EndCursor)
+            : null;
 
-        return new(entries, new SearchToken(nextPage));
+        return new(entries, nextPage);
     }
 
     public async Task<HistorySearchResult<NoteHistoryEntry>> GetNoteHistoryPageAsync(
@@ -153,28 +203,28 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
         int limit = 100,
         CancellationToken ct = default)
     {
-         ???
-        var request = _flurlClient.Request("note_versions.json")
-            .SetQueryParam("limit", limit);
+        var request = _htmlFlurlClient.Request("note", "history");
         
         if (token != null)
             request = request.SetQueryParam("page", token.Page);
 
-        var found = await request.GetJsonAsync<IReadOnlyCollection<SankakuNotesHistoryEntry>>(cancellationToken: ct);
+        var document = await request.GetHtmlDocumentAsync(cancellationToken: ct);
 
-        if (!found.Any())
-            return new(Array.Empty<NoteHistoryEntry>(), null);
-        
-        var entries = found
-            .Select(x => new NoteHistoryEntry(x.Id, x.PostId, x.UpdatedAt))
+        var entries = document.DocumentNode.SelectNodes("//*[@id='content']/table/tbody/tr")
+            .Select(x =>
+            {
+                var postId = int.Parse(x.SelectNodes("td")[1].SelectSingleNode("a").InnerHtml);
+                var dateString = x.SelectNodes("td")[5].InnerHtml;
+                var date = DateTime.Parse(dateString);
+
+                return new NoteHistoryEntry(-1, postId, new DateTimeOffset(date, TimeSpan.Zero));
+            })
             .ToList();
 
         var nextPage = token?.Page[0] switch
         {
-            null => $"b{found.Min(x => x.Id)}",
-            'b' => $"b{found.Min(x => x.Id)}",
-            'a' => $"a{found.Max(x => x.Id)}",
-            var _ when int.TryParse(token.Page, out var page) => (page + 1).ToString(),
+            null => "2",
+            _ when int.TryParse(token.Page, out var page) => (page + 1).ToString(),
             _ => "2"
         };
 
@@ -214,7 +264,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             .SetQueryParam("tags", $"parent:{post.Id}")
             .GetJsonAsync<SankakuPost[]>();
 
-        return posts.Select(x => new PostIdentity(post.Id, post.Md5)).ToList();
+        return posts.Select(x => new PostIdentity(x.Id, x.Md5)).ToList();
     }
 
     private async IAsyncEnumerable<Pool> GetPoolsAsync(int postId)
@@ -249,15 +299,13 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             .ToList();
     }
 
-    private static Rating GetRating(string postRating) => GetRatingFromChar(postRating).Item1;
-
-    private static (Rating, RatingSafeLevel) GetRatingFromChar(string rating)
+    private static Rating GetRating(string rating)
         => rating switch
         {
-            "q" => (Rating.Questionable, RatingSafeLevel.None),
-            "s" => (Rating.Safe, RatingSafeLevel.Sensitive),
-            "e" => (Rating.Explicit, RatingSafeLevel.None),
-            _ => (Rating.Questionable, RatingSafeLevel.None)
+            "q" => Rating.Questionable,
+            "s" => Rating.Safe,
+            "e" => Rating.Explicit,
+            _ => Rating.Questionable
         };
 
     private static IReadOnlyCollection<Tag> GetTags(SankakuPost post)
@@ -270,9 +318,12 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
         {
             0 => "general",
             1 => "artist",
+            2 => "studio",
             3 => "copyright",
             4 => "character",
-            8 => "metadata",
+            5 => "genre",
+            8 => "medium",
+            9 => "meta",
             _ => throw new ArgumentOutOfRangeException(nameof(type))
         };
 

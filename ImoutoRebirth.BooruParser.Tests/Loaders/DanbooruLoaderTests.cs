@@ -29,7 +29,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>
             post.Id.Id.Should().Be(5773061);
             post.Id.Md5Hash.Should().Be("543f49b2d9fd4e31d8cb10ceaff6cad7");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(35);
+            post.Tags.Should().HaveCount(34);
 
             foreach (var postTag in post.Tags)
             {
@@ -38,7 +38,9 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>
                 postTag.Type.Should().BeOneOf(new[] { "meta", "general", "copyright", "character", "circle", "artist" });
             }
             
-            post.Parent.Should().BeNull();
+            post.Parent.Should().NotBeNull();
+            post.Parent!.Id.Should().Be(5775694);
+            post.Parent!.Md5Hash.Should().Be("886823ace72390fe7a8926e2ffe3299d");
             post.Pools.Should().BeEmpty();
             post.Rating.Should().Be(Rating.Safe);
             post.RatingSafeLevel.Should().Be(RatingSafeLevel.Sensitive);

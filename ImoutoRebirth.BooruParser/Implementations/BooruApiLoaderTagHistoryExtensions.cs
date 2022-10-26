@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using ImoutoRebirth.BooruParser.Implementations.Danbooru;
+using ImoutoRebirth.BooruParser.Implementations.Sankaku;
 using ImoutoRebirth.BooruParser.Implementations.Yandere;
 
 namespace ImoutoRebirth.BooruParser.Implementations;
@@ -58,6 +59,23 @@ public static class BooruApiLoaderTagHistoryExtensions
                     yield return tagsHistoryEntry;
 
             } while (searchToken.Page != "0");
+        }
+        else if (loader is SankakuApiLoader)
+        {
+            
+            HistorySearchResult<TagHistoryEntry> page;
+            var cont = false;
+            SearchToken? searchToken = null;
+            do
+            {
+                page = await loader.GetTagHistoryPageAsync(searchToken, limit, ct);
+                searchToken = page.NextToken;
+
+                foreach (var tagsHistoryEntry in page.Results)
+                    yield return tagsHistoryEntry;
+
+                cont = !page.Results.Any(x => x.HistoryId < afterHistoryId);
+            } while (cont);
         }
     }
 

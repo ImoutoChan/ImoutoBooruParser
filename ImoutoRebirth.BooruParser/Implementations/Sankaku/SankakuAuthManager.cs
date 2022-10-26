@@ -71,13 +71,14 @@ public class SankakuAuthManager : ISankakuAuthManager
         await _options.Value.SaveTokensCallbackAsync(tokens);
     }
 
-    private async Task<(string newAccessToken, string newRefreshToken)> RefreshTokenAsync(string refreshToken)
+    private Task<(string newAccessToken, string newRefreshToken)> RefreshTokenAsync(string refreshToken)
     {
+        throw new NotImplementedException();
         // https://capi-v2.sankakucomplex.com/auth/token?lang=en
-        var response = await _flurlClient.Request("auth", "token")
-            .PostJsonAsync(new { refresh_token = refreshToken })
-            .ReceiveJson<SankakuRefreshResponse>();
-
-        return (response.AccessToken, response.RefreshToken);
+        // var response = await _flurlClient.Request("auth", "token")
+        //     .PostJsonAsync(new { refresh_token = refreshToken })
+        //     .ReceiveJson<SankakuRefreshResponse>();
+        //
+        // return (response.AccessToken, response.RefreshToken);
     }
 }
