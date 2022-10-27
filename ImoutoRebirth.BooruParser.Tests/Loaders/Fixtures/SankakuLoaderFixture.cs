@@ -10,6 +10,7 @@ public class SankakuLoaderFixture
 {
     private IBooruApiLoader? _withAuth;
     private IBooruApiLoader? _withoutAuth;
+    private IBooruApiAccessor? _apiAccessor;
     private readonly bool _enableCache = true;
 
     private IFlurlClientFactory Factory =>
@@ -33,6 +34,12 @@ public class SankakuLoaderFixture
 
     public IBooruApiLoader GetLoaderWithAuth()
         => _withAuth ??= new SankakuApiLoader(
+            Factory, 
+            _authorizedOptions,
+            new SankakuAuthManager(new MemoryCache(new MemoryCacheOptions()), _authorizedOptions, Factory));
+
+    public IBooruApiAccessor GetAccessorWithAuth()
+        => _apiAccessor ??= new SankakuApiLoader(
             Factory, 
             _authorizedOptions,
             new SankakuAuthManager(new MemoryCache(new MemoryCacheOptions()), _authorizedOptions, Factory));

@@ -29,17 +29,11 @@ public interface IBooruApiAccessor
 /// <param name="Page">For danbooru: b{lowest-history-id-on-current-page}</param>
 public record SearchToken(string Page);
 
-public record SearchResult(IReadOnlyCollection<PostPreview> Results)
-{
-    public bool IsFound => Results.Any();
-}
+public record SearchResult(IReadOnlyCollection<PostPreview> Results);
 
 public record HistorySearchResult<T>(
-    IReadOnlyCollection<T> Results, 
-    SearchToken? NextToken)
-{
-    public bool IsFound => Results.Any();
-}
+    IReadOnlyCollection<T> Results,
+    SearchToken? NextToken);
 
 public record PostPreview(int Id, string? Md5Hash, string Title, bool IsBanned, bool IsDeleted);
 

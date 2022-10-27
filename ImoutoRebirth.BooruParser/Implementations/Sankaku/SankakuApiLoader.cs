@@ -211,8 +211,9 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
 
     public async Task FavoritePostAsync(int postId)
     {
-        await _flurlClient.Request("favorites.json")
-            .SetQueryParam("post_id", postId)
+        // https://capi-v2.sankakucomplex.com/posts/30879033/favorite?lang=en
+        await _flurlClient.Request("posts", postId, "favorite")
+            .SetQueryParam("lang", "en")
             .PostAsync();
     }
 

@@ -65,7 +65,8 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Source.Should().Be("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=66351185");
             post.ChildrenIds.Should().BeEmpty();
             post.ExistState.Should().Be(ExistState.Exist);
-            post.FileResolution.Should().Be(new Size(756, 1052));
+            post.FileResolution.Width.Should().Be(756);
+            post.FileResolution.Height.Should().Be(1052);
             post.PostedAt.Should().Be(new DateTimeOffset(2017, 12, 18, 21, 22, 21, 0, TimeSpan.Zero));
             post.SampleUrl.Should().StartWith("https://v.sankakucomplex.com/data/sample/de/aa/sample-deaac52a6b001b6953db90a09f7629f7.jpg");
             post.UploaderId.Id.Should().Be(231462);
@@ -385,6 +386,21 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
 
             post.Should().NotBeNull();
             post.SampleUrl.Should().Contain("sample");
+        }
+    }
+    
+    public class FavoritePostAsyncMethod : SankakuLoaderTests
+    {
+        public FavoritePostAsyncMethod(SankakuLoaderFixture loaderFixture)
+            : base(loaderFixture)
+        {
+        }
+
+        [Fact]
+        public async Task ShouldFavoritePost()
+        {
+            var api = _loaderFixture.GetAccessorWithAuth();
+            await api.FavoritePostAsync(30879033);
         }
     }
 }

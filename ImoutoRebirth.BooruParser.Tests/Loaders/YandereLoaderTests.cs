@@ -314,6 +314,8 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
             post.Notes.First().Id.Should().Be(4625);
             post.Notes.First().Text.Should().Be("Hmm.....!");
             post.Notes.First().Point.Should().Be(new Position(72, 824));
+            post.Notes.First().Point.Top.Should().Be(72);
+            post.Notes.First().Point.Left.Should().Be(824);
             post.Notes.First().Size.Should().Be(new Size(109, 274));
         }
 
