@@ -6,9 +6,6 @@ using Microsoft.Extensions.Options;
 
 namespace ImoutoRebirth.BooruParser.Implementations.Sankaku;
 
-// test
-// children: 31729492
-
 public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
 {
     private const string ApiBaseUrl = "https://capi-v2.sankakucomplex.com/";
@@ -94,10 +91,11 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             return null;
 
         var post = posts.First();
+
         return new Post(
             new PostIdentity(post.Id, post.Md5),
             post.FileUrl,
-            post.PreviewUrl ?? post.FileUrl,
+            post.SampleUrl ?? post.FileUrl,
             ExistState.Exist,
             DateTimeOffset.FromUnixTimeSeconds(post.CreatedAt.S),
             new Uploader(post.Author.Id, post.Author.Name),

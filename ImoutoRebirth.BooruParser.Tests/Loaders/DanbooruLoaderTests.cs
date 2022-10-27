@@ -504,7 +504,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>
             
             post.Should().NotBeNull();
             post!.Id.Id.Should().Be(5766237);
-            post!.OriginalUrl.Should().NotBeNullOrWhiteSpace();
+            post.OriginalUrl.Should().NotBeNullOrWhiteSpace();
         }
 
         [Fact]

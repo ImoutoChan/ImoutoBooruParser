@@ -36,6 +36,84 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         }
 
         [Fact]
+        public async Task ShouldGetPostAsync()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+
+            var post = await loader.GetPostAsync(6541010);
+
+            post.Should().NotBeNull();
+            post.OriginalUrl.Should().StartWith("https://v.sankakucomplex.com/data/de/aa/deaac52a6b001b6953db90a09f7629f7.jpg");
+            post.Id.Id.Should().Be(6541010);
+            post.Id.Md5Hash.Should().Be("deaac52a6b001b6953db90a09f7629f7");
+            post.Notes.Should().BeEmpty();
+            post.Tags.Should().HaveCount(113);
+
+            foreach (var postTag in post.Tags)
+            {
+                postTag.Name.Should().NotBeNullOrWhiteSpace();
+                postTag.Type.Should().NotBeNullOrWhiteSpace();
+                postTag.Type.Should().BeOneOf(new[] { "meta", "general", "copyright", "character", "circle", "artist", "medium", "genre" });
+            }
+            
+            post.Parent.Should().NotBeNull();
+            post.Parent!.Id.Should().Be(6541009);
+            post.Parent!.Md5Hash.Should().Be("8f37e824ec321d96f0e149d77ee5d21d");
+            post.Pools.Should().HaveCount(4);
+            post.Rating.Should().Be(Rating.Explicit);
+            post.RatingSafeLevel.Should().Be(RatingSafeLevel.None);
+            post.Source.Should().Be("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=66351185");
+            post.ChildrenIds.Should().BeEmpty();
+            post.ExistState.Should().Be(ExistState.Exist);
+            post.FileResolution.Should().Be(new Size(756, 1052));
+            post.PostedAt.Should().Be(new DateTimeOffset(2017, 12, 18, 21, 22, 21, 0, TimeSpan.Zero));
+            post.SampleUrl.Should().StartWith("https://v.sankakucomplex.com/data/sample/de/aa/sample-deaac52a6b001b6953db90a09f7629f7.jpg");
+            post.UploaderId.Id.Should().Be(231462);
+            post.UploaderId.Name.Should().Be("Domestikun");
+            post.FileSizeInBytes.Should().Be(617163);
+            post.UgoiraFrameDelays.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task ShouldGetPostByMd5Async()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+
+            var post = await loader.GetPostByMd5Async("deaac52a6b001b6953db90a09f7629f7");
+
+            post.Should().NotBeNull();
+            post!.OriginalUrl.Should().StartWith("https://v.sankakucomplex.com/data/de/aa/deaac52a6b001b6953db90a09f7629f7.jpg");
+            post.Id.Id.Should().Be(6541010);
+            post.Id.Md5Hash.Should().Be("deaac52a6b001b6953db90a09f7629f7");
+            post.Notes.Should().BeEmpty();
+            post.Tags.Should().HaveCount(113);
+
+            foreach (var postTag in post.Tags)
+            {
+                postTag.Name.Should().NotBeNullOrWhiteSpace();
+                postTag.Type.Should().NotBeNullOrWhiteSpace();
+                postTag.Type.Should().BeOneOf(new[] { "meta", "general", "copyright", "character", "circle", "artist", "medium", "genre" });
+            }
+            
+            post.Parent.Should().NotBeNull();
+            post.Parent!.Id.Should().Be(6541009);
+            post.Parent!.Md5Hash.Should().Be("8f37e824ec321d96f0e149d77ee5d21d");
+            post.Pools.Should().HaveCount(4);
+            post.Rating.Should().Be(Rating.Explicit);
+            post.RatingSafeLevel.Should().Be(RatingSafeLevel.None);
+            post.Source.Should().Be("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=66351185");
+            post.ChildrenIds.Should().BeEmpty();
+            post.ExistState.Should().Be(ExistState.Exist);
+            post.FileResolution.Should().Be(new Size(756, 1052));
+            post.PostedAt.Should().Be(new DateTimeOffset(2017, 12, 18, 21, 22, 21, 0, TimeSpan.Zero));
+            post.SampleUrl.Should().StartWith("https://v.sankakucomplex.com/data/sample/de/aa/sample-deaac52a6b001b6953db90a09f7629f7.jpg");
+            post.UploaderId.Id.Should().Be(231462);
+            post.UploaderId.Name.Should().Be("Domestikun");
+            post.FileSizeInBytes.Should().Be(617163);
+            post.UgoiraFrameDelays.Should().BeEmpty();
+        }
+
+        [Fact]
         public async Task ShouldContainLinkWithoutAmp()
         {
             var loader = _loaderFixture.GetLoaderWithoutAuth();
@@ -73,9 +151,9 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         }
     }
         
-    public class LoadSearchResultAsyncMethod : SankakuLoaderTests
+    public class SearchAsyncMethod : SankakuLoaderTests
     {
-        public LoadSearchResultAsyncMethod(SankakuLoaderFixture loaderFixture) 
+        public SearchAsyncMethod(SankakuLoaderFixture loaderFixture) 
             : base(loaderFixture)
         {
         }
@@ -180,9 +258,9 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         }
     }
 
-    public class LoadPopularAsyncMethod : SankakuLoaderTests
+    public class GetPopularPostsAsyncMethod : SankakuLoaderTests
     {
-        public LoadPopularAsyncMethod(SankakuLoaderFixture sankakuLoaderFixture)
+        public GetPopularPostsAsyncMethod(SankakuLoaderFixture sankakuLoaderFixture)
             : base(sankakuLoaderFixture)
         {
         }
@@ -238,6 +316,24 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         }
 
         [Fact]
+        public async Task ShouldLoadChildren()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+
+            var post = await loader.GetPostAsync(31729492);
+
+            post.ChildrenIds.Should().HaveCount(8);
+            post.ChildrenIds.Distinct().Should().HaveCount(post.ChildrenIds.Count);
+            post.ChildrenIds.First().Should().Be(new PostIdentity(31729784, "c47bcc8a56dfdf0267c788860ed81c3e"));
+
+            foreach (var postChildrenId in post.ChildrenIds)
+            {
+                postChildrenId.Id.Should().BeGreaterThan(1);
+                postChildrenId.Md5Hash.Should().HaveLength(32);
+            }
+        }
+
+        [Fact]
         public async Task ShouldLoadPostWithEmptyChildren()
         {
             var loader = _loaderFixture.GetLoaderWithoutAuth();
@@ -255,10 +351,29 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         {
             var loader = _loaderFixture.GetLoaderWithoutAuth();
 
-            var post = await loader.GetPostByMd5Async("acea0eadcc5e8cc64100dc3bde45720c");
+            var post = await loader.GetPostAsync(30879033);
 
-            post.Should().NotBeNull();
-            post!.Notes.Count.Should().Be(4);
+            post.Notes.Count.Should().Be(4);
+            
+            post.Notes.ElementAt(0).Id.Should().Be(1838620);
+            post.Notes.ElementAt(0).Text.Should().Be("Wishes to be a slave");
+            post.Notes.ElementAt(0).Size.Should().Be(new Size(620, 280));
+            post.Notes.ElementAt(0).Point.Should().Be(new Position(646, 92));
+            
+            post.Notes.ElementAt(1).Id.Should().Be(1838619);
+            post.Notes.ElementAt(1).Text.Should().Be("H cup\nHuge breasts <3");
+            post.Notes.ElementAt(1).Size.Should().Be(new Size(574, 434));
+            post.Notes.ElementAt(1).Point.Should().Be(new Position(475, 2229));
+            
+            post.Notes.ElementAt(2).Id.Should().Be(1838618);
+            post.Notes.ElementAt(2).Text.Should().Be("Slutty voice <3");
+            post.Notes.ElementAt(2).Size.Should().Be(new Size(550, 224));
+            post.Notes.ElementAt(2).Point.Should().Be(new Position(84, 2171));
+            
+            post.Notes.ElementAt(3).Id.Should().Be(1838617);
+            post.Notes.ElementAt(3).Text.Should().Be("Vulgar\nOrgasm face <3");
+            post.Notes.ElementAt(3).Size.Should().Be(new Size(563, 311));
+            post.Notes.ElementAt(3).Point.Should().Be(new Position(60, 118));
         }
             
         [Fact]

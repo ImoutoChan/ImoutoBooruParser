@@ -33,12 +33,12 @@ public class HardCachingHttpMessageHandler : DelegatingHandler
     
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
     {
-        if (request.Method != HttpMethod.Get)
+        if (request.Method != HttpMethod.Get && !request.RequestUri!.ToString().Contains("/graphql"))
         {
             return await base.SendAsync(request, ct);
         }
         
-        var key = request.RequestUri!.ToString();
+        var key = await GetKeyAsync(request);
         if (Cache.TryGetValue(key, out var value))
         {
             return new HttpResponseMessage
@@ -70,6 +70,15 @@ public class HardCachingHttpMessageHandler : DelegatingHandler
             Headers = {  },
             Version = Version.Parse("1.1")
         };
+    }
+
+    private static async Task<string> GetKeyAsync(HttpRequestMessage request)
+    {
+        if (request.Method == HttpMethod.Get)
+            return request.RequestUri!.ToString();
+
+        var content = await request.Content!.ReadAsStringAsync();
+        return request.RequestUri + content;
     }
 
     private record CacheEntry(string Response, HttpStatusCode Code);
