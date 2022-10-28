@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Flurl;
 using Flurl.Http;
 using Flurl.Http.Configuration;
@@ -7,9 +8,11 @@ using Microsoft.Extensions.Options;
 
 namespace ImoutoRebirth.BooruParser.Implementations.Gelbooru;
 
-// notes 7858922
-public class GelbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
+public class GelbooruApiLoader : IBooruApiLoader
 {
+    private static readonly Regex DateTimeRegex = new(
+        ".*(?<month>\\w{3}).*(?<date>\\d{2}).*(?<hours>\\d{2})\\:(?<minutes>\\d{2})\\:(?<seconds>\\d{2}).*(?<tzhours>[+\\-]\\d{2})(?<tzminutes>\\d{2}).*(?<year>\\d{4})", RegexOptions.Compiled);
+    
     private const string BaseUrl = "https://gelbooru.com/";
     private readonly IFlurlClient _flurlClient;
 
@@ -38,24 +41,7 @@ public class GelbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
 
         var post = postJson.Posts.First();
         
-        return new Post(
-            new PostIdentity(postId, post.Md5),
-            post.FileUrl,
-            post.PreviewUrl,
-            ExistState.Exist,
-            DateTimeOffset.Parse(post.CreatedAt),
-            new Uploader(post.CreatorId, post.Owner.Replace('_', ' ')),
-            post.Source,
-            new Size(post.Width, post.Height),
-            -1,
-            GetRating(post.Rating),
-            GetRatingSafeLevel(post.Rating),
-            Array.Empty<int>(),
-            GetParent(post),
-            GetChildren(),
-            Array.Empty<Pool>(),
-            GetTags(postHtml),
-            GetNotes(post, postHtml));
+        return CreatePost(post, postHtml);
     }
 
     public async Task<Post?> GetPostByMd5Async(string md5)
@@ -75,31 +61,12 @@ public class GelbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
         var postJson = await _flurlClient.Request("index.php")
             .SetQueryParams(new
             {
-                page = "dapi", s = "post", q = "index", json = 1, limit = 1, md5 = md5
+                page = "dapi", s = "post", q = "index", json = 1, limit = 1, tags = $"md5:{md5}"
             })
             .GetJsonAsync<GelbooruPostPage>();
         
-        
         var post = postJson.Posts.First();
-        
-        return new Post(
-            new PostIdentity(post.Id, post.Md5),
-            post.FileUrl,
-            post.PreviewUrl,
-            ExistState.Exist,
-            DateTimeOffset.Parse(post.CreatedAt),
-            new Uploader(post.CreatorId, post.Owner.Replace('_', ' ')),
-            post.Source,
-            new Size(post.Width, post.Height),
-            -1,
-            GetRating(post.Rating),
-            GetRatingSafeLevel(post.Rating),
-            Array.Empty<int>(),
-            GetParent(post),
-            GetChildren(),
-            Array.Empty<Pool>(),
-            GetTags(postHtml),
-            GetNotes(post, postHtml));
+        return CreatePost(post, postHtml);
     }
 
     public async Task<SearchResult> SearchAsync(string tags)
@@ -108,7 +75,7 @@ public class GelbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
         var postJson = await _flurlClient.Request("index.php")
             .SetQueryParams(new
             {
-                page = "dapi", s = "post", q = "index", json = 1, limit = 100, tags = tags
+                page = "dapi", s = "post", q = "index", json = 1, limit = 20, tags = tags
             })
             .GetJsonAsync<GelbooruPostPage>();
 
@@ -131,9 +98,6 @@ public class GelbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
         int limit = 100,
         CancellationToken ct = default)
         => throw new NotSupportedException("Gelbooru does not support history");
-
-    public Task FavoritePostAsync(int postId)
-        => throw new NotSupportedException("It should be possible but isn't implemented right now");
 
     /// <remarks>
     /// Parent is always 0.
@@ -181,12 +145,12 @@ public class GelbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
     private static RatingSafeLevel GetRatingSafeLevel(string postRating) => GetRatingFromChar(postRating).Item2;
 
     private static (Rating, RatingSafeLevel) GetRatingFromChar(string rating)
-        => rating switch
+        => rating[0] switch
         {
-            "q" => (Rating.Questionable, RatingSafeLevel.None),
-            "s" => (Rating.Safe, RatingSafeLevel.Sensitive),
-            "g" => (Rating.Safe, RatingSafeLevel.General),
-            "e" => (Rating.Explicit, RatingSafeLevel.None),
+            'q' => (Rating.Questionable, RatingSafeLevel.None),
+            's' => (Rating.Safe, RatingSafeLevel.Sensitive),
+            'g' => (Rating.Safe, RatingSafeLevel.General),
+            'e' => (Rating.Explicit, RatingSafeLevel.None),
             _ => (Rating.Questionable, RatingSafeLevel.None)
         };
 
@@ -219,4 +183,42 @@ public class GelbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
         
         settings.AfterCall = _ => Throttler.Get("gelbooru").Release();
     }
+
+    private static DateTimeOffset ExtractDate(GelbooruPost post)
+    {
+        var datetime = DateTimeRegex.Match(post.CreatedAt);
+        
+        var year = int.Parse(datetime.Groups["year"].Value);
+        var monthString = datetime.Groups["month"].Value;
+        var date = int.Parse(datetime.Groups["date"].Value);
+        var hours = int.Parse(datetime.Groups["hours"].Value);
+        var minutes = int.Parse(datetime.Groups["minutes"].Value);
+        var seconds = int.Parse(datetime.Groups["seconds"].Value);
+        var tzHours = int.Parse(datetime.Groups["tzhours"].Value);
+        var tzMinutes = int.Parse(datetime.Groups["tzminutes"].Value);
+        var month = DateTime.Parse($"01 {monthString} 2020").Month;
+        
+        return new DateTimeOffset(year, month, date, hours, minutes, seconds,
+            new TimeSpan(tzHours, tzMinutes, 0));
+    }
+
+    private static Post CreatePost(GelbooruPost post, HtmlDocument postHtml) 
+        => new(
+            new PostIdentity(post.Id, post.Md5),
+            post.FileUrl,
+            !string.IsNullOrWhiteSpace(post.SampleUrl) ? post.SampleUrl : post.FileUrl,
+            ExistState.Exist,
+            ExtractDate(post),
+            new Uploader(post.CreatorId, post.Owner.Replace('_', ' ')),
+            post.Source,
+            new Size(post.Width, post.Height),
+            -1,
+            GetRating(post.Rating),
+            GetRatingSafeLevel(post.Rating),
+            Array.Empty<int>(),
+            GetParent(post),
+            GetChildren(),
+            Array.Empty<Pool>(),
+            GetTags(postHtml),
+            GetNotes(post, postHtml));
 }
