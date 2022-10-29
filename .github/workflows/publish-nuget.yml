@@ -32,10 +32,11 @@ jobs:
       - name: Echo version
         run: echo ${{ steps.gitversion.outputs.majorMinorPatch }}
       
-      - name: Setup .NET Core SDK '6.x.x'
+      - name: Setup .NET Core SDK '7.x.x'
         uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: '6.x.x'
+          dotnet-version: '7.x.x'
+          include-prerelease: true
 
       - name: Update project version
         uses: roryprimrose/set-vs-sdk-project-version@v1
