@@ -20,7 +20,7 @@ public class YandereApiLoaderFixture
         });
     
     private readonly IOptions<YandereSettings> _options 
-        = Options.Create(new YandereSettings { PauseBetweenRequestsInMs = 0 });
+        = Options.Create(new YandereSettings { PauseBetweenRequestsInMs = 1 });
 
     private IFlurlClientFactory Factory =>
         _enableCache ? new HardCachePerBaseUrlFlurlClientFactory() : new PerBaseUrlFlurlClientFactory();

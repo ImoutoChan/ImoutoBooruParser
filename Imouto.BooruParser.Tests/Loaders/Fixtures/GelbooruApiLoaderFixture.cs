@@ -9,15 +9,9 @@ public class GelbooruApiLoaderFixture
 {
     private IBooruApiLoader? _loader;
     private readonly bool _enableCache = true;
-
-    private readonly IOptions<GelbooruSettings> _authorizedOptions = Options.Create(
-        new GelbooruSettings()
-        {
-            PauseBetweenRequestsInMs = 100
-        });
     
     private readonly IOptions<GelbooruSettings> _options 
-        = Options.Create(new GelbooruSettings { PauseBetweenRequestsInMs = 0 });
+        = Options.Create(new GelbooruSettings { PauseBetweenRequestsInMs = 1 });
 
     private IFlurlClientFactory Factory =>
         _enableCache ? new HardCachePerBaseUrlFlurlClientFactory() : new PerBaseUrlFlurlClientFactory();

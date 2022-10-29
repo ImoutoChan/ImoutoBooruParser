@@ -123,34 +123,6 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.OriginalUrl.Should().NotContain("&amp;");
         }
     }
-
-    public class LoadFirstTagHistoryPageAsyncMethod : SankakuLoaderTests
-    {
-        public LoadFirstTagHistoryPageAsyncMethod(SankakuLoaderFixture loaderFixture) 
-            : base(loaderFixture)
-        {
-        }
-
-        [Fact]
-        public void ShouldThrowWithoutCredentials()
-        {
-            var loader = _loaderFixture.GetLoaderWithoutAuth();
-
-            Func<Task> action = async () => await loader.GetTagHistoryFirstPageAsync();
-
-            action.Should().ThrowAsync<HttpRequestException>();
-        }
-
-        [Fact]
-        public async Task ShouldReturnWithCredentials()
-        {
-            var loader = _loaderFixture.GetLoaderWithAuth();
-
-            var firstPage = await loader.GetTagHistoryFirstPageAsync();
-
-            firstPage.Should().NotBeEmpty();
-        }
-    }
         
     public class SearchAsyncMethod : SankakuLoaderTests
     {
@@ -197,14 +169,42 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         }
     }
 
-    public class LoadTagHistoryUpToAsyncMethod : SankakuLoaderTests
+    public class GetTagHistoryFirstPageAsyncMethod : SankakuLoaderTests
     {
-        public LoadTagHistoryUpToAsyncMethod(SankakuLoaderFixture loaderFixture) 
+        public GetTagHistoryFirstPageAsyncMethod(SankakuLoaderFixture loaderFixture) 
             : base(loaderFixture)
         {
         }
 
-        [Fact]
+        [Fact(Skip = "only local invokation")]
+        public void ShouldThrowWithoutCredentials()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+
+            Func<Task> action = async () => await loader.GetTagHistoryFirstPageAsync();
+
+            action.Should().ThrowAsync<HttpRequestException>();
+        }
+
+        [Fact(Skip = "only local invokation")]
+        public async Task ShouldReturnWithCredentials()
+        {
+            var loader = _loaderFixture.GetLoaderWithAuth();
+
+            var firstPage = await loader.GetTagHistoryFirstPageAsync();
+
+            firstPage.Should().NotBeEmpty();
+        }
+    }
+
+    public class GetTagHistoryToDateTimeAsyncMethod : SankakuLoaderTests
+    {
+        public GetTagHistoryToDateTimeAsyncMethod(SankakuLoaderFixture loaderFixture) 
+            : base(loaderFixture)
+        {
+        }
+
+        [Fact(Skip = "only local invokation")]
         public void ShouldNotLoadTagsHistoryToDateWithoutCredentials()
         {
             var loader = _loaderFixture.GetLoaderWithoutAuth();
@@ -215,7 +215,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             action.Should().ThrowAsync<HttpRequestException>();
         }
 
-        [Fact]
+        [Fact(Skip = "only local invokation")]
         public async Task ShouldLoadTagsHistoryToDateWithCredentials()
         {
             var loader = _loaderFixture.GetLoaderWithAuth();
@@ -225,14 +225,14 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         }
     }
 
-    public class LoadTagHistoryFromAsyncMethod : SankakuLoaderTests
+    public class GetTagHistoryFromIdToPresentAsyncMethod : SankakuLoaderTests
     {
-        public LoadTagHistoryFromAsyncMethod(SankakuLoaderFixture loaderFixture) 
+        public GetTagHistoryFromIdToPresentAsyncMethod(SankakuLoaderFixture loaderFixture) 
             : base(loaderFixture)
         {
         }
 
-        [Fact]
+        [Fact(Skip = "only local invokation")]
         public async Task ShouldLoadTagsHistoryFromIdWithCredentials()
         {
             var loader = _loaderFixture.GetLoaderWithAuth();
@@ -244,7 +244,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             notesHistory.Should().NotBeEmpty();
         }
 
-        [Fact]
+        [Fact(Skip = "only local invokation")]
         public async Task ShouldLoadTagsHistoryFromIdAndHaveAllDataWithCredentials()
         {
             var loader = _loaderFixture.GetLoaderWithAuth();

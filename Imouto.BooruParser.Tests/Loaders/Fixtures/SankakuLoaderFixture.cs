@@ -26,11 +26,11 @@ public class SankakuLoaderFixture
                 Console.WriteLine($"new token: {tokens.AccessToken}, {tokens.RefreshToken}");
                 return Task.CompletedTask;
             },
-            PauseBetweenRequestsInMs = 500
+            PauseBetweenRequestsInMs = 1
         });
     
     private readonly IOptions<SankakuSettings> _options 
-        = Options.Create(new SankakuSettings { PauseBetweenRequestsInMs = 500 });
+        = Options.Create(new SankakuSettings { PauseBetweenRequestsInMs = 1 });
 
     public IBooruApiLoader GetLoaderWithAuth()
         => _withAuth ??= new SankakuApiLoader(
