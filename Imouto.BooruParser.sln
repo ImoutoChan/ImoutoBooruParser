@@ -10,9 +10,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\publish-nuget.yml = .github\workflows\publish-nuget.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImoutoRebirth.BooruParser", "ImoutoRebirth.BooruParser\ImoutoRebirth.BooruParser.csproj", "{B9E22FBB-5CE4-4D6D-BCAB-3AA1C7313286}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imouto.BooruParser", "Imouto.BooruParser\Imouto.BooruParser.csproj", "{B9E22FBB-5CE4-4D6D-BCAB-3AA1C7313286}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImoutoRebirth.BooruParser.Tests", "ImoutoRebirth.BooruParser.Tests\ImoutoRebirth.BooruParser.Tests.csproj", "{4EB9C526-B44F-4E73-87C5-21E8F1B217EC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imouto.BooruParser.Tests", "Imouto.BooruParser.Tests\Imouto.BooruParser.Tests.csproj", "{4EB9C526-B44F-4E73-87C5-21E8F1B217EC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
