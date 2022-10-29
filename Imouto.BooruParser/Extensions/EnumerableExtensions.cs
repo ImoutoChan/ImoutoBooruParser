@@ -1,4 +1,4 @@
-namespace ImoutoRebirth.BooruParser.Extensions;
+namespace Imouto.BooruParser.Extensions;
 
 public static class EnumerableExtensions
 {

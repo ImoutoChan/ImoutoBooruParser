@@ -1,12 +1,12 @@
 using System.Text.Json.Serialization;
 
-namespace ImoutoRebirth.BooruParser.Implementations.Yandere;
+namespace Imouto.BooruParser.Implementations.Yandere;
 
 public record YanderePost(
     [property: JsonPropertyName("id")] int Id,
     [property: JsonPropertyName("tags")] string Tags,
     [property: JsonPropertyName("created_at")] int CreatedAt,
-    [property: JsonPropertyName("creator_id")] int CreatorId,
+    [property: JsonPropertyName("creator_id")] int? CreatorId,
     [property: JsonPropertyName("author")] string Author,
     [property: JsonPropertyName("source")] string Source,
     [property: JsonPropertyName("md5")] string Md5,
@@ -16,7 +16,6 @@ public record YanderePost(
     [property: JsonPropertyName("jpeg_url")] string JpegUrl,
     [property: JsonPropertyName("rating")] string Rating,
     [property: JsonPropertyName("parent_id")] int? ParentId,
-    [property: JsonPropertyName("status")] string Status,
     [property: JsonPropertyName("width")] int Width,
     [property: JsonPropertyName("height")] int Height,
     [property: JsonPropertyName("last_noted_at")] int LastNotedAt

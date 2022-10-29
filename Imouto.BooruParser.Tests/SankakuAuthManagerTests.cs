@@ -1,12 +1,12 @@
 using FluentAssertions;
 using Flurl.Http.Configuration;
 using Flurl.Http.Testing;
-using ImoutoRebirth.BooruParser.Implementations.Sankaku;
+using Imouto.BooruParser.Implementations.Sankaku;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Xunit;
 
-namespace ImoutoRebirth.BooruParser.Tests;
+namespace Imouto.BooruParser.Tests;
 
 public class SankakuAuthManagerTests
 {

@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using System.Net;
 using System.Text.Json;
 
-namespace ImoutoRebirth.BooruParser.Tests.Loaders.Fixtures.HttpCache;
+namespace Imouto.BooruParser.Tests.Loaders.Fixtures.HttpCache;
 
 public class HardCachingHttpMessageHandler : DelegatingHandler
 {

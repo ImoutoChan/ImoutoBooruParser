@@ -5,7 +5,7 @@ using Flurl.Http.Configuration;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
-namespace ImoutoRebirth.BooruParser.Implementations.Sankaku;
+namespace Imouto.BooruParser.Implementations.Sankaku;
 
 public class SankakuAuthManager : ISankakuAuthManager
 {

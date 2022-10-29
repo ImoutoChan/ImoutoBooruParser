@@ -1,10 +1,10 @@
 using FluentAssertions;
-using ImoutoRebirth.BooruParser.Extensions;
-using ImoutoRebirth.BooruParser.Implementations;
-using ImoutoRebirth.BooruParser.Tests.Loaders.Fixtures;
+using Imouto.BooruParser.Extensions;
+using Imouto.BooruParser.Implementations;
+using Imouto.BooruParser.Tests.Loaders.Fixtures;
 using Xunit;
 
-namespace ImoutoRebirth.BooruParser.Tests.Loaders;
+namespace Imouto.BooruParser.Tests.Loaders;
 
 public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
 {

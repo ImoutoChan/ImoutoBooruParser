@@ -1,8 +1,8 @@
 using FluentAssertions;
-using ImoutoRebirth.BooruParser.Tests.Loaders.Fixtures;
+using Imouto.BooruParser.Tests.Loaders.Fixtures;
 using Xunit;
 
-namespace ImoutoRebirth.BooruParser.Tests.Loaders;
+namespace Imouto.BooruParser.Tests.Loaders;
 
 public class GelbooruLoaderTests : IClassFixture<GelbooruApiLoaderFixture>
 {

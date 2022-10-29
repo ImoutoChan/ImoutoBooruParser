@@ -1,4 +1,4 @@
-namespace ImoutoRebirth.BooruParser.Implementations.Gelbooru;
+namespace Imouto.BooruParser.Implementations.Gelbooru;
 
 public record GelbooruSettings
 {

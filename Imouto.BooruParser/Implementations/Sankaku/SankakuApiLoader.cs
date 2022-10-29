@@ -1,10 +1,10 @@
 using Flurl;
 using Flurl.Http;
 using Flurl.Http.Configuration;
-using ImoutoRebirth.BooruParser.Extensions;
+using Imouto.BooruParser.Extensions;
 using Microsoft.Extensions.Options;
 
-namespace ImoutoRebirth.BooruParser.Implementations.Sankaku;
+namespace Imouto.BooruParser.Implementations.Sankaku;
 
 public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
 {
@@ -160,20 +160,19 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
                 ), cancellationToken: ct)
             .ReceiveJson<SankakuTagHistoryDocument>();
 
-        var entries = response.Data.PostTagHistoryConnection.Edges.Select(x => x.Node)
+        var entries = response.Data.PostTagHistoryConnection?.Edges.Select(x => x.Node)
             .Select(x => new TagHistoryEntry(
                 x.Id, 
                 DateTimeOffset.FromUnixTimeSeconds(long.Parse(x.CreatedAt)), 
                 x.Post.Id, 
                 x.Parent != null ? int.Parse(x.Parent) : null, 
-                true))
-            .ToList();
+                true)) ?? Enumerable.Empty<TagHistoryEntry>();
 
-        var nextPage = response.Data.PostTagHistoryConnection.PageInfo.HasNextPage
+        var nextPage = response.Data.PostTagHistoryConnection?.PageInfo.HasNextPage == true
             ? new SearchToken(response.Data.PostTagHistoryConnection.PageInfo.EndCursor)
             : null;
 
-        return new(entries, nextPage);
+        return new(entries.ToList(), nextPage);
     }
 
     public async Task<HistorySearchResult<NoteHistoryEntry>> GetNoteHistoryPageAsync(

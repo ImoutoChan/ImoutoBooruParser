@@ -1,11 +1,11 @@
 using Flurl.Http.Configuration;
-using ImoutoRebirth.BooruParser.Implementations.Danbooru;
-using ImoutoRebirth.BooruParser.Implementations.Gelbooru;
-using ImoutoRebirth.BooruParser.Implementations.Sankaku;
-using ImoutoRebirth.BooruParser.Implementations.Yandere;
+using Imouto.BooruParser.Implementations.Danbooru;
+using Imouto.BooruParser.Implementations.Gelbooru;
+using Imouto.BooruParser.Implementations.Sankaku;
+using Imouto.BooruParser.Implementations.Yandere;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ImoutoRebirth.BooruParser;
+namespace Imouto.BooruParser;
 
 public static class ServiceCollectionExtensions
 {

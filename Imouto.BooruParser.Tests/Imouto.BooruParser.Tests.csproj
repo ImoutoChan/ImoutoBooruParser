@@ -22,7 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ImoutoRebirth.BooruParser\ImoutoRebirth.BooruParser.csproj" />
+        <ProjectReference Include="..\Imouto.BooruParser\Imouto.BooruParser.csproj" />
     </ItemGroup>
 
 </Project>

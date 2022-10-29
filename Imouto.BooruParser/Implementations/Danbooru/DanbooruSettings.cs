@@ -1,4 +1,4 @@
-namespace ImoutoRebirth.BooruParser.Implementations.Danbooru;
+namespace Imouto.BooruParser.Implementations.Danbooru;
 
 public record DanbooruSettings
 {

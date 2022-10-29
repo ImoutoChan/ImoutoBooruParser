@@ -19,7 +19,7 @@
         <RepositoryUrl>https://github.com/ImoutoChan/ImoutoBooruParser</RepositoryUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
-        <PackageTags>booru search parser danbooru sankakuchannel yande.re yandere imageboard</PackageTags>
+        <PackageTags>booru search parser danbooru sankakuchannel yande.re yandere gelbooru imageboard image art animeart anime</PackageTags>
         <VersionSuffix>beta</VersionSuffix>
     </PropertyGroup>
 

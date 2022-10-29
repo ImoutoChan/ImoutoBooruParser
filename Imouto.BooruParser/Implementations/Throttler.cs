@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace ImoutoRebirth.BooruParser.Implementations;
+namespace Imouto.BooruParser.Implementations;
 
 public class Throttler
 {

@@ -1,4 +1,4 @@
-namespace ImoutoRebirth.BooruParser.Implementations.Yandere;
+namespace Imouto.BooruParser.Implementations.Yandere;
 
 public record YandereSettings
 {

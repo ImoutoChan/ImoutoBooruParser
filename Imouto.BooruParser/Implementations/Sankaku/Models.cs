@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace ImoutoRebirth.BooruParser.Implementations.Sankaku;
+namespace Imouto.BooruParser.Implementations.Sankaku;
 
 public record SankakuNote(
     [property: JsonPropertyName("id")] int Id,

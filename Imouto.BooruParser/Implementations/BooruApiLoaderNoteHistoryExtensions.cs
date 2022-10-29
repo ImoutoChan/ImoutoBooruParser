@@ -1,8 +1,8 @@
 using System.Runtime.CompilerServices;
-using ImoutoRebirth.BooruParser.Implementations.Danbooru;
-using ImoutoRebirth.BooruParser.Implementations.Yandere;
+using Imouto.BooruParser.Implementations.Danbooru;
+using Imouto.BooruParser.Implementations.Yandere;
 
-namespace ImoutoRebirth.BooruParser.Implementations;
+namespace Imouto.BooruParser.Implementations;
 
 public static class BooruApiLoaderNoteHistoryExtensions
 {

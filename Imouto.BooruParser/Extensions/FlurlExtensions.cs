@@ -1,7 +1,7 @@
 using Flurl.Http;
 using HtmlAgilityPack;
 
-namespace ImoutoRebirth.BooruParser.Extensions;
+namespace Imouto.BooruParser.Extensions;
 
 public static class FlurlExtensions
 {

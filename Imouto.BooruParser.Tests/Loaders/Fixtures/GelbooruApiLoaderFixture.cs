@@ -1,9 +1,9 @@
 ﻿using Flurl.Http.Configuration;
-using ImoutoRebirth.BooruParser.Implementations.Gelbooru;
-using ImoutoRebirth.BooruParser.Tests.Loaders.Fixtures.HttpCache;
+using Imouto.BooruParser.Implementations.Gelbooru;
+using Imouto.BooruParser.Tests.Loaders.Fixtures.HttpCache;
 using Microsoft.Extensions.Options;
 
-namespace ImoutoRebirth.BooruParser.Tests.Loaders.Fixtures;
+namespace Imouto.BooruParser.Tests.Loaders.Fixtures;
 
 public class GelbooruApiLoaderFixture
 {

@@ -1,9 +1,9 @@
 using System.Text.Json.Serialization;
 
-namespace ImoutoRebirth.BooruParser.Implementations.Sankaku;
+namespace Imouto.BooruParser.Implementations.Sankaku;
 
 public record Data(
-    [property: JsonPropertyName("postTagHistoryConnection")] PostTagHistoryConnection PostTagHistoryConnection
+    [property: JsonPropertyName("postTagHistoryConnection")] PostTagHistoryConnection? PostTagHistoryConnection
 );
 
 public record Edge(

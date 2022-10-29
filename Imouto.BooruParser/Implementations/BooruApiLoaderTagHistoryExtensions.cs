@@ -1,9 +1,9 @@
 using System.Runtime.CompilerServices;
-using ImoutoRebirth.BooruParser.Implementations.Danbooru;
-using ImoutoRebirth.BooruParser.Implementations.Sankaku;
-using ImoutoRebirth.BooruParser.Implementations.Yandere;
+using Imouto.BooruParser.Implementations.Danbooru;
+using Imouto.BooruParser.Implementations.Sankaku;
+using Imouto.BooruParser.Implementations.Yandere;
 
-namespace ImoutoRebirth.BooruParser.Implementations;
+namespace Imouto.BooruParser.Implementations;
 
 public static class BooruApiLoaderTagHistoryExtensions
 {
@@ -94,6 +94,9 @@ public static class BooruApiLoaderTagHistoryExtensions
 
             foreach (var tagsHistoryEntry in page.Results)
                 yield return tagsHistoryEntry;
+
+            if (!page.Results.Any())
+                break;
 
         } while (page.Results.Last().UpdatedAt >= upToDateTime);
     }

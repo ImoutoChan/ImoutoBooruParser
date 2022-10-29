@@ -1,4 +1,4 @@
-namespace ImoutoRebirth.BooruParser.Implementations.Sankaku;
+namespace Imouto.BooruParser.Implementations.Sankaku;
 
 public record SankakuSettings
 {

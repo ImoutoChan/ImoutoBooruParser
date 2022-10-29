@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace ImoutoRebirth.BooruParser.Implementations.Danbooru;
+namespace Imouto.BooruParser.Implementations.Danbooru;
 
 public record DanbooruChild(
     [property: JsonPropertyName("id")] int Id,

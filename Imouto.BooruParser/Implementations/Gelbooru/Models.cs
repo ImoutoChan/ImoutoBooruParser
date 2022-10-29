@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace ImoutoRebirth.BooruParser.Implementations.Gelbooru;
+namespace Imouto.BooruParser.Implementations.Gelbooru;
 
 public record GelbooruPost(
     [property: JsonPropertyName("id")] int Id,

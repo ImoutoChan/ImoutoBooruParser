@@ -1,10 +1,10 @@
 using FluentAssertions;
-using ImoutoRebirth.BooruParser.Extensions;
-using ImoutoRebirth.BooruParser.Implementations;
-using ImoutoRebirth.BooruParser.Tests.Loaders.Fixtures;
+using Imouto.BooruParser.Extensions;
+using Imouto.BooruParser.Implementations;
+using Imouto.BooruParser.Tests.Loaders.Fixtures;
 using Xunit;
 
-namespace ImoutoRebirth.BooruParser.Tests.Loaders;
+namespace Imouto.BooruParser.Tests.Loaders;
 
 // This line will skip all tests in file
 // xUnit doesn't support skipping all tests in class
@@ -220,8 +220,8 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         {
             var loader = _loaderFixture.GetLoaderWithAuth();
 
-            var notesHistory = await loader.GetTagHistoryToDateTimeAsync(DateTime.Now.AddMinutes(-5)).ToListAsync();
-            notesHistory.Should().NotBeEmpty();
+            var history = await loader.GetTagHistoryToDateTimeAsync(DateTime.Now.AddMinutes(-5)).ToListAsync();
+            history.Should().NotBeEmpty();
         }
     }
 
@@ -237,6 +237,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         {
             var loader = _loaderFixture.GetLoaderWithAuth();
             var firstTagHistoryPage = await loader.GetTagHistoryFirstPageAsync();
+            firstTagHistoryPage.Should().NotBeEmpty();
 
             var notesHistory = await loader.GetTagHistoryFromIdToPresentAsync(firstTagHistoryPage.Last().HistoryId).ToListAsync();
 
@@ -248,6 +249,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         {
             var loader = _loaderFixture.GetLoaderWithAuth();
             var firstTagHistoryPage = await loader.GetTagHistoryFirstPageAsync();
+            firstTagHistoryPage.Should().NotBeEmpty();
 
             var tagsHistory = await loader
                 .GetTagHistoryFromIdToPresentAsync(firstTagHistoryPage.Last().HistoryId - 100)

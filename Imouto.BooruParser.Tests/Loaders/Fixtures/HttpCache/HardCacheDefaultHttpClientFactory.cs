@@ -1,6 +1,6 @@
 using Flurl.Http.Configuration;
 
-namespace ImoutoRebirth.BooruParser.Tests.Loaders.Fixtures.HttpCache;
+namespace Imouto.BooruParser.Tests.Loaders.Fixtures.HttpCache;
 
 public class HardCacheDefaultHttpClientFactory : DefaultHttpClientFactory
 {

@@ -1,4 +1,4 @@
-﻿namespace ImoutoRebirth.BooruParser;
+﻿namespace Imouto.BooruParser;
 
 public interface IBooruApiLoader
 {

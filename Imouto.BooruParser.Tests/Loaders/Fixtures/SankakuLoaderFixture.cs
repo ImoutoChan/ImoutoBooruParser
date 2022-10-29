@@ -1,10 +1,10 @@
 ﻿using Flurl.Http.Configuration;
-using ImoutoRebirth.BooruParser.Implementations.Sankaku;
-using ImoutoRebirth.BooruParser.Tests.Loaders.Fixtures.HttpCache;
+using Imouto.BooruParser.Implementations.Sankaku;
+using Imouto.BooruParser.Tests.Loaders.Fixtures.HttpCache;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
-namespace ImoutoRebirth.BooruParser.Tests.Loaders.Fixtures;
+namespace Imouto.BooruParser.Tests.Loaders.Fixtures;
 
 public class SankakuLoaderFixture
 {
@@ -26,11 +26,11 @@ public class SankakuLoaderFixture
                 Console.WriteLine($"new token: {tokens.AccessToken}, {tokens.RefreshToken}");
                 return Task.CompletedTask;
             },
-            PauseBetweenRequestsInMs = 1
+            PauseBetweenRequestsInMs = 500
         });
     
     private readonly IOptions<SankakuSettings> _options 
-        = Options.Create(new SankakuSettings { PauseBetweenRequestsInMs = 1 });
+        = Options.Create(new SankakuSettings { PauseBetweenRequestsInMs = 500 });
 
     public IBooruApiLoader GetLoaderWithAuth()
         => _withAuth ??= new SankakuApiLoader(

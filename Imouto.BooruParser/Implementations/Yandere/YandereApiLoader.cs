@@ -4,10 +4,10 @@ using Flurl;
 using Flurl.Http;
 using Flurl.Http.Configuration;
 using HtmlAgilityPack;
-using ImoutoRebirth.BooruParser.Extensions;
+using Imouto.BooruParser.Extensions;
 using Microsoft.Extensions.Options;
 
-namespace ImoutoRebirth.BooruParser.Implementations.Yandere;
+namespace Imouto.BooruParser.Implementations.Yandere;
 
 // test 
 /// correct time
@@ -43,24 +43,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             .Request("post", "show", postId)
             .GetHtmlDocumentAsync();
 
-        return new Post(
-            new PostIdentity(postId, post.Md5),
-            post.FileUrl,
-            post.SampleUrl ?? post.JpegUrl,
-            GetExistState(postHtml),
-            DateTimeOffset.FromUnixTimeSeconds(post.CreatedAt),
-            new Uploader(post.CreatorId, post.Author),
-            post.Source,
-            new Size(post.Width, post.Height),
-            post.FileSize,
-            GetRatingFromChar(post.Rating),
-            RatingSafeLevel.None,
-            Array.Empty<int>(),
-            await GetPostIdentityAsync(post.ParentId),
-            await GetChildrenAsync(postHtml),
-            await GetPoolsAsync(postId, postHtml),
-            GetTags(postHtml),
-            GetNotes(post, postHtml));
+        return await GetPost(postId, post, postHtml);
     }
 
     public async Task<Post?> GetPostByMd5Async(string md5)
@@ -78,24 +61,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             .Request("post", "show", post.Id)
             .GetHtmlDocumentAsync();
 
-        return new Post(
-            new PostIdentity(post.Id, post.Md5),
-            post.FileUrl,
-            post.SampleUrl ?? post.JpegUrl,
-            GetExistState(postHtml),
-            DateTimeOffset.FromUnixTimeSeconds(post.CreatedAt),
-            new Uploader(post.CreatorId, post.Author),
-            post.Source,
-            new Size(post.Width, post.Height),
-            post.FileSize,
-            GetRatingFromChar(post.Rating),
-            RatingSafeLevel.None,
-            Array.Empty<int>(),
-            await GetPostIdentityAsync(post.ParentId),
-            await GetChildrenAsync(postHtml),
-            await GetPoolsAsync(post.Id, postHtml),
-            GetTags(postHtml),
-            GetNotes(post, postHtml));
+        return await GetPost(post.Id, post, postHtml);
     }
 
     /// <summary>
@@ -233,7 +199,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
 
         return await GetPostIdentityAsync(postId.Value);
     }
-    
+
     private async Task<PostIdentity> GetPostIdentityAsync(int postId)
     {
         var posts = await _flurlClient.Request("post", "index.json")
@@ -264,7 +230,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
 
         return childrenTasks.Select(x => x.Result).ToList();
     }
-    
+
     private static ExistState GetExistState(HtmlDocument postHtml)
     {
         var isDeleted = postHtml.DocumentNode
@@ -382,4 +348,24 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
 
         settings.AfterCall = _ => Throttler.Get("Yandere").Release();
     }
+
+    private async Task<Post> GetPost(int postId, YanderePost post, HtmlDocument postHtml) 
+        => new(
+            new PostIdentity(postId, post.Md5),
+            post.FileUrl,
+            post.SampleUrl ?? post.JpegUrl,
+            GetExistState(postHtml),
+            DateTimeOffset.FromUnixTimeSeconds(post.CreatedAt),
+            new Uploader(post.CreatorId ?? -1, post.Author),
+            post.Source,
+            new Size(post.Width, post.Height),
+            post.FileSize,
+            GetRatingFromChar(post.Rating),
+            RatingSafeLevel.None,
+            Array.Empty<int>(),
+            await GetPostIdentityAsync(post.ParentId),
+            await GetChildrenAsync(postHtml),
+            await GetPoolsAsync(postId, postHtml),
+            GetTags(postHtml),
+            GetNotes(post, postHtml));
 }

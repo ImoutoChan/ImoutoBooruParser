@@ -3,7 +3,7 @@ using Flurl.Http;
 using Flurl.Http.Configuration;
 using Microsoft.Extensions.Options;
 
-namespace ImoutoRebirth.BooruParser.Implementations.Danbooru;
+namespace Imouto.BooruParser.Implementations.Danbooru;
 
 public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
 {

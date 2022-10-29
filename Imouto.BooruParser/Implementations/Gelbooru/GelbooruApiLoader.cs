@@ -3,10 +3,10 @@ using Flurl;
 using Flurl.Http;
 using Flurl.Http.Configuration;
 using HtmlAgilityPack;
-using ImoutoRebirth.BooruParser.Extensions;
+using Imouto.BooruParser.Extensions;
 using Microsoft.Extensions.Options;
 
-namespace ImoutoRebirth.BooruParser.Implementations.Gelbooru;
+namespace Imouto.BooruParser.Implementations.Gelbooru;
 
 public class GelbooruApiLoader : IBooruApiLoader
 {
