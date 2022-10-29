@@ -16,11 +16,11 @@ public class YandereApiLoaderFixture
         {
             PasswordHash = "5eedf880498cac52bbfc8386150682d54174fab0",
             Login = "testuser1",
-            PauseBetweenRequestsInMs = 1
+            PauseBetweenRequestsInMs = 0
         });
     
     private readonly IOptions<YandereSettings> _options 
-        = Options.Create(new YandereSettings { PauseBetweenRequestsInMs = 1 });
+        = Options.Create(new YandereSettings { PauseBetweenRequestsInMs = 0 });
 
     private IFlurlClientFactory Factory =>
         _enableCache ? new HardCachePerBaseUrlFlurlClientFactory() : new PerBaseUrlFlurlClientFactory();

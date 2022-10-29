@@ -30,7 +30,7 @@ public class SankakuLoaderFixture
         });
     
     private readonly IOptions<SankakuSettings> _options 
-        = Options.Create(new SankakuSettings { PauseBetweenRequestsInMs = 1 });
+        = Options.Create(new SankakuSettings { PauseBetweenRequestsInMs = 0 });
 
     public IBooruApiLoader GetLoaderWithAuth()
         => _withAuth ??= new SankakuApiLoader(
