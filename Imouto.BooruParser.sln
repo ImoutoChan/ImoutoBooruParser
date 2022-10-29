@@ -7,7 +7,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{FD85
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{02C985D7-B745-4894-A7B3-57A75E9790CC}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\publish-nuget.yml = .github\workflows\publish-nuget.yml
+		.github\workflows\deploy.yml = .github\workflows\deploy.yml
+		.github\workflows\test.yml = .github\workflows\test.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imouto.BooruParser", "Imouto.BooruParser\Imouto.BooruParser.csproj", "{B9E22FBB-5CE4-4D6D-BCAB-3AA1C7313286}"

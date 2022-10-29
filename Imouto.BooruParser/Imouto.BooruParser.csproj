@@ -5,7 +5,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-
+        <NoWarn>$(NoWarn);NU5104</NoWarn>
+        
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
     
@@ -20,7 +21,6 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <PackageTags>booru search parser danbooru sankakuchannel yande.re yandere gelbooru imageboard image art animeart anime</PackageTags>
-        <VersionSuffix>beta</VersionSuffix>
     </PropertyGroup>
 
     <ItemGroup>
