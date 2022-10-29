@@ -47,7 +47,7 @@ public record Post(
     ExistState ExistState,
     DateTimeOffset PostedAt,
     Uploader UploaderId,
-    string Source,
+    string? Source,
     Size FileResolution,
     int FileSizeInBytes,
     Rating Rating,

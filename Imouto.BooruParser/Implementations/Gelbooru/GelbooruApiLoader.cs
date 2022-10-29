@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.RegularExpressions;
 using Flurl;
 using Flurl.Http;
@@ -39,9 +40,11 @@ public class GelbooruApiLoader : IBooruApiLoader
             })
             .GetJsonAsync<GelbooruPostPage>();
 
-        var post = postJson.Posts.First();
+        var post = postJson.Posts?.FirstOrDefault();
         
-        return CreatePost(post, postHtml);
+        return post != null 
+            ? CreatePost(post, postHtml) 
+            : CreatePost(postHtml);
     }
 
     public async Task<Post?> GetPostByMd5Async(string md5)
@@ -65,8 +68,11 @@ public class GelbooruApiLoader : IBooruApiLoader
             })
             .GetJsonAsync<GelbooruPostPage>();
         
-        var post = postJson.Posts.First();
-        return CreatePost(post, postHtml);
+        var post = postJson.Posts?.FirstOrDefault();
+        
+        return post != null 
+            ? CreatePost(post, postHtml)
+            : CreatePost(postHtml);
     }
 
     public async Task<SearchResult> SearchAsync(string tags)
@@ -79,9 +85,9 @@ public class GelbooruApiLoader : IBooruApiLoader
             })
             .GetJsonAsync<GelbooruPostPage>();
 
-        return new SearchResult(postJson.Posts
+        return new SearchResult(postJson.Posts?
             .Select(x => new PostPreview(x.Id, x.Md5, x.Tags, false, false))
-            .ToList());
+            .ToArray() ?? Array.Empty<PostPreview>());
     }
 
     public Task<SearchResult> GetPopularPostsAsync(PopularType type)
@@ -110,9 +116,9 @@ public class GelbooruApiLoader : IBooruApiLoader
     /// </remarks>>
     private static IReadOnlyCollection<PostIdentity> GetChildren() => Array.Empty<PostIdentity>();
 
-    private static IReadOnlyCollection<Note> GetNotes(GelbooruPost post, HtmlDocument postHtml)
+    private static IReadOnlyCollection<Note> GetNotes(GelbooruPost? post, HtmlDocument postHtml)
     {
-        if (post.HasNotes != "true")
+        if (post?.HasNotes == "false")
             return Array.Empty<Note>();
 
         var notes = postHtml.DocumentNode
@@ -221,4 +227,44 @@ public class GelbooruApiLoader : IBooruApiLoader
             Array.Empty<Pool>(),
             GetTags(postHtml),
             GetNotes(post, postHtml));
+
+    private static Post CreatePost(HtmlDocument postHtml)
+    {
+        var idString = postHtml.DocumentNode.SelectSingleNode("//head/link[@rel='canonical']").Attributes["href"].Value.Split('=').Last();
+        var id = int.Parse(idString);
+        
+        var url = postHtml.DocumentNode.SelectSingleNode("//head/meta[@property='og:image']").Attributes["content"].Value;
+        var md5 = url.Split('/').Last().Split('.').First();
+        
+        var dateString = postHtml.DocumentNode.SelectSingleNode("//li[contains (., 'Posted: ')]/text()[1]").InnerText[8..];
+        var date = new DateTimeOffset(DateTime.ParseExact(dateString, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), TimeSpan.FromHours(-5));
+        
+        var uploader = postHtml.DocumentNode.SelectSingleNode("//li[contains (., 'Posted: ')]/a/text()")?.InnerText ?? "Anonymous";
+        
+        var source = postHtml.DocumentNode.SelectSingleNode("//li[contains (., 'Source: ')]/a[1]")?.Attributes["href"].Value;
+        
+        var sizeString = postHtml.DocumentNode.SelectSingleNode("//li[contains (., 'Size: ')]/text()").InnerText;
+        var size = sizeString.Split(':').Last().Trim().Split('x').Select(int.Parse).ToList();
+        
+        var rating = postHtml.DocumentNode.SelectSingleNode("//li[contains (., 'Rating: ')]/text()").InnerText.Split(' ').Last().ToLower();
+        
+        return new(
+            new PostIdentity(id, md5),
+            url,
+            url,
+            ExistState.MarkDeleted,
+            date,
+            new Uploader(-1, uploader.Replace('_', ' ')),
+            source,
+            new Size(size[0], size[1]),
+            -1,
+            GetRating(rating),
+            GetRatingSafeLevel(rating),
+            Array.Empty<int>(),
+            null,
+            GetChildren(),
+            Array.Empty<Pool>(),
+            GetTags(postHtml),
+            GetNotes(null, postHtml));
+    }
 }

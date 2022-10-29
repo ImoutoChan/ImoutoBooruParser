@@ -20,5 +20,5 @@ public record GelbooruPost(
 );
 
 public record GelbooruPostPage(
-    [property: JsonPropertyName("post")] IReadOnlyCollection<GelbooruPost> Posts
+    [property: JsonPropertyName("post")] IReadOnlyCollection<GelbooruPost>? Posts
 );

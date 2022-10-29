@@ -159,5 +159,83 @@ public class GelbooruLoaderTests : IClassFixture<GelbooruApiLoaderFixture>
             post.Should().NotBeNull();
             post.SampleUrl.Should().Contain("sample");
         }
+        
+        [Fact]
+        public async Task ShouldGetBannedPostWithSomeData()
+        {
+            var loader = _loaderFixture.GetLoader();
+
+            var post = await loader.GetPostAsync(7841638);
+
+            post.Should().NotBeNull();
+            post.OriginalUrl.Should().Be("https://img3.gelbooru.com//images/b9/b9/b9b933c1835d043ec38cbefbe78554eb.png");
+            post.Id.Id.Should().Be(7841638);
+            post.Id.Md5Hash.Should().Be("b9b933c1835d043ec38cbefbe78554eb");
+            post.Notes.Should().BeEmpty();
+            post.Tags.Should().HaveCount(34);
+
+            foreach (var postTag in post.Tags)
+            {
+                postTag.Name.Should().NotBeNullOrWhiteSpace();
+                postTag.Type.Should().NotBeNullOrWhiteSpace();
+                postTag.Type.Should().BeOneOf("general", "copyright", "character", "circle", "artist", "metadata", "deprecated");
+            }
+            
+            post.Parent.Should().BeNull();
+            post.Pools.Should().BeEmpty();
+            post.Rating.Should().Be(Rating.Explicit);
+            post.RatingSafeLevel.Should().Be(RatingSafeLevel.None);
+            post.Source.Should().BeNull();
+            post.ChildrenIds.Should().BeEmpty();
+            post.ExistState.Should().Be(ExistState.MarkDeleted);
+            post.FileResolution.Should().Be(new Size(2244, 3541));
+            post.PostedAt.Should().Be(new DateTimeOffset(2022, 10, 23, 7, 20, 31, TimeSpan.FromHours(-5)));
+            post.SampleUrl.Should().Be("https://img3.gelbooru.com//images/b9/b9/b9b933c1835d043ec38cbefbe78554eb.png");
+            post.UploaderId.Id.Should().Be(-1);
+            post.UploaderId.Name.Should().Be("oniii-chan");
+            
+            // isn't supported in gelbooru
+            post.FileSizeInBytes.Should().Be(-1);
+            post.UgoiraFrameDelays.Should().BeEmpty();
+        }
+        
+        [Fact]
+        public async Task ShouldGetBannedPostWithSomeDataByMd5()
+        {
+            var loader = _loaderFixture.GetLoader();
+
+            var post = await loader.GetPostByMd5Async("b9b933c1835d043ec38cbefbe78554eb");
+
+            post.Should().NotBeNull();
+            post!.OriginalUrl.Should().Be("https://img3.gelbooru.com//images/b9/b9/b9b933c1835d043ec38cbefbe78554eb.png");
+            post.Id.Id.Should().Be(7841638);
+            post.Id.Md5Hash.Should().Be("b9b933c1835d043ec38cbefbe78554eb");
+            post.Notes.Should().BeEmpty();
+            post.Tags.Should().HaveCount(34);
+
+            foreach (var postTag in post.Tags)
+            {
+                postTag.Name.Should().NotBeNullOrWhiteSpace();
+                postTag.Type.Should().NotBeNullOrWhiteSpace();
+                postTag.Type.Should().BeOneOf("general", "copyright", "character", "circle", "artist", "metadata", "deprecated");
+            }
+            
+            post.Parent.Should().BeNull();
+            post.Pools.Should().BeEmpty();
+            post.Rating.Should().Be(Rating.Explicit);
+            post.RatingSafeLevel.Should().Be(RatingSafeLevel.None);
+            post.Source.Should().BeNull();
+            post.ChildrenIds.Should().BeEmpty();
+            post.ExistState.Should().Be(ExistState.MarkDeleted);
+            post.FileResolution.Should().Be(new Size(2244, 3541));
+            post.PostedAt.Should().Be(new DateTimeOffset(2022, 10, 23, 7, 20, 31, TimeSpan.FromHours(-5)));
+            post.SampleUrl.Should().Be("https://img3.gelbooru.com//images/b9/b9/b9b933c1835d043ec38cbefbe78554eb.png");
+            post.UploaderId.Id.Should().Be(-1);
+            post.UploaderId.Name.Should().Be("oniii-chan");
+            
+            // isn't supported in gelbooru
+            post.FileSizeInBytes.Should().Be(-1);
+            post.UgoiraFrameDelays.Should().BeEmpty();
+        }
     }
 }
