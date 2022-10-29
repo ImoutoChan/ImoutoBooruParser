@@ -1,4 +1,4 @@
-name: Publish Nuget
+name: Test
 
 on:
   push:
