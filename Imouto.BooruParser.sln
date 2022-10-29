@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29519.161
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imouto.BooruParser", "Imouto.BooruParser\Imouto.BooruParser.csproj", "{B2E24C20-E5DE-40B2-A25F-247272782E84}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Imouto.BooruParser.Tests", "Imouto.BooruParser.Tests\Imouto.BooruParser.Tests.csproj", "{B9CC9691-5E9A-477B-AE2C-2AFDCEE498E2}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{FD85DDD1-F4AC-4BA0-801C-ABC4072F4FA7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{02C985D7-B745-4894-A7B3-57A75E9790CC}"
@@ -24,14 +20,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B2E24C20-E5DE-40B2-A25F-247272782E84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B2E24C20-E5DE-40B2-A25F-247272782E84}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B2E24C20-E5DE-40B2-A25F-247272782E84}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B2E24C20-E5DE-40B2-A25F-247272782E84}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B9CC9691-5E9A-477B-AE2C-2AFDCEE498E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B9CC9691-5E9A-477B-AE2C-2AFDCEE498E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B9CC9691-5E9A-477B-AE2C-2AFDCEE498E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B9CC9691-5E9A-477B-AE2C-2AFDCEE498E2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B9E22FBB-5CE4-4D6D-BCAB-3AA1C7313286}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B9E22FBB-5CE4-4D6D-BCAB-3AA1C7313286}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9E22FBB-5CE4-4D6D-BCAB-3AA1C7313286}.Release|Any CPU.ActiveCfg = Release|Any CPU
