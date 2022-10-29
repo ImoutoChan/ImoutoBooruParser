@@ -5,6 +5,22 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <Authors>ImoutoChan</Authors>
+        <Company>ImoutoRebirth</Company>
+        <Product>Imouto.BooruParser</Product>
+        <Description>Dotnet library for working with posts from booru sites (chan.sankakucomplex.com, danbooru.donmai.us, yande.re, gelbooru.com). You can retrieve individual posts, tags/notes history, and search by tags.</Description>
+        <Copyright>(c) ImoutoChan</Copyright>
+        <PackageProjectUrl>https://github.com/ImoutoChan/ImoutoBooruParser</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/ImoutoChan/ImoutoBooruParser</RepositoryUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
+        <PackageTags>booru search parser danbooru sankakuchannel yande.re yandere imageboard</PackageTags>
+        <VersionSuffix>beta</VersionSuffix>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,6 +30,11 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0-rc.2.22472.3" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0-rc.2.22472.3" />
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.24.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\README.md" Pack="true" PackagePath="\" />
+        <None Include="..\LICENSE" Pack="true" PackagePath="\" />
     </ItemGroup>
 
 </Project>
