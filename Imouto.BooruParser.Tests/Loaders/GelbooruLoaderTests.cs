@@ -91,6 +91,16 @@ public class GelbooruLoaderTests : IClassFixture<GelbooruApiLoaderFixture>
             post.FileSizeInBytes.Should().Be(-1);
             post.UgoiraFrameDelays.Should().BeEmpty();
         }
+
+        [Fact]
+        public async Task ShouldReturnPostByMd5For26f7()
+        {
+            var loader = _loaderFixture.GetLoader();
+
+            var post = await loader.GetPostByMd5Async("9fdf36606d2d321b28f78252817226f7");
+
+            post.Should().NotBeNull();
+        }
     }
 
     public class SearchAsyncMethod : GelbooruLoaderTests

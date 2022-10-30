@@ -186,8 +186,6 @@ public class GelbooruApiLoader : IBooruApiLoader
             if (delay > TimeSpan.Zero)
                 await Throttler.Get("gelbooru").UseAsync(delay);
         };
-        
-        settings.AfterCall = _ => Throttler.Get("gelbooru").Release();
     }
 
     private static DateTimeOffset ExtractDate(GelbooruPost post)

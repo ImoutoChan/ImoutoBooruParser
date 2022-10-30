@@ -318,7 +318,5 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             if (delay > TimeSpan.Zero)
                 await Throttler.Get("Sankaku").UseAsync(delay);
         };
-        
-        settings.AfterCall = _ => Throttler.Get("Sankaku").Release();
     }
 }

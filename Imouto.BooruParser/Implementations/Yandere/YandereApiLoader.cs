@@ -345,8 +345,6 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             if (delay > TimeSpan.Zero)
                 await Throttler.Get("Yandere").UseAsync(delay);
         };
-
-        settings.AfterCall = _ => Throttler.Get("Yandere").Release();
     }
 
     private async Task<Post> GetPost(int postId, YanderePost post, HtmlDocument postHtml) 

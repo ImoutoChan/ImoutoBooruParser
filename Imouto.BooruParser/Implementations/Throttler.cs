@@ -14,16 +14,20 @@ public class Throttler
     public async ValueTask UseAsync(TimeSpan delay)
     {
         await _locker.WaitAsync();
-
-        var now = DateTimeOffset.UtcNow;
+        try
+        {
+            var now = DateTimeOffset.UtcNow;
         
-        var timePassedSinceLastCall = now - _lastAccess;
+            var timePassedSinceLastCall = now - _lastAccess;
         
-        if (timePassedSinceLastCall < delay)
-            await Task.Delay(delay - timePassedSinceLastCall);
+            if (timePassedSinceLastCall < delay)
+                await Task.Delay(delay - timePassedSinceLastCall);
 
-        _lastAccess = now;
+            _lastAccess = now;
+        }
+        finally
+        {
+            _locker.Release();
+        }
     }
-    
-    public void Release() => _locker.Release();
 }

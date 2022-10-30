@@ -251,7 +251,5 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
             if (delay > TimeSpan.Zero)
                 await Throttler.Get("danbooru").UseAsync(delay);
         };
-        
-        settings.AfterCall = _ => Throttler.Get("danbooru").Release();
     }
 }
