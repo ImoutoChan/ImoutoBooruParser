@@ -44,7 +44,7 @@ public class GelbooruApiLoader : IBooruApiLoader
         
         return post != null 
             ? CreatePost(post, postHtml) 
-            : CreatePost(postHtml);
+            : CreatePost(postHtml)!;
     }
 
     public async Task<Post?> GetPostByMd5Async(string md5)
@@ -70,7 +70,7 @@ public class GelbooruApiLoader : IBooruApiLoader
         
         var post = postJson.Posts?.FirstOrDefault();
         
-        return post != null 
+        return post != null
             ? CreatePost(post, postHtml)
             : CreatePost(postHtml);
     }
@@ -226,9 +226,14 @@ public class GelbooruApiLoader : IBooruApiLoader
             GetTags(postHtml),
             GetNotes(post, postHtml));
 
-    private static Post CreatePost(HtmlDocument postHtml)
+    private static Post? CreatePost(HtmlDocument postHtml)
     {
-        var idString = postHtml.DocumentNode.SelectSingleNode("//head/link[@rel='canonical']").Attributes["href"].Value.Split('=').Last();
+        var idString = postHtml.DocumentNode.SelectSingleNode("//head/link[@rel='canonical']")
+            ?.Attributes["href"]?.Value?.Split('=')?.Last();
+
+        if (idString == null)
+            return null;
+        
         var id = int.Parse(idString);
         
         var url = postHtml.DocumentNode.SelectSingleNode("//head/meta[@property='og:image']").Attributes["content"].Value;

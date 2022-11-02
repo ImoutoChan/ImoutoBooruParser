@@ -47,7 +47,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Id.Id.Should().Be(6541010);
             post.Id.Md5Hash.Should().Be("deaac52a6b001b6953db90a09f7629f7");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(113);
+            post.Tags.Should().HaveCount(114);
 
             foreach (var postTag in post.Tags)
             {
@@ -87,7 +87,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Id.Id.Should().Be(6541010);
             post.Id.Md5Hash.Should().Be("deaac52a6b001b6953db90a09f7629f7");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(113);
+            post.Tags.Should().HaveCount(114);
 
             foreach (var postTag in post.Tags)
             {

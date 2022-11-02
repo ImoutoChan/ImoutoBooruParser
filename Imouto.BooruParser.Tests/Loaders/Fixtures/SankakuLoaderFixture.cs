@@ -19,8 +19,8 @@ public class SankakuLoaderFixture
     private readonly IOptions<SankakuSettings> _authorizedOptions = Options.Create(
         new SankakuSettings()
         {
-            AccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQ3NzE1OCwic3ViTHZsIjowLCJpc3MiOiJodHRwczovL2NhcGktdjIuc2Fua2FrdWNvbXBsZXguY29tIiwidHlwZSI6IkJlYXJlciIsImF1ZCI6ImNvbXBsZXgiLCJzY29wZSI6ImNvbXBsZXgiLCJpYXQiOjE2NjcwMDA5NjcsImV4cCI6MTY2NzE3Mzc2N30.T92i_rcXstDjWgZzFlZG3FQiSe1VvZ71peTLXp2BZDk",
-            RefreshToken = "tfO~UY6d9NpCcFazNAD4TZXkJwL",
+            AccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQ3NzE1OCwic3ViTHZsIjowLCJpc3MiOiJodHRwczovL2NhcGktdjIuc2Fua2FrdWNvbXBsZXguY29tIiwidHlwZSI6IkJlYXJlciIsImF1ZCI6ImNvbXBsZXgiLCJzY29wZSI6ImNvbXBsZXgiLCJpYXQiOjE2NjczNzk0ODcsImV4cCI6MTY2NzU1MjI4N30.bRQflk9JMqPOpoXoxDFPTcWKyDJX4Pvz9Yp0-SjWUdE",
+            RefreshToken = "7J3YIjnfgAaVqhUrukdbNAWmda6",
             SaveTokensCallbackAsync = tokens =>
             {
                 Console.WriteLine($"new token: {tokens.AccessToken}, {tokens.RefreshToken}");
