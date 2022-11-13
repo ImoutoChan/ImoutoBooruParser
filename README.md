@@ -9,7 +9,7 @@ The dotnet library for retrieving info from booru sites ([chan.sankakucomplex.co
 Install-Package Imouto.BooruParser
 ```
 ```xml
-<PackageReference Include="Imouto.BooruParser" Version="2.0.0" />
+<PackageReference Include="Imouto.BooruParser" Version="2.*" />
 ```
 
 # Version 2.0 released!
