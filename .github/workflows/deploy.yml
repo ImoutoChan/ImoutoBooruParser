@@ -8,11 +8,11 @@ on:
 
 jobs:
   Deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Install GitVersion
-        uses: GitTools/actions/gitversion/setup@v0.9.15
+        uses: GitTools/actions/gitversion/setup@v0.9.11
         with:
           versionSpec: '5.5.0'
       
