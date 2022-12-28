@@ -11,13 +11,8 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - name: Setup .NET Core SDK '3.1.0'
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: '3.1.0'
-
       - name: Install GitVersion
-        uses: GitTools/actions/gitversion/setup@v0.9.15
+        uses: GitTools/actions/gitversion/setup@v0.9.11
         with:
           versionSpec: '5.5.0'
       
@@ -32,7 +27,7 @@ jobs:
 
       - name: Run GitVersion
         id:   gitversion
-        uses: GitTools/actions/gitversion/execute@v0.9.15
+        uses: GitTools/actions/gitversion/execute@v0.9.11
 
       - name: Echo version
         run: echo ${{ steps.gitversion.outputs.majorMinorPatch }}
