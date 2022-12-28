@@ -15,7 +15,7 @@ jobs:
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: '3.1.0'
-        
+
       - name: Install GitVersion
         uses: GitTools/actions/gitversion/setup@v0.9.15
         with:
