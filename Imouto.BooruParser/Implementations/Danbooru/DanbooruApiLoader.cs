@@ -19,6 +19,7 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
     {
         var post = await _flurlClient.Request("posts", $"{postId}.json")
             .SetQueryParam("only", "id,tag_string_artist,tag_string_character,tag_string_copyright,pools,tag_string_general,tag_string_meta,parent_id,md5,file_url,large_file_url,preview_file_url,file_ext,last_noted_at,is_banned,is_deleted,created_at,uploader_id,source,image_width,image_height,file_size,rating,media_metadata[metadata],parent[id,md5],children[id,md5],notes[id,x,y,width,height,body],uploader[id,name]")
+            .WithUserAgent()
             .GetJsonAsync<DanbooruPost>();
 
         return new Post(
@@ -46,6 +47,7 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
         var posts = await _flurlClient.Request("posts.json")
             .SetQueryParam("only", "id,tag_string_artist,tag_string_character,tag_string_copyright,pools,tag_string_general,tag_string_meta,parent_id,md5,file_url,large_file_url,preview_file_url,file_ext,last_noted_at,is_banned,is_deleted,created_at,uploader_id,source,image_width,image_height,file_size,rating,media_metadata[metadata],parent[id,md5],children[id,md5],notes[id,x,y,width,height,body],uploader[id,name]")
             .SetQueryParam("tags", $"md5:{md5}")
+            .WithUserAgent()
             .GetJsonAsync<IReadOnlyCollection<DanbooruPost>>();
 
         if (!posts.Any())
@@ -77,6 +79,7 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
         var posts = await _flurlClient.Request("posts.json")
             .SetQueryParam("tags", tags)
             .SetQueryParam("only", "id,md5,tag_string,is_banned,is_deleted")
+            .WithUserAgent()
             .GetJsonAsync<IReadOnlyCollection<DanbooruPostPreview>>();
 
         return new SearchResult(posts
@@ -98,6 +101,7 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
             .SetQueryParam("date", $"{DateTimeOffset.UtcNow:yyyy-MM-ddTHH:mm:ss.fffzzz}")
             .SetQueryParam("scale", scale)
             .SetQueryParam("only", "id,md5,tag_string,is_banned,is_deleted")
+            .WithUserAgent()
             .GetJsonAsync<IReadOnlyCollection<DanbooruPostPreview>>();
 
         return new SearchResult(posts
@@ -116,7 +120,9 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
         if (token != null)
             request = request.SetQueryParam("page", token.Page);
 
-        var found = await request.GetJsonAsync<IReadOnlyCollection<DanbooruTagsHistoryEntry>>(cancellationToken: ct);
+        var found = await request
+            .WithUserAgent()
+            .GetJsonAsync<IReadOnlyCollection<DanbooruTagsHistoryEntry>>(cancellationToken: ct);
 
         if (!found.Any())
             return new(Array.Empty<TagHistoryEntry>(), null);
@@ -148,7 +154,9 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
         if (token != null)
             request = request.SetQueryParam("page", token.Page);
 
-        var found = await request.GetJsonAsync<IReadOnlyCollection<DanbooruNotesHistoryEntry>>(cancellationToken: ct);
+        var found = await request
+            .WithUserAgent()
+            .GetJsonAsync<IReadOnlyCollection<DanbooruNotesHistoryEntry>>(cancellationToken: ct);
 
         if (!found.Any())
             return new(Array.Empty<NoteHistoryEntry>(), null);
@@ -173,6 +181,7 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
     {
         await _flurlClient.Request("favorites.json")
             .SetQueryParam("post_id", postId)
+            .WithUserAgent()
             .PostAsync();
     }
 
@@ -196,6 +205,7 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
         var pools = await _flurlClient.Request("pools.json")
             .SetQueryParam("search[post_tags_match]", $"id:{postId}")
             .SetQueryParam("only", $"id,name,post_ids")
+            .WithUserAgent()
             .GetJsonAsync<IReadOnlyCollection<DanbooruPool>>();
 
         return pools
