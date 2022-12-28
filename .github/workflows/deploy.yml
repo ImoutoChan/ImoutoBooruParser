@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Install GitVersion
-        uses: GitTools/actions/gitversion/setup@v0.9.11
+        uses: GitTools/actions/gitversion/setup@v0.9.15
         with:
           versionSpec: '5.5.0'
       
