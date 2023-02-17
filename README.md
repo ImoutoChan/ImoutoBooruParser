@@ -25,7 +25,7 @@ var loader = new SankakuApiLoader(...);
 var loader = new GelbooruApiLoader(...);
 ```
 
-The recommended way to consume them is to regiter them in your container:
+The recommended way to consume them is to register them in your container:
 
 ```csharp
 services.AddBooruParsers();
