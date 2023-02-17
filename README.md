@@ -9,8 +9,11 @@ The dotnet library for retrieving info from booru sites ([chan.sankakucomplex.co
 Install-Package Imouto.BooruParser
 ```
 ```xml
-<PackageReference Include="Imouto.BooruParser" Version="2.*" />
+<PackageReference Include="Imouto.BooruParser" Version="3.*" />
 ```
+
+# Version 3.0
+Have to increment major version due to breaking change in danbooru api usage. Now you have to provide your own user agent for your bot in danbooru settings, otherwise danbooru requests would fail with 403 (recent change on their side).
 
 # Version 2.0 released!
 
