@@ -7,6 +7,8 @@ public record DanbooruSettings
     public string? ApiKey { get; set; }
     
     public int PauseBetweenRequestsInMs { get; set; } = 1;
+    
+    public string? BotUserAgent { get; set; }
 
     public TimeSpan PauseBetweenRequests => TimeSpan.FromMilliseconds(PauseBetweenRequestsInMs);
 }

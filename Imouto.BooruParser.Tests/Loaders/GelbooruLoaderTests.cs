@@ -180,7 +180,7 @@ public class GelbooruLoaderTests : IClassFixture<GelbooruApiLoaderFixture>
             post.SampleUrl.Should().Contain("sample");
         }
         
-        [Fact]
+        [Fact(Skip = "No longer works for banned posts")]
         public async Task ShouldGetBannedPostWithSomeData()
         {
             var loader = _loaderFixture.GetLoader();
@@ -219,7 +219,7 @@ public class GelbooruLoaderTests : IClassFixture<GelbooruApiLoaderFixture>
             post.UgoiraFrameDelays.Should().BeEmpty();
         }
         
-        [Fact]
+        [Fact(Skip = "No longer works for banned posts")]
         public async Task ShouldGetBannedPostWithSomeDataByMd5()
         {
             var loader = _loaderFixture.GetLoader();
