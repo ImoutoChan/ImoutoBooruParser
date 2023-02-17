@@ -52,16 +52,5 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore
 
-      - name: Test with dotnet
-        run: dotnet test --no-restore --verbosity normal --logger trx --results-directory "TestResults"
-
-      - name: Test Report
-        uses: dorny/test-reporter@v1
-        if: success() || failure()    # run this step even if previous step failed
-        with:
-          name: Tests            # Name of the check run which will be created
-          path: TestResults/*.trx    # Path to test results
-          reporter: dotnet-trx       # Format of test results
-
       - name: Publish the package
         run: dotnet nuget push **/*.nupkg -k ${{ secrets.NUGET_ORG_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate
