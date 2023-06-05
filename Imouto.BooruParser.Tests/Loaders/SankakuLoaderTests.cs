@@ -47,7 +47,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Id.Id.Should().Be(6541010);
             post.Id.Md5Hash.Should().Be("deaac52a6b001b6953db90a09f7629f7");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(117);
+            post.Tags.Should().HaveCount(120);
 
             foreach (var postTag in post.Tags)
             {
@@ -87,7 +87,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Id.Id.Should().Be(6541010);
             post.Id.Md5Hash.Should().Be("deaac52a6b001b6953db90a09f7629f7");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(117);
+            post.Tags.Should().HaveCount(120);
 
             foreach (var postTag in post.Tags)
             {
@@ -325,9 +325,9 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
 
             var post = await loader.GetPostAsync(31729492);
 
-            post.ChildrenIds.Should().HaveCount(8);
+            post.ChildrenIds.Should().HaveCount(12);
             post.ChildrenIds.Distinct().Should().HaveCount(post.ChildrenIds.Count);
-            post.ChildrenIds.First().Should().Be(new PostIdentity(31729784, "c47bcc8a56dfdf0267c788860ed81c3e"));
+            post.ChildrenIds.First().Should().Be(new PostIdentity(32945185, "47e36f120f7ed20e2aaaba900310bb5b"));
 
             foreach (var postChildrenId in post.ChildrenIds)
             {

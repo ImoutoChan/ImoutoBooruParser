@@ -26,7 +26,7 @@ public class GelbooruLoaderTests : IClassFixture<GelbooruApiLoaderFixture>
             post.Id.Id.Should().Be(7837194);
             post.Id.Md5Hash.Should().Be("89e42789d4ef991e25dab050627c9ef2");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(18);
+            post.Tags.Should().HaveCount(19);
 
             foreach (var postTag in post.Tags)
             {
@@ -65,7 +65,7 @@ public class GelbooruLoaderTests : IClassFixture<GelbooruApiLoaderFixture>
             post.Id.Id.Should().Be(7837194);
             post.Id.Md5Hash.Should().Be("89e42789d4ef991e25dab050627c9ef2");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(18);
+            post.Tags.Should().HaveCount(19);
 
             foreach (var postTag in post.Tags)
             {

@@ -59,7 +59,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
     public async Task<Post> GetPostAsync(int postId)
     {
         var post = await _flurlClient.Request("posts", postId).GetJsonAsync<SankakuPost>();
-
+        
         return new Post(
             new PostIdentity(postId, post.Md5),
             post.FileUrl,
@@ -76,7 +76,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             await GetPostIdentityAsync(post.ParentId),
             await GetChildrenAsync(post),
             await GetPoolsAsync(postId).ToListAsync(),
-            GetTags(post),
+            await GetTags(post),
             await GetNotesAsync(post));
     }
 
@@ -108,7 +108,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             await GetPostIdentityAsync(post.ParentId),
             await GetChildrenAsync(post),
             await GetPoolsAsync(post.Id).ToListAsync(),
-            GetTags(post),
+            await GetTags(post),
             await GetNotesAsync(post));
     }
 
@@ -286,11 +286,32 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             _ => Rating.Questionable
         };
 
-    private static IReadOnlyCollection<Tag> GetTags(SankakuPost post)
-        => post.Tags
+    private async Task<IReadOnlyCollection<Tag>> GetTags(SankakuPost post)
+    {
+        var postHtml = await _htmlFlurlClient.Request("post", "show", post.Md5).GetHtmlDocumentAsync();
+
+        var tagNodes = postHtml.DocumentNode.SelectNodes("//*[@id=\"tag-sidebar\"]/li");
+
+        if (tagNodes != null)
+        {
+            var tags = tagNodes.Select(x =>
+            {
+                var type = x.GetClasses().First().Split('-').Last();
+                var tag = x.SelectSingleNode("a").InnerText;
+
+                return (type, tag);
+            });
+
+            return tags
+                .Select(x => new Tag(x.type, x.tag.Replace('_', ' ')))
+                .ToList();
+        }
+        
+        return post.Tags
             .Select(x => new Tag(GetTagType(x.Type), x.TagName.Replace('_', ' ')))
             .ToList();
-    
+    }
+
     private static string GetTagType(int type) 
         => type switch
         {

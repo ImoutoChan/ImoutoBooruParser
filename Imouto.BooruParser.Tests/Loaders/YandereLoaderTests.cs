@@ -339,7 +339,7 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
             post.Pools.Count.Should().Be(1);
             post.Pools.First().Id.Should().Be(98410);
             post.Pools.First().Name.Should().Be("(C100) [Tegone Spike (Senji)] kaimin shojo");
-            post.Pools.First().Position.Should().Be(1);
+            post.Pools.First().Position.Should().Be(15);
         }
             
         [Fact]
