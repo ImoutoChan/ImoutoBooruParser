@@ -1,6 +1,7 @@
 using Flurl;
 using Flurl.Http;
 using Flurl.Http.Configuration;
+using Flurl.Http.Testing;
 using Imouto.BooruParser.Extensions;
 using Microsoft.Extensions.Options;
 
@@ -39,20 +40,24 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             .Configure(x => SetAuthParameters(x, options));
         
         _htmlFlurlClient = factory.Get(new Url(HtmlBaseUrl))
+            .WithHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
+            .WithHeader("Accept-Encoding", "gzip, deflate, br")
+            .WithHeader("Accept-Language", "en,en-US;q=0.9")
             .WithHeader("Connection", "keep-alive")
-            .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
+            .WithHeader("DNT", "1")
+            .WithHeader("Referer", "https://chan.sankakucomplex.com")
+            .WithHeader("Connection", "keep-alive")
+            .WithHeader("sec-ch-ua", "Not.A/Brand\";v=\"8\", \"Chromium\";v=\"114\", \"Google Chrome\";v=\"114")
             .WithHeader("sec-ch-ua-mobile", "?0")
             .WithHeader("sec-ch-ua-platform", "\"Windows\"")
-            .WithHeader("DNT", "1")
-            .WithHeader("Upgrade-Insecure-Requests", "1")
-            .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36")
-            .WithHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
-            .WithHeader("Sec-Fetch-Site", "none")
+            .WithHeader("Sec-Fetch-Site", "same-origin")
             .WithHeader("Sec-Fetch-Mode", "navigate")
             .WithHeader("Sec-Fetch-User", "?1")
             .WithHeader("Sec-Fetch-Dest", "document")
-            .WithHeader("Accept-Encoding", "gzip, deflate, br")
-            .WithHeader("Accept-Language", "en")
+            .WithHeader("Sec-Gpc", "1")
+            .WithHeader("Upgrade-Insecure-Requests", "1")
+            .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
+            .WithAuth(options)
             .Configure(x => SetAuthParameters(x, options));
     }
 
@@ -297,7 +302,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             var tags = tagNodes.Select(x =>
             {
                 var type = x.GetClasses().First().Split('-').Last();
-                var tag = x.SelectSingleNode("a").InnerText;
+                var tag = x.SelectSingleNode("div/a").InnerText;
 
                 return (type, tag);
             });
@@ -339,5 +344,20 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             if (delay > TimeSpan.Zero)
                 await Throttler.Get("Sankaku").UseAsync(delay);
         };
+    }
+}
+
+public static class AuthExtensions
+{
+    public static T WithAuth<T>(this T clientOrRequest, IOptions<SankakuSettings> options) 
+        where T : IHttpSettingsContainer 
+    {
+        var login = options.Value.Login;
+        var passHash = options.Value.PassHash;
+
+        if (login != null && passHash != null)
+            clientOrRequest.WithHeader("Cookie", $"login={login}; pass_hash={passHash}");
+
+        return clientOrRequest;
     }
 }

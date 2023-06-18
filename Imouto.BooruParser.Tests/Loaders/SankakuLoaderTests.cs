@@ -38,7 +38,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         [Fact]
         public async Task ShouldGetPostAsync()
         {
-            var loader = _loaderFixture.GetLoaderWithoutAuth();
+            var loader = _loaderFixture.GetLoaderWithAuth();
 
             var post = await loader.GetPostAsync(6541010);
 
@@ -78,7 +78,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         [Fact]
         public async Task ShouldGetPostByMd5Async()
         {
-            var loader = _loaderFixture.GetLoaderWithoutAuth();
+            var loader = _loaderFixture.GetLoaderWithAuth();
 
             var post = await loader.GetPostByMd5Async("deaac52a6b001b6953db90a09f7629f7");
 
@@ -309,7 +309,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         [Fact]
         public async Task ShouldLoadParentsAndChildren()
         {
-            var loader = _loaderFixture.GetLoaderWithoutAuth();
+            var loader = _loaderFixture.GetLoaderWithAuth();
 
             var post = await loader.GetPostAsync(31143268);
 
@@ -339,7 +339,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         [Fact]
         public async Task ShouldLoadPostWithEmptyChildren()
         {
-            var loader = _loaderFixture.GetLoaderWithoutAuth();
+            var loader = _loaderFixture.GetLoaderWithAuth();
             var post = await loader.GetPostByMd5Async("692078f4b19d8a7992bc361baac39650");
 
             post.Should().NotBeNull();

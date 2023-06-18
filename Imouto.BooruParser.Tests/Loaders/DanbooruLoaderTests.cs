@@ -29,7 +29,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>
             post.Id.Id.Should().Be(5773061);
             post.Id.Md5Hash.Should().Be("543f49b2d9fd4e31d8cb10ceaff6cad7");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(34);
+            post.Tags.Should().HaveCount(35);
 
             foreach (var postTag in post.Tags)
             {

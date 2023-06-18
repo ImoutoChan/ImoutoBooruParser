@@ -6,6 +6,10 @@ public record SankakuSettings
     
     public string? RefreshToken { get; set; }
     
+    public string? Login { get; set; }
+    
+    public string? PassHash { get; set; }
+    
     public int PauseBetweenRequestsInMs { get; set; } = 1;
 
     public TimeSpan PauseBetweenRequests => TimeSpan.FromMilliseconds(PauseBetweenRequestsInMs);

@@ -17,16 +17,16 @@ public class SankakuLoaderFixture
         _enableCache ? new HardCachePerBaseUrlFlurlClientFactory() : new PerBaseUrlFlurlClientFactory();
     
     private readonly IOptions<SankakuSettings> _authorizedOptions = Options.Create(
-        new SankakuSettings()
+        new SankakuSettings
         {
-            AccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQ3NzE1OCwic3ViTHZsIjowLCJpc3MiOiJodHRwczovL2NhcGktdjIuc2Fua2FrdWNvbXBsZXguY29tIiwidHlwZSI6IkJlYXJlciIsImF1ZCI6ImNvbXBsZXgiLCJzY29wZSI6ImNvbXBsZXgiLCJpYXQiOjE2NzIyNTk4NjQsImV4cCI6MTY3MjQzMjY2NH0.T2rf_f2CKwZizE4HHsE_zROIuiFMUGdTGmCp2pH80mA",
-            RefreshToken = "AczkCpDoFoLR1_PcasAInc9Ewcd",
             SaveTokensCallbackAsync = tokens =>
             {
                 Console.WriteLine($"new token: {tokens.AccessToken}, {tokens.RefreshToken}");
                 return Task.CompletedTask;
             },
-            PauseBetweenRequestsInMs = 1
+            PauseBetweenRequestsInMs = 1,
+            Login = "testuser159",
+            PassHash = "69f56a924a71774358c31e9233fc8e3c9a1b7d55"
         });
     
     private readonly IOptions<SankakuSettings> _options 
