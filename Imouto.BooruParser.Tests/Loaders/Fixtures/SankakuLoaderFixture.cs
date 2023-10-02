@@ -26,7 +26,8 @@ public class SankakuLoaderFixture
             },
             PauseBetweenRequestsInMs = 1,
             Login = "testuser159",
-            PassHash = "69f56a924a71774358c31e9233fc8e3c9a1b7d55"
+            //PassHash = "69f56a924a71774358c31e9233fc8e3c9a1b7d55",
+            Password = "testuser159"
         });
     
     private readonly IOptions<SankakuSettings> _options 

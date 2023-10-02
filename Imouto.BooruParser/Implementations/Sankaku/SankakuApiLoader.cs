@@ -1,7 +1,6 @@
 using Flurl;
 using Flurl.Http;
 using Flurl.Http.Configuration;
-using Flurl.Http.Testing;
 using Imouto.BooruParser.Extensions;
 using Microsoft.Extensions.Options;
 
@@ -57,8 +56,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             .WithHeader("Sec-Gpc", "1")
             .WithHeader("Upgrade-Insecure-Requests", "1")
             .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
-            .WithAuth(options)
-            .Configure(x => SetAuthParameters(x, options));
+            .Configure(x => SetHtmlAuthParameters(x, options));
     }
 
     public async Task<Post> GetPostAsync(int postId)
@@ -196,10 +194,10 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             .Select(x =>
             {
                 var postId = int.Parse(x.SelectNodes("td")[1].SelectSingleNode("a").InnerHtml);
-                var dateString = x.SelectNodes("td")[5].InnerHtml;
+                var dateString = x.SelectNodes("td")[5].Attributes["time_value"].Value;
                 var date = DateTime.Parse(dateString);
 
-                return new NoteHistoryEntry(-1, postId, new DateTimeOffset(date, TimeSpan.Zero));
+                return new NoteHistoryEntry(-1, postId, new DateTimeOffset(date, TimeSpan.FromHours(-4)));
             })
             .ToList();
 
@@ -345,19 +343,20 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
                 await Throttler.Get("Sankaku").UseAsync(delay);
         };
     }
-}
 
-public static class AuthExtensions
-{
-    public static T WithAuth<T>(this T clientOrRequest, IOptions<SankakuSettings> options) 
-        where T : IHttpSettingsContainer 
+    private void SetHtmlAuthParameters(FlurlHttpSettings settings, IOptions<SankakuSettings> options)
     {
-        var login = options.Value.Login;
-        var passHash = options.Value.PassHash;
+        settings.BeforeCallAsync = async call =>
+        {
+            var sessionCookies = await _sankakuAuthManager.GetSankakuChannelSessionAsync();
 
-        if (login != null && passHash != null)
-            clientOrRequest.WithHeader("Cookie", $"login={login}; pass_hash={passHash}");
+            if (sessionCookies.Any())
+                call.Request.WithCookies(sessionCookies);
 
-        return clientOrRequest;
+            var delay = options.Value.PauseBetweenRequests;
+            if (delay > TimeSpan.Zero)
+                await Throttler.Get("Sankaku").UseAsync(delay);
+        };
     }
 }
+

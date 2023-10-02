@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using Flurl;
 using Flurl.Http;
 using Flurl.Http.Configuration;
+using Imouto.BooruParser.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 
@@ -14,6 +15,7 @@ public class SankakuAuthManager : ISankakuAuthManager
 
     private readonly IMemoryCache _memoryCache;
     private readonly IOptions<SankakuSettings> _options;
+    private readonly IFlurlClientFactory _factory;
     private readonly IFlurlClient _flurlClient;
 
     public SankakuAuthManager(
@@ -23,6 +25,7 @@ public class SankakuAuthManager : ISankakuAuthManager
     {
         _memoryCache = memoryCache;
         _options = options;
+        _factory = factory;
         _flurlClient = factory.Get(new Url(BaseUrl));
     }
 
@@ -43,6 +46,52 @@ public class SankakuAuthManager : ISankakuAuthManager
         await SaveTokensAsync(new Tokens(accessToken, refreshToken));
 
         return accessToken;
+    }
+
+    public async Task<IReadOnlyCollection<FlurlCookie>> GetSankakuChannelSessionAsync()
+    {
+        if (_options.Value.Login is null || _options.Value.Password is null)
+            return Array.Empty<FlurlCookie>();
+        
+        var client = _factory.Get(new Url("https://chan.sankakucomplex.com"))
+            .WithHeader("Connection", "keep-alive")
+            .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
+            .WithHeader("sec-ch-ua-mobile", "?0")
+            .WithHeader("sec-ch-ua-platform", "\"Windows\"")
+            .WithHeader("DNT", "1")
+            .WithHeader("Upgrade-Insecure-Requests", "1")
+            .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36")
+            .WithHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+            .WithHeader("Sec-Fetch-Site", "none")
+            .WithHeader("Sec-Fetch-Mode", "navigate")
+            .WithHeader("Sec-Fetch-User", "?1")
+            .WithHeader("Sec-Fetch-Dest", "document")
+            .WithHeader("Accept-Encoding", "gzip, deflate, br")
+            .WithHeader("Accept-Language", "en");
+
+        var doc = await client
+            .Request("user", "login")
+            .GetHtmlDocumentAsync();
+
+        var authenticityToken = doc.DocumentNode.SelectNodes("//form")
+            .First(x => x.Attributes["action"].Value == "/en/user/authenticate")
+            .SelectSingleNode("input[@name='authenticity_token']")
+            .Attributes["value"].Value;
+
+        IReadOnlyList<FlurlCookie>? cookies = null;
+        var response = await client
+            .Request("en", "user", "authenticate")
+            .OnRedirect(x => cookies = x.Response.Cookies)
+            .PostUrlEncodedAsync(new Dictionary<string, string>()
+            {
+                { "authenticity_token", authenticityToken },
+                { "url", "" },
+                { "user[name]", _options.Value.Login! },
+                { "user[password]", _options.Value.Password! },
+                { "commit", "Login" }
+            });
+
+        return cookies!;
     }
 
     private static bool IsExpired(string accessToken)

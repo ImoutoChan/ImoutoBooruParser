@@ -162,7 +162,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         [Fact]
         public async Task ShouldLoadNotesHistory()
         {
-            var loader = _loaderFixture.GetLoaderWithoutAuth();
+            var loader = _loaderFixture.GetLoaderWithAuth();
 
             var notesHistory = await loader.GetNoteHistoryToDateTimeAsync(DateTime.Now.AddHours(-1)).ToListAsync();
             notesHistory.Should().NotBeEmpty();

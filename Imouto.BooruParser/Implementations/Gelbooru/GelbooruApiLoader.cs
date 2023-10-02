@@ -107,13 +107,13 @@ public class GelbooruApiLoader : IBooruApiLoader
 
     /// <remarks>
     /// Parent is always 0.
-    /// </remarks>>
+    /// </remarks>
     private static PostIdentity? GetParent(GelbooruPost post)
         => post.ParentId != 0 ? new PostIdentity(post.ParentId, string.Empty) : null;
 
     /// <remarks>
     /// Haven't found any post with them
-    /// </remarks>>
+    /// </remarks>
     private static IReadOnlyCollection<PostIdentity> GetChildren() => Array.Empty<PostIdentity>();
 
     private static IReadOnlyCollection<Note> GetNotes(GelbooruPost? post, HtmlDocument postHtml)
