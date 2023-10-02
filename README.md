@@ -11,12 +11,12 @@ Install-Package Imouto.BooruParser
 ```xml
 <PackageReference Include="Imouto.BooruParser" Version="3.*" />
 ```
-# Version 3.1
-Once again sankaku broke everything. It's now recommended to provide login and pass_hash for sankaku in order to receive all tags from posts. Without it you can only get 20 general tags.
-
 # Version 3.2.0
 * Added **Rule34**, they have a lot of tagged pay-walled staff and I will be using them as tag source for this stuff. No auth is required for now.
 * Sankaku was broken once again. This time they changed their auth flow on their old site. PassHash no longer works. Without auth you also can't get all of post tags (only 20 general tags). I fixed it (only god know for how long). You have to provide login and password and it should work.
+
+# Version 3.1
+Once again sankaku broke everything. It's now recommended to provide login and pass_hash for sankaku in order to receive all tags from posts. Without it you can only get 20 general tags.
 
 # Version 3.0
 Have to increment major version due to breaking change in danbooru api usage. Now you have to provide your own user agent for your bot in danbooru settings, otherwise danbooru requests would fail with 403 (recent change on their side).
