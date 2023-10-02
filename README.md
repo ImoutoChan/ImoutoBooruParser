@@ -11,6 +11,8 @@ Install-Package Imouto.BooruParser
 ```xml
 <PackageReference Include="Imouto.BooruParser" Version="3.*" />
 ```
+# Version 3.1
+Once again sankaku broke everything. It's now recommended to provide login and pass_hash for sankaku in order to receive all tags from posts. Without it you can only get 20 general tags.
 
 # Version 3.2.0
 * Added **Rule34**, they have a lot of tagged pay-walled staff and I will be using them as tag source for this stuff. No auth is required for now.
