@@ -116,7 +116,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         }
         
         [Fact]
-        public async Task ShouldGetPostByMd5Async_2a00599e108817e0d9a4eb2e3f353abb()
+        public async Task ShouldGetPostByMd5Async_dc9da74597ecd47b2848fb4d68fce77a()
         {
             var loader = _loaderFixture.GetLoaderWithAuth();
 
@@ -150,6 +150,17 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.UploaderId.Name.Should().Be("Just_some_guy");
             post.FileSizeInBytes.Should().Be(22152413);
             post.UgoiraFrameDelays.Should().BeEmpty();
+        }
+        
+        [Fact]
+        public async Task ShouldGetPostByMd5Async_d62ed6aebd2b75aa9661795b54a957d7()
+        {
+            var loader = _loaderFixture.GetLoaderWithAuth();
+
+            var post = await loader.GetPostByMd5Async("d62ed6aebd2b75aa9661795b54a957d7");
+
+            post.Should().NotBeNull();
+            post!.Tags.Should().HaveCount(57);
         }
 
         [Fact]
