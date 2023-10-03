@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Imouto.BooruParser.Extensions;
 using Imouto.BooruParser.Implementations;
+using Imouto.BooruParser.Implementations.Sankaku;
 using Imouto.BooruParser.Tests.Loaders.Fixtures;
 using Xunit;
 
@@ -113,6 +114,43 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.FileSizeInBytes.Should().Be(617163);
             post.UgoiraFrameDelays.Should().BeEmpty();
         }
+        
+        [Fact]
+        public async Task ShouldGetPostByMd5Async_2a00599e108817e0d9a4eb2e3f353abb()
+        {
+            var loader = _loaderFixture.GetLoaderWithAuth();
+
+            var post = await loader.GetPostByMd5Async("dc9da74597ecd47b2848fb4d68fce77a");
+
+            post.Should().NotBeNull();
+            post!.OriginalUrl.Should().StartWith("https://v.sankakucomplex.com/data/dc/9d/dc9da74597ecd47b2848fb4d68fce77a.mp4");
+            post.Id.Id.Should().Be(34486935);
+            post.Id.Md5Hash.Should().Be("dc9da74597ecd47b2848fb4d68fce77a");
+            post.Notes.Should().BeEmpty();
+            post.Tags.Should().HaveCount(75);
+
+            foreach (var postTag in post.Tags)
+            {
+                postTag.Name.Should().NotBeNullOrWhiteSpace();
+                postTag.Type.Should().NotBeNullOrWhiteSpace();
+                postTag.Type.Should().BeOneOf(new[] { "meta", "general", "copyright", "character", "circle", "artist", "medium", "genre" });
+            }
+            
+            post.Parent.Should().BeNull();
+            post.Pools.Should().HaveCount(0);
+            post.Rating.Should().Be(Rating.Explicit);
+            post.RatingSafeLevel.Should().Be(RatingSafeLevel.None);
+            post.Source.Should().Be("");
+            post.ChildrenIds.Should().BeEmpty();
+            post.ExistState.Should().Be(ExistState.Exist);
+            post.FileResolution.Should().Be(new Size(1644, 1862));
+            post.PostedAt.Should().Be(new DateTimeOffset(2023, 09, 29, 5, 54, 09, 0, TimeSpan.Zero));
+            post.SampleUrl.Should().StartWith("https://v.sankakucomplex.com/data/dc/9d/dc9da74597ecd47b2848fb4d68fce77a.mp4");
+            post.UploaderId.Id.Should().Be(568254);
+            post.UploaderId.Name.Should().Be("Just_some_guy");
+            post.FileSizeInBytes.Should().Be(22152413);
+            post.UgoiraFrameDelays.Should().BeEmpty();
+        }
 
         [Fact]
         public async Task ShouldContainLinkWithoutAmp()
@@ -176,7 +214,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         {
         }
 
-        [Fact(Skip = "only local invokation")]
+        [Fact]
         public void ShouldThrowWithoutCredentials()
         {
             var loader = _loaderFixture.GetLoaderWithoutAuth();
@@ -186,7 +224,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             action.Should().ThrowAsync<HttpRequestException>();
         }
 
-        [Fact(Skip = "only local invokation")]
+        [Fact]
         public async Task ShouldReturnWithCredentials()
         {
             var loader = _loaderFixture.GetLoaderWithAuth();
@@ -204,7 +242,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         {
         }
 
-        [Fact(Skip = "only local invokation")]
+        [Fact]
         public void ShouldNotLoadTagsHistoryToDateWithoutCredentials()
         {
             var loader = _loaderFixture.GetLoaderWithoutAuth();
@@ -215,7 +253,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             action.Should().ThrowAsync<HttpRequestException>();
         }
 
-        [Fact(Skip = "only local invokation")]
+        [Fact]
         public async Task ShouldLoadTagsHistoryToDateWithCredentials()
         {
             var loader = _loaderFixture.GetLoaderWithAuth();
@@ -232,7 +270,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         {
         }
 
-        [Fact(Skip = "only local invokation")]
+        [Fact]
         public async Task ShouldLoadTagsHistoryFromIdWithCredentials()
         {
             var loader = _loaderFixture.GetLoaderWithAuth();
@@ -244,7 +282,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             notesHistory.Should().NotBeEmpty();
         }
 
-        [Fact(Skip = "only local invokation")]
+        [Fact]
         public async Task ShouldLoadTagsHistoryFromIdAndHaveAllDataWithCredentials()
         {
             var loader = _loaderFixture.GetLoaderWithAuth();
@@ -398,7 +436,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         {
         }
 
-        [Fact(Skip = "Auth is required")]
+        [Fact]
         public async Task ShouldFavoritePost()
         {
             var api = _loaderFixture.GetAccessorWithAuth();

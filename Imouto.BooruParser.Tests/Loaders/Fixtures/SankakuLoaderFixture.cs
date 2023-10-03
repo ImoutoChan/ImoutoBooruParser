@@ -19,14 +19,8 @@ public class SankakuLoaderFixture
     private readonly IOptions<SankakuSettings> _authorizedOptions = Options.Create(
         new SankakuSettings
         {
-            SaveTokensCallbackAsync = tokens =>
-            {
-                Console.WriteLine($"new token: {tokens.AccessToken}, {tokens.RefreshToken}");
-                return Task.CompletedTask;
-            },
             PauseBetweenRequestsInMs = 1,
             Login = "testuser159",
-            //PassHash = "69f56a924a71774358c31e9233fc8e3c9a1b7d55",
             Password = "testuser159"
         });
     
