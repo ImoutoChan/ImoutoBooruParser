@@ -63,7 +63,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Pools.Should().HaveCount(4);
             post.Rating.Should().Be(Rating.Explicit);
             post.RatingSafeLevel.Should().Be(RatingSafeLevel.None);
-            post.Source.Should().Be("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=66351185");
+            post.Source.Should().Be(null);
             post.ChildrenIds.Should().BeEmpty();
             post.ExistState.Should().Be(ExistState.Exist);
             post.FileResolution.Width.Should().Be(756);
@@ -103,7 +103,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Pools.Should().HaveCount(4);
             post.Rating.Should().Be(Rating.Explicit);
             post.RatingSafeLevel.Should().Be(RatingSafeLevel.None);
-            post.Source.Should().Be("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=66351185");
+            post.Source.Should().Be(null);
             post.ChildrenIds.Should().BeEmpty();
             post.ExistState.Should().Be(ExistState.Exist);
             post.FileResolution.Should().Be(new Size(756, 1052));
@@ -127,7 +127,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Id.Id.Should().Be(34486935);
             post.Id.Md5Hash.Should().Be("dc9da74597ecd47b2848fb4d68fce77a");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(75);
+            post.Tags.Should().HaveCount(76);
 
             foreach (var postTag in post.Tags)
             {
@@ -140,7 +140,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Pools.Should().HaveCount(0);
             post.Rating.Should().Be(Rating.Explicit);
             post.RatingSafeLevel.Should().Be(RatingSafeLevel.None);
-            post.Source.Should().Be("");
+            post.Source.Should().Be(null);
             post.ChildrenIds.Should().BeEmpty();
             post.ExistState.Should().Be(ExistState.Exist);
             post.FileResolution.Should().Be(new Size(1644, 1862));
@@ -160,7 +160,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             var post = await loader.GetPostByMd5Async("d62ed6aebd2b75aa9661795b54a957d7");
 
             post.Should().NotBeNull();
-            post!.Tags.Should().HaveCount(57);
+            post!.Tags.Should().HaveCount(61);
         }
 
         [Fact]

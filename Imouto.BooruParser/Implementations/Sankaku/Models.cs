@@ -31,7 +31,6 @@ public record SankakuPost(
     [property: JsonPropertyName("has_notes")] bool HasNotes,
     [property: JsonPropertyName("md5")] string Md5,
     [property: JsonPropertyName("parent_id")] int? ParentId,
-    [property: JsonPropertyName("source")] string Source,
     [property: JsonPropertyName("tags")] IReadOnlyList<SankakuTag> Tags
 );
 

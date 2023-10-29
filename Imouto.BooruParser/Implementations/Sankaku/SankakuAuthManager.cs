@@ -71,17 +71,17 @@ public class SankakuAuthManager : ISankakuAuthManager
             .WithHeader("Accept-Language", "en");
 
         var doc = await client
-            .Request("user", "login")
+            .Request("users", "login")
             .GetHtmlDocumentAsync();
 
         var authenticityToken = doc.DocumentNode.SelectNodes("//form")
-            .First(x => x.Attributes["action"].Value == "/en/user/authenticate")
+            .First(x => x.Attributes["action"].Value == "/en/users/authenticate")
             .SelectSingleNode("input[@name='authenticity_token']")
             .Attributes["value"].Value;
 
         IReadOnlyList<FlurlCookie>? cookies = null;
         var response = await client
-            .Request("en", "user", "authenticate")
+            .Request("en", "users", "authenticate")
             .OnRedirect(x => cookies = x.Response.Cookies)
             .PostUrlEncodedAsync(new Dictionary<string, string>()
             {

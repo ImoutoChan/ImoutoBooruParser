@@ -70,7 +70,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             ExistState.Exist,
             DateTimeOffset.FromUnixTimeSeconds(post.CreatedAt.S),
             new Uploader(post.Author.Id, post.Author.Name),
-            post.Source,
+            null, // sankaku deprecated source field 
             new Size(post.Width, post.Height),
             post.FileSize,
             GetRating(post.Rating),
@@ -102,7 +102,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             ExistState.Exist,
             DateTimeOffset.FromUnixTimeSeconds(post.CreatedAt.S),
             new Uploader(post.Author.Id, post.Author.Name),
-            post.Source,
+            null, // sankaku deprecated source field 
             new Size(post.Width, post.Height),
             post.FileSize,
             GetRating(post.Rating),
@@ -244,7 +244,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
         var posts = await _flurlClient.Request("posts")
             .SetQueryParam("tags", $"parent:{post.Id}")
             .GetJsonAsync<SankakuPost[]>();
-
+        
         return posts.Select(x => new PostIdentity(x.Id, x.Md5)).ToList();
     }
 
