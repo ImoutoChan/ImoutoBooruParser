@@ -44,7 +44,14 @@ public static class BooruApiLoaderTagHistoryExtensions
             var predictedPage = (currentId - afterHistoryId) / 20 + 2;
             
             // validation
-            var page = await loader.GetTagHistoryPageAsync(new SearchToken($"{predictedPage}"), limit, ct);
+            HistorySearchResult<TagHistoryEntry> page;
+            var tries = 10;
+            do
+            {
+                page = await loader.GetTagHistoryPageAsync(new SearchToken($"{predictedPage++}"), limit, ct);
+                tries--;
+            } while (!page.Results.Any() && tries > 0);
+            
             if (page.Results.All(x => x.HistoryId > afterHistoryId))
                 throw new Exception("Prediction failed");
 

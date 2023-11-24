@@ -221,6 +221,20 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
             result.Should().NotBeEmpty();
             result.DistinctBy(x => x.HistoryId).Should().HaveCount(result.Count);
         }
+
+        /// <summary>
+        /// Bug with loading history after 4952686
+        /// </summary>
+        [Fact]
+        public async Task ShouldGetTagHistoryFrom4952686IdToPresent()
+        {
+            var loader = _loaderFixture.GetLoader();
+
+            var result = await loader.GetTagHistoryFromIdToPresentAsync(4952686).ToListAsync();
+
+            result.Should().NotBeEmpty();
+            result.DistinctBy(x => x.HistoryId).Should().HaveCount(result.Count);
+        }
     }
 
     public class GetPopularPostsAsyncMethod : YandereLoaderTests
