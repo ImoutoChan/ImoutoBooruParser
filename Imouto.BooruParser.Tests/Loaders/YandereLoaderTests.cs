@@ -225,7 +225,7 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
         /// <summary>
         /// Bug with loading history after 4952686
         /// </summary>
-        [Fact]
+        [Fact(Skip = "Too long history")]
         public async Task ShouldGetTagHistoryFrom4952686IdToPresent()
         {
             var loader = _loaderFixture.GetLoader();

@@ -11,7 +11,7 @@ public class SankakuLoaderFixture
     private IBooruApiLoader? _withAuth;
     private IBooruApiLoader? _withoutAuth;
     private IBooruApiAccessor? _apiAccessor;
-    private readonly bool _enableCache = true;
+    private readonly bool _enableCache = false;
 
     private IFlurlClientFactory Factory =>
         _enableCache ? new HardCachePerBaseUrlFlurlClientFactory() : new PerBaseUrlFlurlClientFactory();

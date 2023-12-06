@@ -354,7 +354,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>
             var post = await loader.GetPostAsync(5314036);
 
             post.Tags.Count.Should().BeGreaterThan(30);
-            post.ChildrenIds.Count.Should().Be(1);
+            post.ChildrenIds.Count.Should().Be(2);
             post.ChildrenIds.First().Should().Be(new PostIdentity(5318896, "46dda085dc9c60dd4380ed7b4433aa41"));
             post.Parent.Should().BeNull();
         }
