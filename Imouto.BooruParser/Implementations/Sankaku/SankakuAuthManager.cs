@@ -53,25 +53,15 @@ public class SankakuAuthManager : ISankakuAuthManager
     {
         if (_options.Value.Login is null || _options.Value.Password is null)
             return Array.Empty<FlurlCookie>();
+
+        var jar = new CookieJar();
         
         var client = _factory.Get(new Url("https://chan.sankakucomplex.com"))
-            .WithHeader("Connection", "keep-alive")
-            .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
-            .WithHeader("sec-ch-ua-mobile", "?0")
-            .WithHeader("sec-ch-ua-platform", "\"Windows\"")
-            .WithHeader("DNT", "1")
-            .WithHeader("Upgrade-Insecure-Requests", "1")
-            .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36")
-            .WithHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
-            .WithHeader("Sec-Fetch-Site", "none")
-            .WithHeader("Sec-Fetch-Mode", "navigate")
-            .WithHeader("Sec-Fetch-User", "?1")
-            .WithHeader("Sec-Fetch-Dest", "document")
-            .WithHeader("Accept-Encoding", "gzip, deflate, br")
-            .WithHeader("Accept-Language", "en");
+            .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36");
 
         var doc = await client
             .Request("users", "login")
+            .WithCookies(jar)
             .GetHtmlDocumentAsync();
 
         var authenticityToken = doc.DocumentNode.SelectNodes("//form")
@@ -82,6 +72,7 @@ public class SankakuAuthManager : ISankakuAuthManager
         IReadOnlyList<FlurlCookie>? cookies = null;
         var response = await client
             .Request("en", "users", "authenticate")
+            .WithCookies(jar)
             .OnRedirect(x => cookies = x.Response.Cookies)
             .PostUrlEncodedAsync(new Dictionary<string, string>()
             {

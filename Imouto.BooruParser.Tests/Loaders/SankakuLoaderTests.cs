@@ -160,7 +160,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             var post = await loader.GetPostByMd5Async("d62ed6aebd2b75aa9661795b54a957d7");
 
             post.Should().NotBeNull();
-            post!.Tags.Should().HaveCount(61);
+            post!.Tags.Should().HaveCount(62);
         }
 
         [Fact]
