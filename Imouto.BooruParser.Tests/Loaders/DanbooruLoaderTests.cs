@@ -1,20 +1,60 @@
+using System.Net;
 using FluentAssertions;
 using Imouto.BooruParser.Implementations;
+using Imouto.BooruParser.Implementations.Danbooru;
 using Imouto.BooruParser.Tests.Loaders.Fixtures;
 using Xunit;
 
 namespace Imouto.BooruParser.Tests.Loaders;
 
-public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>
+public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, IClassFixture<GelbooruApiLoaderFixture>
 {
     private readonly DanbooruApiLoaderFixture _loaderFixture;
+    private readonly GelbooruApiLoaderFixture? _gelbooruApiLoaderFixture;
 
-    private DanbooruLoaderTests(DanbooruApiLoaderFixture loaderFixture) => _loaderFixture = loaderFixture;
+    private DanbooruLoaderTests(
+        DanbooruApiLoaderFixture loaderFixture, 
+        GelbooruApiLoaderFixture? gelbooruApiLoaderFixture = null)
+    {
+        _loaderFixture = loaderFixture;
+        _gelbooruApiLoaderFixture = gelbooruApiLoaderFixture;
+    }
 
     public class GetPostAsyncMethod : DanbooruLoaderTests
     {
-        public GetPostAsyncMethod(DanbooruApiLoaderFixture loaderFixture) : base(loaderFixture)
+        public GetPostAsyncMethod(
+            DanbooruApiLoaderFixture loaderFixture,
+            GelbooruApiLoaderFixture gelbooruApiLoaderFixture) : base(loaderFixture, gelbooruApiLoaderFixture)
         {
+        }
+
+        [Fact]
+        public async Task ShouldDownloadPostMedia()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+            var post = await loader.GetPostAsync(5773061);
+            var mediaUrl = post.OriginalUrl;
+
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("User-Agent", "UnitTestBot/1.0");
+            var result = await client.SendAsync(new HttpRequestMessage(HttpMethod.Get, mediaUrl));
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
+        }
+
+        [Fact]
+        public async Task ShouldDownloadPostMediaThroughGelbooru()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+            var post = await loader.GetPostAsync(5773061);
+
+            var gelbooruLoader = _gelbooruApiLoaderFixture!.GetLoader();
+            var gelbooruPost = await gelbooruLoader.GetPostByMd5Async(post.Id.Md5Hash);
+            var mediaUrl = gelbooruPost!.OriginalUrl;
+            
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("User-Agent", "UnitTestBot/1.0");
+            var result = await client.SendAsync(new HttpRequestMessage(HttpMethod.Get, mediaUrl));
+            result.StatusCode.Should().Be(HttpStatusCode.OK);
         }
 
         [Fact]
