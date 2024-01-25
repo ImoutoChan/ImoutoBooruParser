@@ -11,6 +11,9 @@ Install-Package Imouto.BooruParser
 ```xml
 <PackageReference Include="Imouto.BooruParser" Version="3.*" />
 ```
+# Version 3.3.0
+* Sankaku is child of devil and was broken once again. Removed old auth chan. part as now all logins goes throw beta.
+
 # Version 3.2.0
 * Added **Rule34**, they have a lot of tagged pay-walled staff and I will be using them as tag source for this stuff. No auth is required for now.
 * Sankaku was broken once again. This time they changed their auth flow on their old site. PassHash no longer works. Without auth you also can't get all of post tags (only 20 general tags). I fixed it (only god know for how long). You have to provide login and password and it should work.

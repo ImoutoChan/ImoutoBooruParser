@@ -48,7 +48,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Id.Id.Should().Be(6541010);
             post.Id.Md5Hash.Should().Be("deaac52a6b001b6953db90a09f7629f7");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(120);
+            post.Tags.Should().HaveCount(121);
 
             foreach (var postTag in post.Tags)
             {
@@ -88,7 +88,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Id.Id.Should().Be(6541010);
             post.Id.Md5Hash.Should().Be("deaac52a6b001b6953db90a09f7629f7");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(120);
+            post.Tags.Should().HaveCount(121);
 
             foreach (var postTag in post.Tags)
             {
@@ -127,7 +127,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Id.Id.Should().Be(34486935);
             post.Id.Md5Hash.Should().Be("dc9da74597ecd47b2848fb4d68fce77a");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(76);
+            post.Tags.Should().HaveCount(96);
 
             foreach (var postTag in post.Tags)
             {
@@ -160,7 +160,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             var post = await loader.GetPostByMd5Async("d62ed6aebd2b75aa9661795b54a957d7");
 
             post.Should().NotBeNull();
-            post!.Tags.Should().HaveCount(62);
+            post!.Tags.Should().HaveCount(63);
         }
 
         [Fact]
@@ -395,7 +395,8 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post!.Tags.Count.Should().BeGreaterThan(30);
 
             // no longer empty, but inaccessible
-            post.ChildrenIds.Count.Should().Be(2);
+            // and now empty again
+            post.ChildrenIds.Count.Should().Be(0);
         }
 
         [Fact]

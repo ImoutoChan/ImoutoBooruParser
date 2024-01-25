@@ -300,7 +300,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             var tags = tagNodes.Select(x =>
             {
                 var type = x.GetClasses().First().Split('-').Last();
-                var tag = x.SelectSingleNode("div/a").InnerText;
+                var tag = x.SelectSingleNode("a").InnerText;
 
                 return (type, tag);
             });
