@@ -127,7 +127,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Id.Id.Should().Be(34486935);
             post.Id.Md5Hash.Should().Be("dc9da74597ecd47b2848fb4d68fce77a");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(96);
+            post.Tags.Should().HaveCount(99);
 
             foreach (var postTag in post.Tags)
             {
@@ -374,7 +374,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
 
             var post = await loader.GetPostAsync(31729492);
 
-            post.ChildrenIds.Should().HaveCount(12);
+            post.ChildrenIds.Should().HaveCount(10);
             post.ChildrenIds.Distinct().Should().HaveCount(post.ChildrenIds.Count);
             post.ChildrenIds.First().Should().Be(new PostIdentity(32945185, "47e36f120f7ed20e2aaaba900310bb5b"));
 

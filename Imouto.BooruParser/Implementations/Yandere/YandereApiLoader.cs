@@ -352,6 +352,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             new PostIdentity(postId, post.Md5),
             post.FileUrl,
             post.SampleUrl ?? post.JpegUrl,
+            post.JpegUrl,
             GetExistState(postHtml),
             DateTimeOffset.FromUnixTimeSeconds(post.CreatedAt),
             new Uploader(post.CreatorId ?? -1, post.Author),

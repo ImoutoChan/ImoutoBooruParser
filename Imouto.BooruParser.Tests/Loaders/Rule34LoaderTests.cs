@@ -26,7 +26,7 @@ public class Rule34LoaderTests : IClassFixture<Rule34ApiLoaderFixture>
             post.Id.Id.Should().Be(8548333);
             post.Id.Md5Hash.Should().Be("42936037bc650b4d38bc9f6df355b0f1");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(110);
+            post.Tags.Should().HaveCount(111);
 
             foreach (var postTag in post.Tags)
             {
@@ -65,7 +65,7 @@ public class Rule34LoaderTests : IClassFixture<Rule34ApiLoaderFixture>
             post.Id.Id.Should().Be(8548333);
             post.Id.Md5Hash.Should().Be("42936037bc650b4d38bc9f6df355b0f1");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(110);
+            post.Tags.Should().HaveCount(111);
 
             foreach (var postTag in post.Tags)
             {

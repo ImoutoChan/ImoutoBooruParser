@@ -16,7 +16,8 @@ public record GelbooruPost(
     [property: JsonPropertyName("tags")] string Tags,
     [property: JsonPropertyName("has_notes")] string HasNotes,
     [property: JsonPropertyName("file_url")] string FileUrl,
-    [property: JsonPropertyName("sample_url")] string? SampleUrl
+    [property: JsonPropertyName("sample_url")] string? SampleUrl,
+    [property: JsonPropertyName("preview_url")] string? PreviewUrl
 );
 
 public record GelbooruPostPage(

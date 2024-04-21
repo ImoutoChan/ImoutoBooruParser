@@ -232,6 +232,7 @@ public class Rule34ApiLoader : IBooruApiLoader
             new PostIdentity(post.Id, post.Hash),
             post.FileUrl,
             !string.IsNullOrWhiteSpace(post.SampleUrl) ? post.SampleUrl : post.FileUrl,
+            post.PreviewUrl,
             ExistState.Exist,
             DateTimeOffset.FromUnixTimeSeconds(post.Change),
             new Uploader(-1, post.Owner.Replace('_', ' ')),

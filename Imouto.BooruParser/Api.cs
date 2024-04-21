@@ -44,6 +44,7 @@ public record Post(
     PostIdentity Id,
     string? OriginalUrl,
     string? SampleUrl,
+    string? PreviewUrl,
     ExistState ExistState,
     DateTimeOffset PostedAt,
     Uploader UploaderId,

@@ -77,7 +77,7 @@ public class GelbooruApiLoader : IBooruApiLoader
 
     public async Task<SearchResult> SearchAsync(string tags)
     {
-        //https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=20&tags=1girl
+        // https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=20&tags=1girl
         var postJson = await _flurlClient.Request("index.php")
             .SetQueryParams(new
             {
@@ -211,6 +211,7 @@ public class GelbooruApiLoader : IBooruApiLoader
             new PostIdentity(post.Id, post.Md5),
             post.FileUrl,
             !string.IsNullOrWhiteSpace(post.SampleUrl) ? post.SampleUrl : post.FileUrl,
+            post.PreviewUrl,
             ExistState.Exist,
             ExtractDate(post),
             new Uploader(post.CreatorId, post.Owner.Replace('_', ' ')),
@@ -253,6 +254,7 @@ public class GelbooruApiLoader : IBooruApiLoader
         
         return new(
             new PostIdentity(id, md5),
+            url,
             url,
             url,
             ExistState.MarkDeleted,
