@@ -308,12 +308,12 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             });
 
             return tags
-                .Select(x => new Tag(x.type, x.tag.Replace('_', ' ')))
+                .Select(x => new Tag(x.type, x.tag.Replace('_', ' ').ToLowerInvariant()))
                 .ToList();
         }
         
         return post.Tags
-            .Select(x => new Tag(GetTagType(x.Type), x.TagName.Replace('_', ' ')))
+            .Select(x => new Tag(GetTagType(x.Type), x.TagName.Replace('_', ' ').ToLowerInvariant()))
             .ToList();
     }
 
