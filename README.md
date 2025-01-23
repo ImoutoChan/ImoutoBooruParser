@@ -9,7 +9,7 @@ The dotnet library for retrieving info from booru sites ([chan.sankakucomplex.co
 Install-Package Imouto.BooruParser
 ```
 ```xml
-<PackageReference Include="Imouto.BooruParser" Version="3.*" />
+<PackageReference Include="Imouto.BooruParser" Version="4.*" />
 ```
 # Version 4.0.0
 * I'm bumping the major version due to changes in the public API. Sankaku now uses string Ids for various entities, 
