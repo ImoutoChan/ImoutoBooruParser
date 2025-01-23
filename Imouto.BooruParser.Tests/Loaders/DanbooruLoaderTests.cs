@@ -1,7 +1,6 @@
 using System.Net;
 using FluentAssertions;
 using Imouto.BooruParser.Implementations;
-using Imouto.BooruParser.Implementations.Danbooru;
 using Imouto.BooruParser.Tests.Loaders.Fixtures;
 using Xunit;
 
@@ -66,7 +65,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
 
             post.Should().NotBeNull();
             post.OriginalUrl.Should().Be("https://cdn.donmai.us/original/54/3f/543f49b2d9fd4e31d8cb10ceaff6cad7.jpg");
-            post.Id.Id.Should().Be(5773061);
+            post.Id.GetIntId().Should().Be(5773061);
             post.Id.Md5Hash.Should().Be("543f49b2d9fd4e31d8cb10ceaff6cad7");
             post.Notes.Should().BeEmpty();
             post.Tags.Should().HaveCount(36);
@@ -79,7 +78,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
             }
             
             post.Parent.Should().NotBeNull();
-            post.Parent!.Id.Should().Be(5775694);
+            post.Parent!.Id.Should().Be("5775694");
             post.Parent!.Md5Hash.Should().Be("886823ace72390fe7a8926e2ffe3299d");
             post.Pools.Should().BeEmpty();
             post.Rating.Should().Be(Rating.Safe);
@@ -90,7 +89,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
             post.FileResolution.Should().Be(new Size(1000, 1414));
             post.PostedAt.Should().Be(new DateTimeOffset(2022, 10, 25, 12, 01, 24, 980, TimeSpan.Zero));
             post.SampleUrl.Should().Be("https://cdn.donmai.us/sample/54/3f/sample-543f49b2d9fd4e31d8cb10ceaff6cad7.jpg");
-            post.UploaderId.Id.Should().Be(508969);
+            post.UploaderId.Id.Should().Be("508969");
             post.UploaderId.Name.Should().Be("Topsy Krett");
             post.FileSizeInBytes.Should().Be(151135);
             post.UgoiraFrameDelays.Should().BeEmpty();
@@ -122,7 +121,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
             
             searchResult.Results.Should().NotBeEmpty();
             
-            searchResult.Results.First().Id.Should().Be(3630304);
+            searchResult.Results.First().Id.Should().Be("3630304");
             searchResult.Results.First().Md5Hash.Should().BeNull();
         }
     
@@ -135,7 +134,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
             
             searchResult.Results.Should().NotBeEmpty();
             
-            searchResult.Results.First().Id.Should().Be(5031817);
+            searchResult.Results.First().Id.Should().Be("5031817");
             searchResult.Results.First().Md5Hash.Should().Be("4ff6bfa1745692b8eaf4ba2d2208c207");
         }
     }
@@ -236,7 +235,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
             await foreach (var item in loader.GetTagHistoryFromIdToPresentAsync(page.Results.Last().HistoryId))
                 result.Add(item);
     
-            result.Should().HaveCountGreaterOrEqualTo(299);
+            result.Should().HaveCountGreaterThanOrEqualTo(299);
             result.DistinctBy(x => x.HistoryId).Should().HaveCount(result.Count);
         }
     
@@ -256,7 +255,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
             tagsHistory.First(x => x.HistoryId == 43125951).ParentId.Should().BeNull();
             
             tagsHistory.First(x => x.HistoryId == 43125948).ParentChanged.Should().BeFalse();
-            tagsHistory.First(x => x.HistoryId == 43125948).ParentId.Should().Be(4978487);
+            tagsHistory.First(x => x.HistoryId == 43125948).ParentId.Should().Be("4978487");
         }
         
         [Fact]
@@ -315,7 +314,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
             var result = await loader.GetPopularPostsAsync(PopularType.Day);
     
             result.Results.Should().NotBeEmpty();
-            result.Results.First().Id.Should().BeGreaterThan(0);
+            result.Results.First().Id.Should().NotBeEmpty();
             result.Results.First().Title.Should().NotBeNullOrWhiteSpace();
             result.Results.First().Md5Hash.Should().NotBeNullOrWhiteSpace();
         }
@@ -328,7 +327,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
             var result = await loader.GetPopularPostsAsync(PopularType.Week);
     
             result.Results.Should().NotBeEmpty();
-            result.Results.First().Id.Should().BeGreaterThan(0);
+            result.Results.First().Id.Should().NotBeEmpty();
             result.Results.First().Title.Should().NotBeNullOrWhiteSpace();
             result.Results.First().Md5Hash.Should().NotBeNullOrWhiteSpace();
         }
@@ -341,7 +340,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
             var result = await loader.GetPopularPostsAsync(PopularType.Month);
     
             result.Results.Should().NotBeEmpty();
-            result.Results.First().Id.Should().BeGreaterThan(0);
+            result.Results.First().Id.Should().NotBeEmpty();
             result.Results.First().Title.Should().NotBeNullOrWhiteSpace();
             result.Results.First().Md5Hash.Should().NotBeNullOrWhiteSpace();
         }
@@ -364,7 +363,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
             post.Tags.Count.Should().BeGreaterThan(30);
             post.ChildrenIds.Count.Should().NotBe(0);
             post.Parent.Should().NotBeNull();
-            post.Parent!.Id.Should().BeGreaterThan(0);
+            post.Parent!.Id.Should().NotBeEmpty();
             post.Parent!.Md5Hash.Should().NotBeNullOrWhiteSpace();
         }
 
@@ -395,7 +394,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
 
             post.Tags.Count.Should().BeGreaterThan(30);
             post.ChildrenIds.Count.Should().Be(2);
-            post.ChildrenIds.First().Should().Be(new PostIdentity(5318896, "46dda085dc9c60dd4380ed7b4433aa41"));
+            post.ChildrenIds.First().Should().Be(new PostIdentity("5318896", "46dda085dc9c60dd4380ed7b4433aa41"));
             post.Parent.Should().BeNull();
         }
             
@@ -440,7 +439,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
             
             var post = await loader.GetPostAsync(5246157);
             
-            post.Pools.Count.Should().BeGreaterOrEqualTo(1);
+            post.Pools.Count.Should().BeGreaterThanOrEqualTo(1);
         }
             
         [Fact]
@@ -450,7 +449,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
             
             var post = await loader.GetPostAsync(599785);
             
-            post.Pools.Count.Should().BeGreaterOrEqualTo(3);
+            post.Pools.Count.Should().BeGreaterThanOrEqualTo(3);
         }
             
         [Fact]
@@ -523,9 +522,9 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
         }
 
         [Theory]
-        [InlineData(5069825)]
-        [InlineData(5767795)]
-        public async Task ShouldGetBannedPostWithSomeData(int id)
+        [InlineData("5069825")]
+        [InlineData("5767795")]
+        public async Task ShouldGetBannedPostWithSomeData(string id)
         {
             var loader = _loaderFixture.GetLoaderWithoutAuth();
 
@@ -543,7 +542,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
             var post = await loader.GetPostByMd5Async("fcf0c189e898edcb316ea0b61096c622");
             
             post.Should().NotBeNull();
-            post!.Id.Id.Should().Be(5766237);
+            post!.Id.GetIntId().Should().Be(5766237);
             post.OriginalUrl.Should().NotBeNullOrWhiteSpace();
         }
 
@@ -555,7 +554,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
             var restrictedPost = await loader.GetPostByMd5Async("b9b933c1835d043ec38cbefbe78554eb");
 
             restrictedPost.Should().NotBeNull();
-            restrictedPost!.Id.Id.Should().Be(5767795);
+            restrictedPost!.Id.GetIntId().Should().Be(5767795);
             restrictedPost.OriginalUrl.Should().BeNull();
             restrictedPost.Tags.Should().NotBeEmpty();
         }

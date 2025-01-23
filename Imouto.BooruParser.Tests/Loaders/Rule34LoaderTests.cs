@@ -23,10 +23,10 @@ public class Rule34LoaderTests : IClassFixture<Rule34ApiLoaderFixture>
 
             post.Should().NotBeNull();
             post.OriginalUrl.Should().Be("https://api-cdn-mp4.rule34.xxx/images/7492/42936037bc650b4d38bc9f6df355b0f1.mp4");
-            post.Id.Id.Should().Be(8548333);
+            post.Id.GetIntId().Should().Be(8548333);
             post.Id.Md5Hash.Should().Be("42936037bc650b4d38bc9f6df355b0f1");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(111);
+            post.Tags.Should().HaveCount(110);
 
             foreach (var postTag in post.Tags)
             {
@@ -43,13 +43,13 @@ public class Rule34LoaderTests : IClassFixture<Rule34ApiLoaderFixture>
             post.ChildrenIds.Should().BeEmpty();
             post.ExistState.Should().Be(ExistState.Exist);
             post.FileResolution.Should().Be(new Size(1920, 1440));
-            post.PostedAt.Should().Be(new DateTimeOffset(2024, 1, 10, 15, 04, 41, TimeSpan.Zero));
+            post.PostedAt.Should().Be(new DateTimeOffset(2025, 1, 4, 15, 32, 54, TimeSpan.Zero));
             post.SampleUrl.Should().Be("https://api-cdn.rule34.xxx/images/7492/42936037bc650b4d38bc9f6df355b0f1.jpg");
             post.UploaderId.Name.Should().Be("nebushad");
             
             // isn't supported in gelbooru
             post.FileSizeInBytes.Should().Be(-1);
-            post.UploaderId.Id.Should().Be(-1);
+            post.UploaderId.Id.Should().Be("-1");
             post.UgoiraFrameDelays.Should().BeEmpty();
         }
 
@@ -62,10 +62,10 @@ public class Rule34LoaderTests : IClassFixture<Rule34ApiLoaderFixture>
 
             post.Should().NotBeNull();
             post!.OriginalUrl.Should().Be("https://api-cdn-mp4.rule34.xxx/images/7492/42936037bc650b4d38bc9f6df355b0f1.mp4");
-            post.Id.Id.Should().Be(8548333);
+            post.Id.GetIntId().Should().Be(8548333);
             post.Id.Md5Hash.Should().Be("42936037bc650b4d38bc9f6df355b0f1");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(111);
+            post.Tags.Should().HaveCount(110);
 
             foreach (var postTag in post.Tags)
             {
@@ -82,13 +82,13 @@ public class Rule34LoaderTests : IClassFixture<Rule34ApiLoaderFixture>
             post.ChildrenIds.Should().BeEmpty();
             post.ExistState.Should().Be(ExistState.Exist);
             post.FileResolution.Should().Be(new Size(1920, 1440));
-            post.PostedAt.Should().Be(new DateTimeOffset(2024, 1, 10, 15, 04, 41, TimeSpan.Zero));
+            post.PostedAt.Should().Be(new DateTimeOffset(2025, 1, 4, 15, 32, 54, TimeSpan.Zero));
             post.SampleUrl.Should().Be("https://api-cdn.rule34.xxx/images/7492/42936037bc650b4d38bc9f6df355b0f1.jpg");
             post.UploaderId.Name.Should().Be("nebushad");
             
             // isn't supported in gelbooru
             post.FileSizeInBytes.Should().Be(-1);
-            post.UploaderId.Id.Should().Be(-1);
+            post.UploaderId.Id.Should().Be("-1");
             post.UgoiraFrameDelays.Should().BeEmpty();
         }
     }
@@ -128,12 +128,12 @@ public class Rule34LoaderTests : IClassFixture<Rule34ApiLoaderFixture>
 
             post.Notes.Should().HaveCount(2);
             
-            post.Notes.First().Id.Should().Be(93525);
+            post.Notes.First().Id.Should().Be("93525");
             post.Notes.First().Text.Should().Be("Slap");
             post.Notes.First().Point.Should().Be(new Position(8, 77));
             post.Notes.First().Size.Should().Be(new Size(257, 378));
             
-            post.Notes.ElementAt(1).Id.Should().Be(93526);
+            post.Notes.ElementAt(1).Id.Should().Be("93526");
             post.Notes.ElementAt(1).Text.Should().Be("Slap");
             post.Notes.ElementAt(1).Point.Should().Be(new Position(33, 1131));
             post.Notes.ElementAt(1).Size.Should().Be(new Size(178, 524));

@@ -1,8 +1,37 @@
-﻿namespace Imouto.BooruParser;
+﻿using Imouto.BooruParser.Implementations.Sankaku;
+
+namespace Imouto.BooruParser;
+
+public static class BooruApiLoaderExtensions
+{
+    public static Task<Post> GetPostAsync(this IBooruApiLoader loader, int postId)
+    {
+        if (loader is SankakuApiLoader)
+            throw new InvalidOperationException("Sankaku doesn't support getting post by int id");
+
+        return loader.GetPostAsync(postId.ToString());
+    }
+
+    public static Task FavoritePostAsync(this IBooruApiAccessor loader, int postId)
+    {
+        if (loader is SankakuApiLoader)
+            throw new InvalidOperationException("Sankaku doesn't support fav post by int id");
+
+        return loader.FavoritePostAsync(postId.ToString());
+    }
+
+    public static int GetIntId(this PostIdentity postIdentity)
+    {
+        if (int.TryParse(postIdentity.Id, out var intId))
+            return intId;
+
+        throw new InvalidOperationException("This is probably is sankaku post, which doesn't support int id");
+    }
+}
 
 public interface IBooruApiLoader
 {
-    Task<Post> GetPostAsync(int postId);
+    Task<Post> GetPostAsync(string postId);
     
     Task<Post?> GetPostByMd5Async(string md5);
 
@@ -23,7 +52,7 @@ public interface IBooruApiLoader
 
 public interface IBooruApiAccessor
 {
-    Task FavoritePostAsync(int postId);
+    Task FavoritePostAsync(string postId);
 }
 
 /// <param name="Page">For danbooru: b{lowest-history-id-on-current-page}</param>
@@ -35,7 +64,7 @@ public record HistorySearchResult<T>(
     IReadOnlyCollection<T> Results,
     SearchToken? NextToken);
 
-public record PostPreview(int Id, string? Md5Hash, string Title, bool IsBanned, bool IsDeleted);
+public record PostPreview(string Id, string? Md5Hash, string Title, bool IsBanned, bool IsDeleted);
 
 /// <summary>
 /// OriginalUrl, SampleUrl and PostIdentity.Md5 are nulls when post is banned
@@ -69,15 +98,15 @@ public enum Rating { Safe, Questionable, Explicit }
 
 public enum RatingSafeLevel { None, Sensitive, General }
 
-public record Pool(int Id, string Name, int Position);
+public record Pool(string Id, string Name, int Position);
 
-public record Note(int Id, string Text, Position Point, Size Size);
+public record Note(string Id, string Text, Position Point, Size Size);
 
 public record Tag(string Type, string Name);
 
-public record PostIdentity(int Id, string Md5Hash);
+public record PostIdentity(string Id, string Md5Hash);
 
-public record Uploader(int Id, string Name);
+public record Uploader(string Id, string Name);
 
 public record struct Position(int Top, int Left);
 
@@ -86,8 +115,8 @@ public record struct Size(int Width, int Height);
 public record TagHistoryEntry(
     int HistoryId,
     DateTimeOffset UpdatedAt,
-    int PostId,
-    int? ParentId,
+    string PostId,
+    string? ParentId,
     bool ParentChanged);
 
-public record NoteHistoryEntry(int HistoryId, int PostId, DateTimeOffset UpdatedAt);
+public record NoteHistoryEntry(int HistoryId, string PostId, DateTimeOffset UpdatedAt);

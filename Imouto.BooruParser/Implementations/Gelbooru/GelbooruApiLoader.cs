@@ -17,10 +17,12 @@ public class GelbooruApiLoader : IBooruApiLoader
     private const string BaseUrl = "https://gelbooru.com/";
     private readonly IFlurlClient _flurlClient;
 
-    public GelbooruApiLoader(IFlurlClientFactory factory, IOptions<GelbooruSettings> options) 
-        => _flurlClient = factory.Get(new Url(BaseUrl)).Configure(x => SetAuthParameters(x, options));
+    public GelbooruApiLoader(IFlurlClientCache factory, IOptions<GelbooruSettings> options)
+        => _flurlClient = factory
+            .GetOrAdd(new Url(BaseUrl), new Url(BaseUrl))
+            .BeforeCall(_ => DelayWithThrottler(options));
 
-    public async Task<Post> GetPostAsync(int postId)
+    public async Task<Post> GetPostAsync(string postId)
     {
         // https://gelbooru.com/index.php?page=post&s=view&id=
         var postHtml = await _flurlClient.Request("index.php")
@@ -86,7 +88,7 @@ public class GelbooruApiLoader : IBooruApiLoader
             .GetJsonAsync<GelbooruPostPage>();
 
         return new SearchResult(postJson.Posts?
-            .Select(x => new PostPreview(x.Id, x.Md5, x.Tags, false, false))
+            .Select(x => new PostPreview(x.Id.ToString(), x.Md5, x.Tags, false, false))
             .ToArray() ?? Array.Empty<PostPreview>());
     }
 
@@ -109,7 +111,7 @@ public class GelbooruApiLoader : IBooruApiLoader
     /// Parent is always 0.
     /// </remarks>
     private static PostIdentity? GetParent(GelbooruPost post)
-        => post.ParentId != 0 ? new PostIdentity(post.ParentId, string.Empty) : null;
+        => post.ParentId != 0 ? new PostIdentity(post.ParentId.ToString(), string.Empty) : null;
 
     /// <remarks>
     /// Haven't found any post with them
@@ -136,7 +138,7 @@ public class GelbooruApiLoader : IBooruApiLoader
                 var id = Convert.ToInt32(note.Attributes["data-id"].Value);
                 var text = note.InnerText;
 
-                return new Note(id, text, point, size);
+                return new Note(id.ToString(), text, point, size);
             }) ?? Enumerable.Empty<Note>();
 
         return notes.ToList();
@@ -177,15 +179,11 @@ public class GelbooruApiLoader : IBooruApiLoader
     /// <summary>
     /// Auth isn't supported right now.
     /// </summary>
-    private static void SetAuthParameters(FlurlHttpSettings settings, IOptions<GelbooruSettings> options)
+    private static async Task DelayWithThrottler(IOptions<GelbooruSettings> options)
     {
         var delay = options.Value.PauseBetweenRequests;
-        
-        settings.BeforeCallAsync = async call =>
-        {
-            if (delay > TimeSpan.Zero)
-                await Throttler.Get("gelbooru").UseAsync(delay);
-        };
+        if (delay > TimeSpan.Zero)
+            await Throttler.Get("gelbooru").UseAsync(delay);
     }
 
     private static DateTimeOffset ExtractDate(GelbooruPost post)
@@ -208,13 +206,13 @@ public class GelbooruApiLoader : IBooruApiLoader
 
     private static Post CreatePost(GelbooruPost post, HtmlDocument postHtml) 
         => new(
-            new PostIdentity(post.Id, post.Md5),
+            new PostIdentity(post.Id.ToString(), post.Md5),
             post.FileUrl,
             !string.IsNullOrWhiteSpace(post.SampleUrl) ? post.SampleUrl : post.FileUrl,
             post.PreviewUrl,
             ExistState.Exist,
             ExtractDate(post),
-            new Uploader(post.CreatorId, post.Owner.Replace('_', ' ')),
+            new Uploader(post.CreatorId.ToString(), post.Owner.Replace('_', ' ')),
             post.Source,
             new Size(post.Width, post.Height),
             -1,
@@ -253,13 +251,13 @@ public class GelbooruApiLoader : IBooruApiLoader
         var rating = postHtml.DocumentNode.SelectSingleNode("//li[contains (., 'Rating: ')]/text()").InnerText.Split(' ').Last().ToLower();
         
         return new(
-            new PostIdentity(id, md5),
+            new PostIdentity(id.ToString(), md5),
             url,
             url,
             url,
             ExistState.MarkDeleted,
             date,
-            new Uploader(-1, uploader.Replace('_', ' ')),
+            new Uploader("-1", uploader.Replace('_', ' ')),
             source,
             new Size(size[0], size[1]),
             -1,

@@ -3,21 +3,21 @@ using System.Text.Json.Serialization;
 namespace Imouto.BooruParser.Implementations.Sankaku;
 
 public record SankakuNote(
-    [property: JsonPropertyName("id")] int Id,
+    [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("created_at")] SankakuDateTime CreatedAt,
     [property: JsonPropertyName("updated_at")] SankakuDateTime UpdatedAt,
-    [property: JsonPropertyName("creator_id")] int CreatorId,
+    [property: JsonPropertyName("creator_id")] string CreatorId,
     [property: JsonPropertyName("x")] int X,
     [property: JsonPropertyName("y")] int Y,
     [property: JsonPropertyName("width")] int Width,
     [property: JsonPropertyName("height")] int Height,
     [property: JsonPropertyName("is_active")] bool IsActive,
-    [property: JsonPropertyName("post_id")] int PostId,
+    [property: JsonPropertyName("post_id")] string PostId,
     [property: JsonPropertyName("body")] string Body
 );
 
 public record SankakuPost(
-    [property: JsonPropertyName("id")] int Id,
+    [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("rating")] string Rating,
     [property: JsonPropertyName("author")] SankakuAuthor Author,
     [property: JsonPropertyName("preview_url")] string? PreviewUrl,
@@ -30,7 +30,7 @@ public record SankakuPost(
     [property: JsonPropertyName("has_children")] bool HasChildren,
     [property: JsonPropertyName("has_notes")] bool HasNotes,
     [property: JsonPropertyName("md5")] string Md5,
-    [property: JsonPropertyName("parent_id")] int? ParentId,
+    [property: JsonPropertyName("parent_id")] string? ParentId,
     [property: JsonPropertyName("tags")] IReadOnlyList<SankakuTag> Tags
 );
 
@@ -39,7 +39,7 @@ public record SankakuDateTime(
 );
 
 public record SankakuAuthor(
-    [property: JsonPropertyName("id")] int Id,
+    [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("name")] string Name
 );
 
@@ -49,17 +49,17 @@ public record SankakuTag(
 );
 
 public record SankakuPostPool(
-    [property: JsonPropertyName("id")] int Id,
+    [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("name")] string Name
 );
 public record SankakuPool(
-    [property: JsonPropertyName("id")] int Id,
+    [property: JsonPropertyName("id")] string Id,
     [property: JsonPropertyName("name")] string Name,
     [property: JsonPropertyName("posts")] SankakuPoolPost[] Posts
 );
 
 public record SankakuPoolPost(
-    [property: JsonPropertyName("id")] int Id
+    [property: JsonPropertyName("id")] string Id
 );
 
 public record SankakuRefreshResponse(

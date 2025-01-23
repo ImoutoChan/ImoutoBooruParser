@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Flurl;
 using Flurl.Http;
 using Flurl.Http.Configuration;
@@ -15,9 +14,9 @@ public class Rule34ApiLoader : IBooruApiLoader
     private readonly IFlurlClient _flurlHtmlClient;
     private readonly IFlurlClient _flurlJsonClient;
 
-    public Rule34ApiLoader(IFlurlClientFactory factory, IOptions<Rule34Settings> options)
+    public Rule34ApiLoader(IFlurlClientCache factory, IOptions<Rule34Settings> options)
     {
-        _flurlHtmlClient = factory.Get(new Url(HtmlBaseUrl))
+        _flurlHtmlClient = factory.GetOrAdd(new Url(HtmlBaseUrl), new Url(HtmlBaseUrl))
             .WithHeader("Connection", "keep-alive")
             .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
             .WithHeader("sec-ch-ua-mobile", "?0")
@@ -31,9 +30,9 @@ public class Rule34ApiLoader : IBooruApiLoader
             .WithHeader("Sec-Fetch-User", "?1")
             .WithHeader("Sec-Fetch-Dest", "document")
             .WithHeader("Accept-Language", "en")
-            .Configure(x => SetAuthParameters(x, options));
+            .BeforeCall(_ => DelayWithThrottler(options));
 
-        _flurlJsonClient = factory.Get(new Url(JsonBaseUrl))
+        _flurlJsonClient = factory.GetOrAdd(new Url(JsonBaseUrl), new Url(JsonBaseUrl))
             .WithHeader("Connection", "keep-alive")
             .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
             .WithHeader("sec-ch-ua-mobile", "?0")
@@ -47,10 +46,10 @@ public class Rule34ApiLoader : IBooruApiLoader
             .WithHeader("Sec-Fetch-User", "?1")
             .WithHeader("Sec-Fetch-Dest", "document")
             .WithHeader("Accept-Language", "en")
-            .Configure(x => SetAuthParameters(x, options));
+            .BeforeCall(_ => DelayWithThrottler(options));
     }
 
-    public async Task<Post> GetPostAsync(int postId)
+    public async Task<Post> GetPostAsync(string postId)
     {
         // https://rule34.xxx/index.php?page=post&s=view&id=
         var postHtml = await _flurlHtmlClient.Request("index.php")
@@ -115,7 +114,7 @@ public class Rule34ApiLoader : IBooruApiLoader
             .GetJsonAsync<Rule34Post[]>();
 
         return new SearchResult(postJson?
-            .Select(x => new PostPreview(x.Id, x.Hash, x.Tags, false, false))
+            .Select(x => new PostPreview(x.Id.ToString(), x.Hash, x.Tags, false, false))
             .ToArray() ?? Array.Empty<PostPreview>());
     }
 
@@ -135,7 +134,7 @@ public class Rule34ApiLoader : IBooruApiLoader
         => throw new NotSupportedException("Rule34 does not support history");
 
     private static PostIdentity? GetParent(Rule34Post post)
-        => post.ParentId != 0 ? new PostIdentity(post.ParentId, string.Empty) : null;
+        => post.ParentId != 0 ? new PostIdentity(post.ParentId.ToString(), string.Empty) : null;
 
     /// <remarks>
     /// Haven't found any post with them
@@ -174,7 +173,7 @@ public class Rule34ApiLoader : IBooruApiLoader
                     var id = Convert.ToInt32(body.Attributes["id"].Value.Split('-').Last());
                     var text = body.InnerText;
 
-                    return new Note(id, text, point, size);
+                    return new Note(id.ToString(), text, point, size);
                 })
             : Enumerable.Empty<Note>();
 
@@ -216,26 +215,23 @@ public class Rule34ApiLoader : IBooruApiLoader
     /// <summary>
     /// Auth isn't supported right now.
     /// </summary>
-    private static void SetAuthParameters(FlurlHttpSettings settings, IOptions<Rule34Settings> options)
+    private static async Task DelayWithThrottler(IOptions<Rule34Settings> options)
     {
         var delay = options.Value.PauseBetweenRequests;
-        
-        settings.BeforeCallAsync = async call =>
-        {
-            if (delay > TimeSpan.Zero)
-                await Throttler.Get("rule34").UseAsync(delay);
-        };
+        if (delay > TimeSpan.Zero)
+            await Throttler.Get("rule34").UseAsync(delay);
     }
+
 
     private static Post CreatePost(Rule34Post post, HtmlDocument postHtml) 
         => new(
-            new PostIdentity(post.Id, post.Hash),
+            new PostIdentity(post.Id.ToString(), post.Hash),
             post.FileUrl,
             !string.IsNullOrWhiteSpace(post.SampleUrl) ? post.SampleUrl : post.FileUrl,
             post.PreviewUrl,
             ExistState.Exist,
             DateTimeOffset.FromUnixTimeSeconds(post.Change),
-            new Uploader(-1, post.Owner.Replace('_', ' ')),
+            new Uploader("-1", post.Owner.Replace('_', ' ')),
             post.Source,
             new Size(post.Width, post.Height),
             -1,

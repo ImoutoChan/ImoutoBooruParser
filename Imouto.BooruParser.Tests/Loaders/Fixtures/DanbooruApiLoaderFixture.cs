@@ -28,8 +28,10 @@ public class DanbooruApiLoaderFixture
             BotUserAgent = "UnitTestBot/1.0"
         });
 
-    private IFlurlClientFactory Factory =>
-        _enableCache ? new HardCachePerBaseUrlFlurlClientFactory() : new PerBaseUrlFlurlClientFactory();
+    private IFlurlClientCache Factory =>
+        _enableCache
+            ? new FlurlClientCache().WithDefaults(x => x.AddMiddleware(() => new HardCachingHttpMessageHandler()))
+            : new FlurlClientCache();
 
     public IBooruApiLoader GetLoaderWithAuth()
         => _danbooruWithAuth ??= new DanbooruApiLoader(Factory, _authorizedOptions);

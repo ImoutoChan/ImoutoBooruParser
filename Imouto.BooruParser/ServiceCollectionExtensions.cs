@@ -17,7 +17,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddBooruParsers(this IServiceCollection services)
     {
-        services.AddSingleton<IFlurlClientFactory, PerBaseUrlFlurlClientFactory>();
+        services.AddSingleton<IFlurlClientCache>(_ => new FlurlClientCache());
         
         services.AddTransient<IBooruApiLoader, DanbooruApiLoader>();
         services.AddTransient<IBooruApiLoader, YandereApiLoader>();

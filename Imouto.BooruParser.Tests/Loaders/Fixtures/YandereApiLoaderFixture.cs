@@ -22,8 +22,10 @@ public class YandereApiLoaderFixture
     private readonly IOptions<YandereSettings> _options 
         = Options.Create(new YandereSettings { PauseBetweenRequestsInMs = 0 });
 
-    private IFlurlClientFactory Factory =>
-        _enableCache ? new HardCachePerBaseUrlFlurlClientFactory() : new PerBaseUrlFlurlClientFactory();
+    private IFlurlClientCache Factory =>
+        _enableCache
+            ? new FlurlClientCache().WithDefaults(x => x.AddMiddleware(() => new HardCachingHttpMessageHandler()))
+            : new FlurlClientCache();
 
     public IBooruApiLoader GetLoader() => _loader ??= new YandereApiLoader(Factory, _options);
 

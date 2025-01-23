@@ -11,6 +11,14 @@ Install-Package Imouto.BooruParser
 ```xml
 <PackageReference Include="Imouto.BooruParser" Version="3.*" />
 ```
+# Version 4.0.0 RC1
+* I'm bumping major version because I had to change public API. Sankaku now has string ids on different entities, 
+and we have to adjust for it. Most public API types now have a generic id parameter. It's string for sankaku and int
+for every other booru. If you're not interested in sankaku you can just assume that ids are int as it was before.
+* Technical: FluentAssertion is replaced with AwesomeAssertions, you know why.
+* Technical: Flurl is upgraded to the latest 4 version, it has some breaking changes, but I've adjusted for them, we see 
+how it goes. 
+
 # Version 3.3.0
 * Sankaku is child of devil and was broken once again. Removed old auth chan. part as now all logins goes throw beta.
 

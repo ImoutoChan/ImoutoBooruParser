@@ -13,8 +13,10 @@ public class Rule34ApiLoaderFixture
     private readonly IOptions<Rule34Settings> _options 
         = Options.Create(new Rule34Settings { PauseBetweenRequestsInMs = 0 });
 
-    private IFlurlClientFactory Factory =>
-        _enableCache ? new HardCachePerBaseUrlFlurlClientFactory() : new PerBaseUrlFlurlClientFactory();
+    private IFlurlClientCache Factory =>
+        _enableCache
+            ? new FlurlClientCache().WithDefaults(x => x.AddMiddleware(() => new HardCachingHttpMessageHandler()))
+            : new FlurlClientCache();
 
     public IBooruApiLoader GetLoader() => _loader ??= new Rule34ApiLoader(Factory, _options);
 }

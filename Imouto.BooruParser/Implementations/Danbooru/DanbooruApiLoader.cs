@@ -11,13 +11,13 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
     private readonly IFlurlClient _flurlClient;
     private readonly string _botUserAgent;
 
-    public DanbooruApiLoader(IFlurlClientFactory factory, IOptions<DanbooruSettings> options)
+    public DanbooruApiLoader(IFlurlClientCache factory, IOptions<DanbooruSettings> options)
     {
-        _flurlClient = factory.Get(new Url(BaseUrl)).Configure(x => SetAuthParameters(x, options));
+        _flurlClient = factory.GetOrAdd(new Url(BaseUrl), new Url(BaseUrl)).BeforeCall(x => SetAuthParameters(x, options));
         _botUserAgent = options.Value.BotUserAgent ?? throw new Exception("UserAgent is required to make api calls");
     }
 
-    public async Task<Post> GetPostAsync(int postId)
+    public async Task<Post> GetPostAsync(string postId)
     {
         var post = await _flurlClient.Request("posts", $"{postId}.json")
             .SetQueryParam("only", "id,tag_string_artist,tag_string_character,tag_string_copyright,pools,tag_string_general,tag_string_meta,parent_id,md5,file_url,large_file_url,preview_file_url,file_ext,last_noted_at,is_banned,is_deleted,created_at,uploader_id,source,image_width,image_height,file_size,rating,media_metadata[metadata],parent[id,md5],children[id,md5],notes[id,x,y,width,height,body],uploader[id,name]")
@@ -31,7 +31,7 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
             post.PreviewFileUrl,
             post.IsBanned || post.IsDeleted ? ExistState.MarkDeleted : ExistState.Exist,
             post.CreatedAt.ToUniversalTime(),
-            new Uploader(post.UploaderId, post.Uploader.Name.Replace('_', ' ')),
+            new Uploader(post.UploaderId.ToString(), post.Uploader.Name.Replace('_', ' ')),
             post.Source,
             new Size(post.ImageWidth, post.ImageHeight),
             post.FileSize,
@@ -58,13 +58,13 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
 
         var post = posts.First();
         return new Post(
-            new PostIdentity(post.Id, post.Md5),
+            new PostIdentity(post.Id.ToString(), post.Md5),
             post.FileUrl,
             post.LargeFileUrl ?? post.PreviewFileUrl,
             post.PreviewFileUrl,
             post.IsBanned || post.IsDeleted ? ExistState.MarkDeleted : ExistState.Exist,
             post.CreatedAt,
-            new Uploader(post.UploaderId, post.Uploader.Name.Replace('_', ' ')),
+            new Uploader(post.UploaderId.ToString(), post.Uploader.Name.Replace('_', ' ')),
             post.Source,
             new Size(post.ImageWidth, post.ImageHeight),
             post.FileSize,
@@ -73,7 +73,7 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
             GetUgoiraMetadata(post),
             GetParent(post),
             GetChildren(post),
-            await GetPoolsAsync(post.Id),
+            await GetPoolsAsync(post.Id.ToString()),
             GetTags(post),
             GetNotes(post));
     }
@@ -87,7 +87,7 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
             .GetJsonAsync<IReadOnlyCollection<DanbooruPostPreview>>();
 
         return new SearchResult(posts
-            .Select(x => new PostPreview(x.Id, x.Md5, x.TagString, x.IsBanned, x.IsDeleted))
+            .Select(x => new PostPreview(x.Id.ToString(), x.Md5, x.TagString, x.IsBanned, x.IsDeleted))
             .ToList());
     }
 
@@ -109,7 +109,7 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
             .GetJsonAsync<IReadOnlyCollection<DanbooruPostPreview>>();
 
         return new SearchResult(posts
-            .Select(x => new PostPreview(x.Id, x.Md5, x.TagString, x.IsBanned, x.IsDeleted))
+            .Select(x => new PostPreview(x.Id.ToString(), x.Md5, x.TagString, x.IsBanned, x.IsDeleted))
             .ToList());
     }
 
@@ -130,9 +130,16 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
 
         if (!found.Any())
             return new(Array.Empty<TagHistoryEntry>(), null);
-        
+
         var entries = found
-            .Select(x => new TagHistoryEntry(x.Id, x.UpdatedAt, x.PostId, x.ParentId, x.ParentChanged))
+            .Select(
+                x =>
+                    new TagHistoryEntry(
+                        x.Id,
+                        x.UpdatedAt,
+                        x.PostId.ToString(),
+                        x.ParentId == null ? null : x.ParentId.ToString(),
+                        x.ParentChanged))
             .ToList();
 
         var nextPage = token?.Page[0] switch
@@ -166,7 +173,7 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
             return new(Array.Empty<NoteHistoryEntry>(), null);
         
         var entries = found
-            .Select(x => new NoteHistoryEntry(x.Id, x.PostId, x.UpdatedAt))
+            .Select(x => new NoteHistoryEntry(x.Id, x.PostId.ToString(), x.UpdatedAt))
             .ToList();
 
         var nextPage = token?.Page[0] switch
@@ -181,7 +188,7 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
         return new(entries, new SearchToken(nextPage));
     }
 
-    public async Task FavoritePostAsync(int postId)
+    public async Task FavoritePostAsync(string postId)
     {
         await _flurlClient.Request("favorites.json")
             .SetQueryParam("post_id", postId)
@@ -190,10 +197,10 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
     }
 
     private static PostIdentity? GetParent(DanbooruPost post)
-        => post.Parent != null ? new PostIdentity(post.Parent.Id, post.Parent.Md5) : null;
+        => post.Parent != null ? new PostIdentity(post.Parent.Id.ToString(), post.Parent.Md5) : null;
 
     private static IReadOnlyCollection<PostIdentity> GetChildren(DanbooruPost post)
-        => post.Children.Select(x => new PostIdentity(x.Id, x.Md5)).ToList();
+        => post.Children.Select(x => new PostIdentity(x.Id.ToString(), x.Md5)).ToList();
 
     private static IReadOnlyCollection<int> GetUgoiraMetadata(DanbooruPost post)
     {
@@ -204,7 +211,7 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
         return post.MediaMetadata.Metadata.UgoiraFrameDelays ?? Array.Empty<int>();
     }
 
-    private async Task<IReadOnlyCollection<Pool>> GetPoolsAsync(int postId)
+    private async Task<IReadOnlyCollection<Pool>> GetPoolsAsync(string postId)
     {
         var pools = await _flurlClient.Request("pools.json")
             .SetQueryParam("search[post_tags_match]", $"id:{postId}")
@@ -213,7 +220,7 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
             .GetJsonAsync<IReadOnlyCollection<DanbooruPool>>();
 
         return pools
-            .Select(x => new Pool(x.Id, x.Name, Array.IndexOf(x.PostIds, postId)))
+            .Select(x => new Pool(x.Id.ToString(), x.Name, Array.IndexOf(x.PostIds, postId)))
             .ToList();
     }
 
@@ -223,7 +230,7 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
             return Array.Empty<Note>();
 
         return post.Notes
-            .Select(x => new Note(x.Id, x.Body, new Position(x.Y, x.X), new Size(x.Width, x.Height)))
+            .Select(x => new Note(x.Id.ToString(), x.Body, new Position(x.Y, x.X), new Size(x.Width, x.Height)))
             .ToList();
     }
 
@@ -251,19 +258,16 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
             .Select(x => new Tag(x.Type, x.Tag.Replace('_', ' ')))
             .ToList();
 
-    private static void SetAuthParameters(FlurlHttpSettings settings, IOptions<DanbooruSettings> options)
+    private static async Task SetAuthParameters(FlurlCall call, IOptions<DanbooruSettings> options)
     {
         var login = options.Value.Login;
         var apiKey = options.Value.ApiKey;
         var delay = options.Value.PauseBetweenRequests;
 
-        settings.BeforeCallAsync = async call =>
-        {
-            if (options.Value.Login != null && options.Value.ApiKey != null)
-                call.Request.SetQueryParam("login", login).SetQueryParam("api_key", apiKey);
+        if (options.Value.Login != null && options.Value.ApiKey != null)
+            call.Request.SetQueryParam("login", login).SetQueryParam("api_key", apiKey);
 
-            if (delay > TimeSpan.Zero)
-                await Throttler.Get("danbooru").UseAsync(delay);
-        };
+        if (delay > TimeSpan.Zero)
+            await Throttler.Get("danbooru").UseAsync(delay);
     }
 }

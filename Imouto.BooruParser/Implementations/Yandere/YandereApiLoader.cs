@@ -27,12 +27,12 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
 
     private readonly IFlurlClient _flurlClient;
 
-    public YandereApiLoader(IFlurlClientFactory factory, IOptions<YandereSettings> options)
+    public YandereApiLoader(IFlurlClientCache factory, IOptions<YandereSettings> options)
     {
-        _flurlClient = factory.Get(new Url(BaseUrl)).Configure(x => SetAuthParameters(x, options));
+        _flurlClient = factory.GetOrAdd(new Url(BaseUrl), new Url(BaseUrl)).BeforeCall(x => SetAuthParameters(x, options));
     }
 
-    public async Task<Post> GetPostAsync(int postId)
+    public async Task<Post> GetPostAsync(string postId)
     {
         var posts = await _flurlClient.Request("post", "index.json")
             .SetQueryParam("tags", $"id:{postId}")
@@ -61,7 +61,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             .Request("post", "show", post.Id)
             .GetHtmlDocumentAsync();
 
-        return await GetPost(post.Id, post, postHtml);
+        return await GetPost(post.Id.ToString(), post, postHtml);
     }
 
     /// <summary>
@@ -74,7 +74,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             .GetJsonAsync<IReadOnlyCollection<YanderePost>>();
 
         return new SearchResult(posts
-            .Select(x => new PostPreview(x.Id, x.Md5, x.Tags, false, false))
+            .Select(x => new PostPreview(x.Id.ToString(), x.Md5, x.Tags, false, false))
             .ToList());
     }
 
@@ -94,7 +94,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             .GetJsonAsync<IReadOnlyCollection<YanderePost>>();
 
         return new SearchResult(posts
-            .Select(x => new PostPreview(x.Id, x.Md5, x.Tags, false, false))
+            .Select(x => new PostPreview(x.Id.ToString(), x.Md5, x.Tags, false, false))
             .ToList());
     }
 
@@ -137,8 +137,8 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
                 return new TagHistoryEntry(
                     x.id,
                     new DateTimeOffset(date, TimeSpan.Zero),
-                    postId,
-                    parentId,
+                    postId.ToString(),
+                    parentId == null ? null : parentId.ToString(),
                     parentChanged);
             }) ?? Enumerable.Empty<TagHistoryEntry>();
 
@@ -171,7 +171,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
                 var dateString = x.SelectNodes("td")[5].InnerHtml;
                 var date = DateTime.ParseExact(dateString, "MM/dd/yy", CultureInfo.InvariantCulture);
 
-                return new NoteHistoryEntry(-1, postId, date);
+                return new NoteHistoryEntry(-1, postId.ToString(), date);
             })
             .ToList();
 
@@ -184,11 +184,11 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
         return new HistorySearchResult<NoteHistoryEntry>(entries, new SearchToken(nextPage));
     }
 
-    public async Task FavoritePostAsync(int postId)
+    public async Task FavoritePostAsync(string postId)
     {
         await _flurlClient.Request("post", "vote.json")
             .PostMultipartAsync(content => content
-                .Add("id", new StringContent(postId.ToString()))
+                .Add("id", new StringContent(postId))
                 .Add("score", new StringContent("3")));
     }
 
@@ -208,7 +208,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
 
         var post = posts.First();
 
-        return new PostIdentity(post.Id, post.Md5);
+        return new PostIdentity(post.Id.ToString(), post.Md5);
     }
 
     private async Task<IReadOnlyCollection<PostIdentity>> GetChildrenAsync(
@@ -269,7 +269,10 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             .SetQueryParam("id", poolId)
             .GetJsonAsync<YanderePool>();
 
-        return new Pool(pool.Id, pool.Name.Replace('_', ' '), Array.IndexOf(pool.Posts.Select(x => x.Id).ToArray(), postId));
+        return new Pool(
+            pool.Id.ToString(),
+            pool.Name.Replace('_', ' '),
+            Array.IndexOf(pool.Posts.Select(x => x.Id).ToArray(), postId));
     }
 
     private static IReadOnlyCollection<Note> GetNotes(YanderePost post, HtmlDocument postHtml)
@@ -296,7 +299,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
                 var id = Convert.ToInt32(textNode.Attributes["id"].Value.Split('-').Last());
                 var text = textNode.InnerHtml;
 
-                return new Note(id, text, point, size);
+                return new Note(id.ToString(), text, point, size);
             }) ?? Enumerable.Empty<Note>();
 
         return notes.ToList();
@@ -331,23 +334,20 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             .ToList();
     }
 
-    private static void SetAuthParameters(FlurlHttpSettings settings, IOptions<YandereSettings> options)
+    private static async Task SetAuthParameters(FlurlCall call, IOptions<YandereSettings> options)
     {
         var login = options.Value.Login;
         var passwordHash = options.Value.PasswordHash;
         var delay = options.Value.PauseBetweenRequests;
 
-        settings.BeforeCallAsync = async call =>
-        {
-            if (login != null && passwordHash != null)
-                call.Request.SetQueryParam("login", login).SetQueryParam("password_hash", passwordHash);
+        if (login != null && passwordHash != null)
+            call.Request.SetQueryParam("login", login).SetQueryParam("password_hash", passwordHash);
 
-            if (delay > TimeSpan.Zero)
-                await Throttler.Get("Yandere").UseAsync(delay);
-        };
+        if (delay > TimeSpan.Zero)
+            await Throttler.Get("Yandere").UseAsync(delay);
     }
 
-    private async Task<Post> GetPost(int postId, YanderePost post, HtmlDocument postHtml) 
+    private async Task<Post> GetPost(string postId, YanderePost post, HtmlDocument postHtml)
         => new(
             new PostIdentity(postId, post.Md5),
             post.FileUrl,
@@ -355,7 +355,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             post.JpegUrl,
             GetExistState(postHtml),
             DateTimeOffset.FromUnixTimeSeconds(post.CreatedAt),
-            new Uploader(post.CreatorId ?? -1, post.Author),
+            new Uploader(post.CreatorId?.ToString() ?? "-1", post.Author),
             post.Source,
             new Size(post.Width, post.Height),
             post.FileSize,
@@ -364,7 +364,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             Array.Empty<int>(),
             await GetPostIdentityAsync(post.ParentId),
             await GetChildrenAsync(postHtml),
-            await GetPoolsAsync(postId, postHtml),
+            await GetPoolsAsync(post.Id, postHtml),
             GetTags(postHtml),
             GetNotes(post, postHtml));
 }
