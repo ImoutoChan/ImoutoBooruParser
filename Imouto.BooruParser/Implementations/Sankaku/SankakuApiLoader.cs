@@ -21,7 +21,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
         ISankakuAuthManager sankakuAuthManager)
     {
         _sankakuAuthManager = sankakuAuthManager;
-        _flurlClient = factory.GetOrAdd(new Url(ApiBaseUrl), new Url(ApiBaseUrl))
+        _flurlClient = factory.GetForDomain(new Url(ApiBaseUrl))
             .WithHeader("Connection", "keep-alive")
             .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
             .WithHeader("sec-ch-ua-mobile", "?0")
@@ -38,7 +38,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             .WithHeader("Accept-Language", "en")
             .BeforeCall(x => SetAuthParameters(x, options))!;
         
-        _htmlFlurlClient = factory.GetOrAdd(new Url(HtmlBaseUrl), new Url(HtmlBaseUrl))
+        _htmlFlurlClient = factory.GetForDomain(new Url(HtmlBaseUrl))
             .WithHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
             .WithHeader("Accept-Encoding", "gzip, deflate, br")
             .WithHeader("Accept-Language", "en,en-US;q=0.9")

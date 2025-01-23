@@ -29,7 +29,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
 
     public YandereApiLoader(IFlurlClientCache factory, IOptions<YandereSettings> options)
     {
-        _flurlClient = factory.GetOrAdd(new Url(BaseUrl), new Url(BaseUrl)).BeforeCall(x => SetAuthParameters(x, options));
+        _flurlClient = factory.GetForDomain(new Url(BaseUrl)).BeforeCall(x => SetAuthParameters(x, options));
     }
 
     public async Task<Post> GetPostAsync(string postId)

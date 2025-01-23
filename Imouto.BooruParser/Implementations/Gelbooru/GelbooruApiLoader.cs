@@ -19,7 +19,7 @@ public class GelbooruApiLoader : IBooruApiLoader
 
     public GelbooruApiLoader(IFlurlClientCache factory, IOptions<GelbooruSettings> options)
         => _flurlClient = factory
-            .GetOrAdd(new Url(BaseUrl), new Url(BaseUrl))
+            .GetForDomain(new Url(BaseUrl))
             .BeforeCall(_ => DelayWithThrottler(options));
 
     public async Task<Post> GetPostAsync(string postId)

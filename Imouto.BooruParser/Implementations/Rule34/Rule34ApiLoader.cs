@@ -16,7 +16,7 @@ public class Rule34ApiLoader : IBooruApiLoader
 
     public Rule34ApiLoader(IFlurlClientCache factory, IOptions<Rule34Settings> options)
     {
-        _flurlHtmlClient = factory.GetOrAdd(new Url(HtmlBaseUrl), new Url(HtmlBaseUrl))
+        _flurlHtmlClient = factory.GetForDomain(new Url(HtmlBaseUrl))
             .WithHeader("Connection", "keep-alive")
             .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
             .WithHeader("sec-ch-ua-mobile", "?0")
@@ -32,7 +32,7 @@ public class Rule34ApiLoader : IBooruApiLoader
             .WithHeader("Accept-Language", "en")
             .BeforeCall(_ => DelayWithThrottler(options));
 
-        _flurlJsonClient = factory.GetOrAdd(new Url(JsonBaseUrl), new Url(JsonBaseUrl))
+        _flurlJsonClient = factory.GetForDomain(new Url(JsonBaseUrl))
             .WithHeader("Connection", "keep-alive")
             .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
             .WithHeader("sec-ch-ua-mobile", "?0")
