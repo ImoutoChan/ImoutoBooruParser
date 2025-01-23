@@ -1,5 +1,9 @@
 ﻿namespace Imouto.BooruParser;
 
+public interface IBooruApiLoader : IBooruApiLoader<int>
+{
+}
+
 public interface IBooruApiLoader<TId>
 {
     Task<Post<TId>> GetPostAsync(TId postId);
@@ -19,6 +23,10 @@ public interface IBooruApiLoader<TId>
         SearchToken? token,
         int limit = 100,
         CancellationToken ct = default);
+}
+
+public interface IBooruApiAccessor : IBooruApiAccessor<int>
+{
 }
 
 public interface IBooruApiAccessor<in TId>

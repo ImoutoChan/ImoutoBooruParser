@@ -1,11 +1,12 @@
 using Flurl;
 using Flurl.Http;
 using Flurl.Http.Configuration;
+using Imouto.BooruParser.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace Imouto.BooruParser.Implementations.Danbooru;
 
-public class DanbooruApiLoader : IBooruApiLoader<int>, IBooruApiAccessor<int>
+public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
 {
     private const string BaseUrl = "https://danbooru.donmai.us";
     private readonly IFlurlClient _flurlClient;
@@ -13,7 +14,7 @@ public class DanbooruApiLoader : IBooruApiLoader<int>, IBooruApiAccessor<int>
 
     public DanbooruApiLoader(IFlurlClientCache factory, IOptions<DanbooruSettings> options)
     {
-        _flurlClient = factory.GetOrAdd(new Url(BaseUrl), new Url(BaseUrl)).BeforeCall(x => SetAuthParameters(x, options));
+        _flurlClient = factory.GetForDomain(new Url(BaseUrl)).BeforeCall(x => SetAuthParameters(x, options));
         _botUserAgent = options.Value.BotUserAgent ?? throw new Exception("UserAgent is required to make api calls");
     }
 

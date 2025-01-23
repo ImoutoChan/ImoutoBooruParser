@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 
 namespace Imouto.BooruParser.Implementations.Gelbooru;
 
-public class GelbooruApiLoader : IBooruApiLoader<int>
+public class GelbooruApiLoader : IBooruApiLoader
 {
     private static readonly Regex DateTimeRegex = new(
         ".*(?<month>\\w{3}).*(?<date>\\d{2}).*(?<hours>\\d{2})\\:(?<minutes>\\d{2})\\:(?<seconds>\\d{2}).*(?<tzhours>[+\\-]\\d{2})(?<tzminutes>\\d{2}).*(?<year>\\d{4})", RegexOptions.Compiled);
@@ -19,7 +19,7 @@ public class GelbooruApiLoader : IBooruApiLoader<int>
 
     public GelbooruApiLoader(IFlurlClientCache factory, IOptions<GelbooruSettings> options)
         => _flurlClient = factory
-            .GetOrAdd(new Url(BaseUrl), new Url(BaseUrl))
+            .GetForDomain(new Url(BaseUrl))
             .BeforeCall(_ => DelayWithThrottler(options));
 
     public async Task<Post<int>> GetPostAsync(int postId)

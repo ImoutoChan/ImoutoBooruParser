@@ -17,7 +17,7 @@ namespace Imouto.BooruParser.Implementations.Yandere;
 /// tags with type 729673
 /// notes 729673
 /// extensions for tags and notes
-public class YandereApiLoader : IBooruApiLoader<int>, IBooruApiAccessor<int>
+public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
 {
     private static readonly Regex NotePositionRegex = new(
             "width[:\\s]*(?<width>\\d+.{0,1}\\d*)px.*height[:\\s]*(?<height>\\d+.{0,1}\\d*)px.*top[:\\s]*(?<top>\\d+.{0,1}\\d*)px.*left[:\\s]*(?<left>\\d+.{0,1}\\d*)px",
@@ -29,7 +29,7 @@ public class YandereApiLoader : IBooruApiLoader<int>, IBooruApiAccessor<int>
 
     public YandereApiLoader(IFlurlClientCache factory, IOptions<YandereSettings> options)
     {
-        _flurlClient = factory.GetOrAdd(new Url(BaseUrl), new Url(BaseUrl)).BeforeCall(x => SetAuthParameters(x, options));
+        _flurlClient = factory.GetForDomain(new Url(BaseUrl)).BeforeCall(x => SetAuthParameters(x, options));
     }
 
     public async Task<Post<int>> GetPostAsync(int postId)

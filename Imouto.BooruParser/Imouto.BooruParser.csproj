@@ -21,7 +21,7 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <PackageTags>booru search parser danbooru sankakuchannel yande.re yandere gelbooru imageboard image art animeart anime</PackageTags>
-        <Version>4.0.0-rc1</Version>
+        <Version>4.0.0-rc2</Version>
     </PropertyGroup>
 
     <ItemGroup>

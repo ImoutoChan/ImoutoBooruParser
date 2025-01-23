@@ -1,4 +1,6 @@
+using Flurl;
 using Flurl.Http;
+using Flurl.Http.Configuration;
 using HtmlAgilityPack;
 
 namespace Imouto.BooruParser.Extensions;
@@ -16,4 +18,7 @@ public static class FlurlExtensions
         doc.LoadHtml(str);
         return doc;
     }
+
+    public static IFlurlClient GetForDomain(this IFlurlClientCache cache, Url baseUrl)
+        => cache.GetOrAdd(baseUrl, baseUrl);
 }
