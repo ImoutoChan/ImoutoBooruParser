@@ -6,8 +6,8 @@ namespace Imouto.BooruParser.Implementations;
 
 public static class BooruApiLoaderNoteHistoryExtensions
 {
-    public static async Task<IReadOnlyCollection<NoteHistoryEntry>> GetNoteHistoryFirstPageAsync(
-        this IBooruApiLoader loader,
+    public static async Task<IReadOnlyCollection<NoteHistoryEntry<TId>>> GetNoteHistoryFirstPageAsync<TId>(
+        this IBooruApiLoader<TId> loader,
         int limit = 100,
         CancellationToken ct = default)
     {
@@ -15,8 +15,8 @@ public static class BooruApiLoaderNoteHistoryExtensions
         return page.Results;
     }
 
-    public static async IAsyncEnumerable<NoteHistoryEntry> GetNoteHistoryFromIdToPresentAsync(
-        this IBooruApiLoader loader, 
+    public static async IAsyncEnumerable<NoteHistoryEntry<TId>> GetNoteHistoryFromIdToPresentAsync<TId>(
+        this IBooruApiLoader<TId> loader,
         int afterHistoryId,
         int limit = 100,
         [EnumeratorCancellation] CancellationToken ct = default)
@@ -40,14 +40,14 @@ public static class BooruApiLoaderNoteHistoryExtensions
         }
     }
 
-    public static async IAsyncEnumerable<NoteHistoryEntry> GetNoteHistoryToDateTimeAsync(
-        this IBooruApiLoader loader, 
+    public static async IAsyncEnumerable<NoteHistoryEntry<TId>> GetNoteHistoryToDateTimeAsync<TId>(
+        this IBooruApiLoader<TId> loader,
         DateTimeOffset upToDateTime,
         int limit = 100,
         [EnumeratorCancellation] CancellationToken ct = default)
     {
         SearchToken? searchToken = null;
-        HistorySearchResult<NoteHistoryEntry> page;
+        HistorySearchResult<NoteHistoryEntry<TId>> page;
         do
         {
             page = await loader.GetNoteHistoryPageAsync(searchToken, limit, ct);

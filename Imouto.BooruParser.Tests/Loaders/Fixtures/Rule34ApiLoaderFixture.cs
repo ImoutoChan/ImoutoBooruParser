@@ -7,14 +7,16 @@ namespace Imouto.BooruParser.Tests.Loaders.Fixtures;
 
 public class Rule34ApiLoaderFixture
 {
-    private IBooruApiLoader? _loader;
+    private IBooruApiLoader<int>? _loader;
     private readonly bool _enableCache = false;
     
     private readonly IOptions<Rule34Settings> _options 
         = Options.Create(new Rule34Settings { PauseBetweenRequestsInMs = 0 });
 
-    private IFlurlClientFactory Factory =>
-        _enableCache ? new HardCachePerBaseUrlFlurlClientFactory() : new PerBaseUrlFlurlClientFactory();
+    private IFlurlClientCache Factory =>
+        _enableCache
+            ? new FlurlClientCache().WithDefaults(x => x.AddMiddleware(() => new HardCachingHttpMessageHandler()))
+            : new FlurlClientCache();
 
-    public IBooruApiLoader GetLoader() => _loader ??= new Rule34ApiLoader(Factory, _options);
+    public IBooruApiLoader<int> GetLoader() => _loader ??= new Rule34ApiLoader(Factory, _options);
 }

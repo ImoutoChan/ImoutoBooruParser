@@ -30,7 +30,9 @@ public class HardCachingHttpMessageHandler : DelegatingHandler
     }
 
     public HardCachingHttpMessageHandler(HttpMessageHandler innerHandler) : base(innerHandler) { }
-    
+
+    public HardCachingHttpMessageHandler() { }
+
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
     {
         if (request.Method != HttpMethod.Get && !request.RequestUri!.ToString().Contains("/graphql"))

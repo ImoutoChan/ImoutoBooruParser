@@ -7,9 +7,9 @@ namespace Imouto.BooruParser.Tests.Loaders.Fixtures;
 
 public class DanbooruApiLoaderFixture
 {
-    private IBooruApiLoader? _danbooruWithAuth;
-    private IBooruApiLoader? _danbooruWithoutAuth;
-    private IBooruApiAccessor? _danbooruApiAccessor;
+    private IBooruApiLoader<int>? _danbooruWithAuth;
+    private IBooruApiLoader<int>? _danbooruWithoutAuth;
+    private IBooruApiAccessor<int>? _danbooruApiAccessor;
     private readonly bool _enableCache = true;
 
     private readonly IOptions<DanbooruSettings> _options 
@@ -28,15 +28,17 @@ public class DanbooruApiLoaderFixture
             BotUserAgent = "UnitTestBot/1.0"
         });
 
-    private IFlurlClientFactory Factory =>
-        _enableCache ? new HardCachePerBaseUrlFlurlClientFactory() : new PerBaseUrlFlurlClientFactory();
+    private IFlurlClientCache Factory =>
+        _enableCache
+            ? new FlurlClientCache().WithDefaults(x => x.AddMiddleware(() => new HardCachingHttpMessageHandler()))
+            : new FlurlClientCache();
 
-    public IBooruApiLoader GetLoaderWithAuth()
+    public IBooruApiLoader<int> GetLoaderWithAuth()
         => _danbooruWithAuth ??= new DanbooruApiLoader(Factory, _authorizedOptions);
 
-    public IBooruApiLoader GetLoaderWithoutAuth()
+    public IBooruApiLoader<int> GetLoaderWithoutAuth()
         => _danbooruWithoutAuth ??= new DanbooruApiLoader(Factory, _options);
 
-    public IBooruApiAccessor GetApiAccessorWithAuth()
+    public IBooruApiAccessor<int> GetApiAccessorWithAuth()
         => _danbooruApiAccessor ??= new DanbooruApiLoader(Factory, _authorizedOptions);
 }

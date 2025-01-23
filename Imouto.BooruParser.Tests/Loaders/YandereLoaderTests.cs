@@ -134,7 +134,7 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
             var result = await loader.GetNoteHistoryToDateTimeAsync(DateTime.Now.AddHours(-5)).ToListAsync();
 
             result.Should().NotBeEmpty();
-            result.Should().HaveCountGreaterOrEqualTo(25);
+            result.Should().HaveCountGreaterThanOrEqualTo(25);
             result.ToList().ForEach(x => x.HistoryId.Should().Be(-1));
         }
         
@@ -340,7 +340,7 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
 
             var post = await loader.GetPostAsync(572039);
 
-            post.Pools.Count.Should().BeGreaterOrEqualTo(1);
+            post.Pools.Count.Should().BeGreaterThanOrEqualTo(1);
         }
         
         [Fact]

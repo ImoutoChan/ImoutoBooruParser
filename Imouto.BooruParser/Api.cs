@@ -1,64 +1,86 @@
 ﻿namespace Imouto.BooruParser;
 
-public interface IBooruApiLoader
+public interface IBooruApiLoader<TId>
 {
-    Task<Post> GetPostAsync(int postId);
+    Task<Post<TId>> GetPostAsync(TId postId);
     
-    Task<Post?> GetPostByMd5Async(string md5);
+    Task<Post<TId>?> GetPostByMd5Async(string md5);
 
-    Task<SearchResult> SearchAsync(string tags);
+    Task<SearchResult<TId>> SearchAsync(string tags);
 
-    Task<SearchResult> GetPopularPostsAsync(PopularType type);
+    Task<SearchResult<TId>> GetPopularPostsAsync(PopularType type);
 
-    Task<HistorySearchResult<TagHistoryEntry>> GetTagHistoryPageAsync(
+    Task<HistorySearchResult<TagHistoryEntry<TId>>> GetTagHistoryPageAsync(
         SearchToken? token,
         int limit = 100,
         CancellationToken ct = default);
 
-    Task<HistorySearchResult<NoteHistoryEntry>> GetNoteHistoryPageAsync(
+    Task<HistorySearchResult<NoteHistoryEntry<TId>>> GetNoteHistoryPageAsync(
         SearchToken? token,
         int limit = 100,
         CancellationToken ct = default);
 }
 
-public interface IBooruApiAccessor
+public interface IBooruApiAccessor<in TId>
 {
-    Task FavoritePostAsync(int postId);
+    Task FavoritePostAsync(TId postId);
 }
 
 /// <param name="Page">For danbooru: b{lowest-history-id-on-current-page}</param>
 public record SearchToken(string Page);
 
-public record SearchResult(IReadOnlyCollection<PostPreview> Results);
+public record SearchResult<TId>(IReadOnlyCollection<PostPreview<TId>> Results);
 
 public record HistorySearchResult<T>(
     IReadOnlyCollection<T> Results,
     SearchToken? NextToken);
 
-public record PostPreview(int Id, string? Md5Hash, string Title, bool IsBanned, bool IsDeleted);
+public record PostPreview<TId>(TId Id, string? Md5Hash, string Title, bool IsBanned, bool IsDeleted);
 
 /// <summary>
 /// OriginalUrl, SampleUrl and PostIdentity.Md5 are nulls when post is banned
 /// </summary>
-public record Post(
-    PostIdentity Id,
+public record Post<TId>(
+    PostIdentity<TId> Id,
     string? OriginalUrl,
     string? SampleUrl,
     string? PreviewUrl,
     ExistState ExistState,
     DateTimeOffset PostedAt,
-    Uploader UploaderId,
+    Uploader<TId> UploaderId,
     string? Source,
     Size FileResolution,
     int FileSizeInBytes,
     Rating Rating,
     RatingSafeLevel RatingSafeLevel,
     IReadOnlyCollection<int> UgoiraFrameDelays,
-    PostIdentity? Parent,
-    IReadOnlyCollection<PostIdentity> ChildrenIds,
-    IReadOnlyCollection<Pool> Pools,
+    PostIdentity<TId>? Parent,
+    IReadOnlyCollection<PostIdentity<TId>> ChildrenIds,
+    IReadOnlyCollection<Pool<TId>> Pools,
     IReadOnlyCollection<Tag> Tags,
-    IReadOnlyCollection<Note> Notes);
+    IReadOnlyCollection<Note<TId>> Notes);
+
+public record Post(
+    PostIdentity<int> Id,
+    string? OriginalUrl,
+    string? SampleUrl,
+    string? PreviewUrl,
+    ExistState ExistState,
+    DateTimeOffset PostedAt,
+    Uploader<int> UploaderId,
+    string? Source,
+    Size FileResolution,
+    int FileSizeInBytes,
+    Rating Rating,
+    RatingSafeLevel RatingSafeLevel,
+    IReadOnlyCollection<int> UgoiraFrameDelays,
+    PostIdentity<int>? Parent,
+    IReadOnlyCollection<PostIdentity<int>> ChildrenIds,
+    IReadOnlyCollection<Pool<int>> Pools,
+    IReadOnlyCollection<Tag> Tags,
+    IReadOnlyCollection<Note<int>> Notes) : Post<int>(Id, OriginalUrl, SampleUrl, PreviewUrl, ExistState, PostedAt,
+    UploaderId, Source, FileResolution, FileSizeInBytes, Rating, RatingSafeLevel, UgoiraFrameDelays, Parent,
+    ChildrenIds, Pools, Tags, Notes);
 
 
 public enum ExistState { Exist, MarkDeleted, Deleted }
@@ -69,25 +91,25 @@ public enum Rating { Safe, Questionable, Explicit }
 
 public enum RatingSafeLevel { None, Sensitive, General }
 
-public record Pool(int Id, string Name, int Position);
+public record Pool<TId>(TId Id, string Name, int Position);
 
-public record Note(int Id, string Text, Position Point, Size Size);
+public record Note<TId>(TId Id, string Text, Position Point, Size Size);
 
 public record Tag(string Type, string Name);
 
-public record PostIdentity(int Id, string Md5Hash);
+public record PostIdentity<TId>(TId Id, string Md5Hash);
 
-public record Uploader(int Id, string Name);
+public record Uploader<TId>(TId Id, string Name);
 
 public record struct Position(int Top, int Left);
 
 public record struct Size(int Width, int Height);
 
-public record TagHistoryEntry(
+public record TagHistoryEntry<TId>(
     int HistoryId,
     DateTimeOffset UpdatedAt,
-    int PostId,
-    int? ParentId,
+    TId PostId,
+    string? ParentId,
     bool ParentChanged);
 
-public record NoteHistoryEntry(int HistoryId, int PostId, DateTimeOffset UpdatedAt);
+public record NoteHistoryEntry<TId>(int HistoryId, TId PostId, DateTimeOffset UpdatedAt);

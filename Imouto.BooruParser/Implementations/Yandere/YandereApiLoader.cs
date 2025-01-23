@@ -17,7 +17,7 @@ namespace Imouto.BooruParser.Implementations.Yandere;
 /// tags with type 729673
 /// notes 729673
 /// extensions for tags and notes
-public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
+public class YandereApiLoader : IBooruApiLoader<int>, IBooruApiAccessor<int>
 {
     private static readonly Regex NotePositionRegex = new(
             "width[:\\s]*(?<width>\\d+.{0,1}\\d*)px.*height[:\\s]*(?<height>\\d+.{0,1}\\d*)px.*top[:\\s]*(?<top>\\d+.{0,1}\\d*)px.*left[:\\s]*(?<left>\\d+.{0,1}\\d*)px",
@@ -27,12 +27,12 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
 
     private readonly IFlurlClient _flurlClient;
 
-    public YandereApiLoader(IFlurlClientFactory factory, IOptions<YandereSettings> options)
+    public YandereApiLoader(IFlurlClientCache factory, IOptions<YandereSettings> options)
     {
-        _flurlClient = factory.Get(new Url(BaseUrl)).Configure(x => SetAuthParameters(x, options));
+        _flurlClient = factory.GetOrAdd(new Url(BaseUrl), new Url(BaseUrl)).BeforeCall(x => SetAuthParameters(x, options));
     }
 
-    public async Task<Post> GetPostAsync(int postId)
+    public async Task<Post<int>> GetPostAsync(int postId)
     {
         var posts = await _flurlClient.Request("post", "index.json")
             .SetQueryParam("tags", $"id:{postId}")
@@ -46,7 +46,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
         return await GetPost(postId, post, postHtml);
     }
 
-    public async Task<Post?> GetPostByMd5Async(string md5)
+    public async Task<Post<int>?> GetPostByMd5Async(string md5)
     {
         // https://yande.re/post.json?tags=md5%3Ae6500b62d4003a5f4ba226d3a665c25a
         var posts = await _flurlClient.Request("post.json")
@@ -67,18 +67,18 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
     /// <summary>
     /// Remember to include "holds:all" if you want to see all posts.
     /// </summary>
-    public async Task<SearchResult> SearchAsync(string tags)
+    public async Task<SearchResult<int>> SearchAsync(string tags)
     {
         var posts = await _flurlClient.Request("post.json")
             .SetQueryParam("tags", tags)
             .GetJsonAsync<IReadOnlyCollection<YanderePost>>();
 
-        return new SearchResult(posts
-            .Select(x => new PostPreview(x.Id, x.Md5, x.Tags, false, false))
+        return new SearchResult<int>(posts
+            .Select(x => new PostPreview<int>(x.Id, x.Md5, x.Tags, false, false))
             .ToList());
     }
 
-    public async Task<SearchResult> GetPopularPostsAsync(PopularType type)
+    public async Task<SearchResult<int>> GetPopularPostsAsync(PopularType type)
     {
         var period = type switch
         {
@@ -93,12 +93,12 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             .SetQueryParam("period", period)
             .GetJsonAsync<IReadOnlyCollection<YanderePost>>();
 
-        return new SearchResult(posts
-            .Select(x => new PostPreview(x.Id, x.Md5, x.Tags, false, false))
+        return new SearchResult<int>(posts
+            .Select(x => new PostPreview<int>(x.Id, x.Md5, x.Tags, false, false))
             .ToList());
     }
 
-    public async Task<HistorySearchResult<TagHistoryEntry>> GetTagHistoryPageAsync(
+    public async Task<HistorySearchResult<TagHistoryEntry<int>>> GetTagHistoryPageAsync(
         SearchToken? token,
         int limit = 100,
         CancellationToken ct = default)
@@ -134,13 +134,13 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
                     parentChanged = true;
                 }
 
-                return new TagHistoryEntry(
+                return new TagHistoryEntry<int>(
                     x.id,
                     new DateTimeOffset(date, TimeSpan.Zero),
                     postId,
-                    parentId,
+                    parentId.HasValue ? parentId.ToString() : null,
                     parentChanged);
-            }) ?? Enumerable.Empty<TagHistoryEntry>();
+            }) ?? Enumerable.Empty<TagHistoryEntry<int>>();
 
         var nextPage = token?.Page switch
         {
@@ -148,10 +148,10 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             _ => "2"
         };
 
-        return new HistorySearchResult<TagHistoryEntry>(entries.ToList(), new SearchToken(nextPage));
+        return new HistorySearchResult<TagHistoryEntry<int>>(entries.ToList(), new SearchToken(nextPage));
     }
 
-    public async Task<HistorySearchResult<NoteHistoryEntry>> GetNoteHistoryPageAsync(
+    public async Task<HistorySearchResult<NoteHistoryEntry<int>>> GetNoteHistoryPageAsync(
         SearchToken? token,
         int limit = 100,
         CancellationToken ct = default)
@@ -171,7 +171,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
                 var dateString = x.SelectNodes("td")[5].InnerHtml;
                 var date = DateTime.ParseExact(dateString, "MM/dd/yy", CultureInfo.InvariantCulture);
 
-                return new NoteHistoryEntry(-1, postId, date);
+                return new NoteHistoryEntry<int>(-1, postId, date);
             })
             .ToList();
 
@@ -181,7 +181,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             _ => "2"
         };
 
-        return new HistorySearchResult<NoteHistoryEntry>(entries, new SearchToken(nextPage));
+        return new HistorySearchResult<NoteHistoryEntry<int>>(entries, new SearchToken(nextPage));
     }
 
     public async Task FavoritePostAsync(int postId)
@@ -192,7 +192,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
                 .Add("score", new StringContent("3")));
     }
 
-    private async Task<PostIdentity?> GetPostIdentityAsync(int? postId)
+    private async Task<PostIdentity<int>?> GetPostIdentityAsync(int? postId)
     {
         if (postId == null)
             return null;
@@ -200,7 +200,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
         return await GetPostIdentityAsync(postId.Value);
     }
 
-    private async Task<PostIdentity> GetPostIdentityAsync(int postId)
+    private async Task<PostIdentity<int>> GetPostIdentityAsync(int postId)
     {
         var posts = await _flurlClient.Request("post", "index.json")
             .SetQueryParam("tags", $"id:{postId} holds:all")
@@ -208,10 +208,10 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
 
         var post = posts.First();
 
-        return new PostIdentity(post.Id, post.Md5);
+        return new PostIdentity<int>(post.Id, post.Md5);
     }
 
-    private async Task<IReadOnlyCollection<PostIdentity>> GetChildrenAsync(
+    private async Task<IReadOnlyCollection<PostIdentity<int>>> GetChildrenAsync(
         HtmlDocument postHtml)
     {
         var childrenIds = postHtml.DocumentNode
@@ -222,7 +222,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             .ToArray() ?? Array.Empty<int>();
 
         if (!childrenIds.Any())
-            return Array.Empty<PostIdentity>();
+            return Array.Empty<PostIdentity<int>>();
 
         var childrenTasks = childrenIds.Select(GetPostIdentityAsync).ToList();
 
@@ -240,7 +240,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
         return isDeleted ? ExistState.MarkDeleted : ExistState.Exist;
     }
 
-    private async Task<IReadOnlyCollection<Pool>> GetPoolsAsync(int postId, HtmlDocument postHtml)
+    private async Task<IReadOnlyCollection<Pool<int>>> GetPoolsAsync(int postId, HtmlDocument postHtml)
     {
         var pools = postHtml.DocumentNode
             .SelectNodes(@"//*[@id='post-view']/div[@class='status-notice']")
@@ -262,20 +262,20 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
         return tasks.Select(x => x.Result).ToList();
     }
 
-    private async Task<Pool> GetPoolForPostAsync(int poolId, int postId)
+    private async Task<Pool<int>> GetPoolForPostAsync(int poolId, int postId)
     {
         // https://yande.re/pool/show.json?id={id}
         var pool = await _flurlClient.Request("pool", "show.json")
             .SetQueryParam("id", poolId)
             .GetJsonAsync<YanderePool>();
 
-        return new Pool(pool.Id, pool.Name.Replace('_', ' '), Array.IndexOf(pool.Posts.Select(x => x.Id).ToArray(), postId));
+        return new Pool<int>(pool.Id, pool.Name.Replace('_', ' '), Array.IndexOf(pool.Posts.Select(x => x.Id).ToArray(), postId));
     }
 
-    private static IReadOnlyCollection<Note> GetNotes(YanderePost post, HtmlDocument postHtml)
+    private static IReadOnlyCollection<Note<int>> GetNotes(YanderePost post, HtmlDocument postHtml)
     {
         if (post.LastNotedAt == 0)
-            return Array.Empty<Note>();
+            return Array.Empty<Note<int>>();
 
         var notes = postHtml.DocumentNode
             .SelectSingleNode(@"//*[@id='note-container']")
@@ -296,8 +296,8 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
                 var id = Convert.ToInt32(textNode.Attributes["id"].Value.Split('-').Last());
                 var text = textNode.InnerHtml;
 
-                return new Note(id, text, point, size);
-            }) ?? Enumerable.Empty<Note>();
+                return new Note<int>(id, text, point, size);
+            }) ?? Enumerable.Empty<Note<int>>();
 
         return notes.ToList();
         
@@ -331,31 +331,28 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             .ToList();
     }
 
-    private static void SetAuthParameters(FlurlHttpSettings settings, IOptions<YandereSettings> options)
+    private static async Task SetAuthParameters(FlurlCall call, IOptions<YandereSettings> options)
     {
         var login = options.Value.Login;
         var passwordHash = options.Value.PasswordHash;
         var delay = options.Value.PauseBetweenRequests;
 
-        settings.BeforeCallAsync = async call =>
-        {
-            if (login != null && passwordHash != null)
-                call.Request.SetQueryParam("login", login).SetQueryParam("password_hash", passwordHash);
+        if (login != null && passwordHash != null)
+            call.Request.SetQueryParam("login", login).SetQueryParam("password_hash", passwordHash);
 
-            if (delay > TimeSpan.Zero)
-                await Throttler.Get("Yandere").UseAsync(delay);
-        };
+        if (delay > TimeSpan.Zero)
+            await Throttler.Get("Yandere").UseAsync(delay);
     }
 
-    private async Task<Post> GetPost(int postId, YanderePost post, HtmlDocument postHtml) 
+    private async Task<Post<int>> GetPost(int postId, YanderePost post, HtmlDocument postHtml) 
         => new(
-            new PostIdentity(postId, post.Md5),
+            new PostIdentity<int>(postId, post.Md5),
             post.FileUrl,
             post.SampleUrl ?? post.JpegUrl,
             post.JpegUrl,
             GetExistState(postHtml),
             DateTimeOffset.FromUnixTimeSeconds(post.CreatedAt),
-            new Uploader(post.CreatorId ?? -1, post.Author),
+            new Uploader<int>(post.CreatorId ?? -1, post.Author),
             post.Source,
             new Size(post.Width, post.Height),
             post.FileSize,

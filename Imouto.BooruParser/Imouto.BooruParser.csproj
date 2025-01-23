@@ -21,15 +21,16 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <PackageTags>booru search parser danbooru sankakuchannel yande.re yandere gelbooru imageboard image art animeart anime</PackageTags>
+        <Version>4.0.0-rc1</Version>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Flurl.Http" Version="4.0.0-pre2" />
-        <PackageReference Include="HtmlAgilityPack" Version="1.11.46" />
-        <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="7.0.0" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
-        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.34.0" />
+        <PackageReference Include="Flurl.Http" Version="4.0.2" />
+        <PackageReference Include="HtmlAgilityPack" Version="1.11.72" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.1" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.1" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.1" />
     </ItemGroup>
 
     <ItemGroup>

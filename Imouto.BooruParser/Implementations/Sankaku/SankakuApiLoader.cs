@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace Imouto.BooruParser.Implementations.Sankaku;
 
-public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
+public class SankakuApiLoader : IBooruApiLoader<string>, IBooruApiAccessor<string>
 {
     private const string ApiBaseUrl = "https://capi-v2.sankakucomplex.com/";
     private const string HtmlBaseUrl = "https://chan.sankakucomplex.com/";
@@ -16,12 +16,12 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
     private readonly ISankakuAuthManager _sankakuAuthManager;
 
     public SankakuApiLoader(
-        IFlurlClientFactory factory, 
+        IFlurlClientCache factory,
         IOptions<SankakuSettings> options,
         ISankakuAuthManager sankakuAuthManager)
     {
         _sankakuAuthManager = sankakuAuthManager;
-        _flurlClient = factory.Get(new Url(ApiBaseUrl))
+        _flurlClient = factory.GetOrAdd(new Url(ApiBaseUrl), new Url(ApiBaseUrl))
             .WithHeader("Connection", "keep-alive")
             .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
             .WithHeader("sec-ch-ua-mobile", "?0")
@@ -36,9 +36,9 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             .WithHeader("Sec-Fetch-Dest", "document")
             .WithHeader("Accept-Encoding", "gzip, deflate, br")
             .WithHeader("Accept-Language", "en")
-            .Configure(x => SetAuthParameters(x, options));
+            .BeforeCall(x => SetAuthParameters(x, options))!;
         
-        _htmlFlurlClient = factory.Get(new Url(HtmlBaseUrl))
+        _htmlFlurlClient = factory.GetOrAdd(new Url(HtmlBaseUrl), new Url(HtmlBaseUrl))
             .WithHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
             .WithHeader("Accept-Encoding", "gzip, deflate, br")
             .WithHeader("Accept-Language", "en,en-US;q=0.9")
@@ -56,21 +56,21 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             .WithHeader("Sec-Gpc", "1")
             .WithHeader("Upgrade-Insecure-Requests", "1")
             .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36")
-            .Configure(x => SetHtmlAuthParameters(x, options));
+            .BeforeCall(x => SetHtmlAuthParameters(x, options));
     }
 
-    public async Task<Post> GetPostAsync(int postId)
+    public async Task<Post<string>> GetPostAsync(string postId)
     {
         var post = await _flurlClient.Request("posts", postId).GetJsonAsync<SankakuPost>();
         
-        return new Post(
-            new PostIdentity(postId, post.Md5),
+        return new Post<string>(
+            new PostIdentity<string>(postId, post.Md5),
             post.FileUrl,
             post.SampleUrl ?? post.FileUrl,
             post.PreviewUrl,
             ExistState.Exist,
             DateTimeOffset.FromUnixTimeSeconds(post.CreatedAt.S),
-            new Uploader(post.Author.Id, post.Author.Name),
+            new Uploader<string>(post.Author.Id, post.Author.Name),
             null, // sankaku deprecated source field 
             new Size(post.Width, post.Height),
             post.FileSize,
@@ -84,7 +84,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             await GetNotesAsync(post));
     }
 
-    public async Task<Post?> GetPostByMd5Async(string md5)
+    public async Task<Post<string>?> GetPostByMd5Async(string md5)
     {
         // https://capi-v2.sankakucomplex.com/posts?tags=md5:123e273a06a85f7a897ec1561b26911a
         var posts = await _flurlClient.Request("posts")
@@ -96,14 +96,14 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
 
         var post = posts.First();
 
-        return new Post(
-            new PostIdentity(post.Id, post.Md5),
+        return new Post<string>(
+            new PostIdentity<string>(post.Id, post.Md5),
             post.FileUrl,
             post.SampleUrl ?? post.FileUrl,
             post.PreviewUrl,
             ExistState.Exist,
             DateTimeOffset.FromUnixTimeSeconds(post.CreatedAt.S),
-            new Uploader(post.Author.Id, post.Author.Name),
+            new Uploader<string>(post.Author.Id, post.Author.Name),
             null, // sankaku deprecated source field 
             new Size(post.Width, post.Height),
             post.FileSize,
@@ -117,14 +117,14 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             await GetNotesAsync(post));
     }
 
-    public async Task<SearchResult> SearchAsync(string tags)
+    public async Task<SearchResult<string>> SearchAsync(string tags)
     {
         var posts = await _flurlClient.Request("posts")
             .SetQueryParam("tags", tags)
             .GetJsonAsync<IReadOnlyCollection<SankakuPost>>();
 
-        return new SearchResult(posts
-            .Select(x => new PostPreview(
+        return new SearchResult<string>(posts
+            .Select(x => new PostPreview<string>(
                 x.Id, 
                 x.Md5, 
                 string.Join(" ", x.Tags.Select(y => y.TagName)), 
@@ -133,7 +133,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             .ToList());
     }
 
-    public Task<SearchResult> GetPopularPostsAsync(PopularType type)
+    public Task<SearchResult<string>> GetPopularPostsAsync(PopularType type)
     {
         var end = DateTime.Now.Date;
         var start = type switch
@@ -150,7 +150,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
         return SearchAsync(search);
     }
 
-    public async Task<HistorySearchResult<TagHistoryEntry>> GetTagHistoryPageAsync(
+    public async Task<HistorySearchResult<TagHistoryEntry<string>>> GetTagHistoryPageAsync(
         SearchToken? token,
         int limit = 100,
         CancellationToken ct = default)
@@ -166,12 +166,12 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             .ReceiveJson<SankakuTagHistoryDocument>();
 
         var entries = response.Data.PostTagHistoryConnection?.Edges.Select(x => x.Node)
-            .Select(x => new TagHistoryEntry(
+            .Select(x => new TagHistoryEntry<string>(
                 x.Id, 
                 DateTimeOffset.FromUnixTimeSeconds(long.Parse(x.CreatedAt)), 
                 x.Post.Id, 
-                x.Parent != null ? int.Parse(x.Parent) : null, 
-                true)) ?? Enumerable.Empty<TagHistoryEntry>();
+                x.Parent,
+                true)) ?? Enumerable.Empty<TagHistoryEntry<string>>();
 
         var nextPage = response.Data.PostTagHistoryConnection?.PageInfo.HasNextPage == true
             ? new SearchToken(response.Data.PostTagHistoryConnection.PageInfo.EndCursor)
@@ -180,7 +180,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
         return new(entries.ToList(), nextPage);
     }
 
-    public async Task<HistorySearchResult<NoteHistoryEntry>> GetNoteHistoryPageAsync(
+    public async Task<HistorySearchResult<NoteHistoryEntry<string>>> GetNoteHistoryPageAsync(
         SearchToken? token,
         int limit = 100,
         CancellationToken ct = default)
@@ -195,11 +195,11 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
         var entries = document.DocumentNode.SelectNodes("//*[@id='content']/table/tbody/tr")
             .Select(x =>
             {
-                var postId = int.Parse(x.SelectNodes("td")[1].SelectSingleNode("a").InnerHtml);
+                var postId = x.SelectNodes("td")[1].SelectSingleNode("a").InnerHtml;
                 var dateString = x.SelectNodes("td")[5].Attributes["time_value"].Value;
                 var date = DateTime.Parse(dateString);
 
-                return new NoteHistoryEntry(-1, postId, new DateTimeOffset(date, TimeSpan.FromHours(-4)));
+                return new NoteHistoryEntry<string>(-1, postId, new DateTimeOffset(date, TimeSpan.FromHours(-4)));
             })
             .ToList();
 
@@ -213,44 +213,39 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
         return new(entries, new SearchToken(nextPage));
     }
 
-    public async Task FavoritePostAsync(int postId)
+    public async Task FavoritePostAsync(string postId)
     {
         // https://capi-v2.sankakucomplex.com/posts/30879033/favorite?lang=en
         await _flurlClient.Request("posts", postId, "favorite")
             .SetQueryParam("lang", "en")
             .PostAsync();
     }
-
-    private async Task<PostIdentity?> GetPostIdentityAsync(int? postId)
+    
+    private async Task<PostIdentity<string>?> GetPostIdentityAsync(string? postId)
     {
         if (postId == null)
             return null;
 
-        return await GetPostIdentityAsync(postId.Value);
-    }
-    
-    private async Task<PostIdentity> GetPostIdentityAsync(int postId)
-    {
         var post = await _flurlClient.Request("posts", postId)
             .GetJsonAsync<SankakuPost>();
 
-        return new PostIdentity(post.Id, post.Md5);
+        return new PostIdentity<string>(post.Id, post.Md5);
     }
 
-    private async Task<IReadOnlyCollection<PostIdentity>> GetChildrenAsync(SankakuPost post)
+    private async Task<IReadOnlyCollection<PostIdentity<string>>> GetChildrenAsync(SankakuPost post)
     {
         if (!post.HasChildren)
-            return Array.Empty<PostIdentity>();
+            return Array.Empty<PostIdentity<string>>();
         
         // https://capi-v2.sankakucomplex.com/posts?tags=parent:31729492
         var posts = await _flurlClient.Request("posts")
             .SetQueryParam("tags", $"parent:{post.Id}")
             .GetJsonAsync<SankakuPost[]>();
         
-        return posts.Select(x => new PostIdentity(x.Id, x.Md5)).ToList();
+        return posts.Select(x => new PostIdentity<string>(x.Id, x.Md5)).ToList();
     }
 
-    private async IAsyncEnumerable<Pool> GetPoolsAsync(int postId)
+    private async IAsyncEnumerable<Pool<string>> GetPoolsAsync(string postId)
     {
         // https://capi-v2.sankakucomplex.com/post/31236940/pools
         var pools = await _flurlClient.Request("post", postId, "pools")
@@ -264,21 +259,21 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
 
             var poolPosts = pool.Posts.Select(x => x.Id).ToArray();
 
-            yield return new Pool(poolInfo.Id, poolInfo.Name, Array.IndexOf(poolPosts, postId));
+            yield return new Pool<string>(poolInfo.Id, poolInfo.Name, Array.IndexOf(poolPosts, postId));
         }
     }
 
-    private async Task<IReadOnlyCollection<Note>> GetNotesAsync(SankakuPost post)
+    private async Task<IReadOnlyCollection<Note<string>>> GetNotesAsync(SankakuPost post)
     {
         if (!post.HasNotes)
-            return Array.Empty<Note>();
+            return Array.Empty<Note<string>>();
 
         //https://capi-v2.sankakucomplex.com/posts/31930965/notes
         var notes = await _flurlClient.Request("posts", post.Id, "notes")
             .GetJsonAsync<IReadOnlyCollection<SankakuNote>>();
         
         return notes
-            .Select(x => new Note(x.Id, x.Body, new Position(x.Y, x.X), new Size(x.Width, x.Height)))
+            .Select(x => new Note<string>(x.Id, x.Body, new Position(x.Y, x.X), new Size(x.Width, x.Height)))
             .ToList();
     }
 
@@ -331,34 +326,28 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             _ => throw new ArgumentOutOfRangeException(nameof(type))
         };
 
-    private void SetAuthParameters(FlurlHttpSettings settings, IOptions<SankakuSettings> options)
+    private async Task SetAuthParameters(FlurlCall call, IOptions<SankakuSettings> options)
     {
-        settings.BeforeCallAsync = async call =>
-        {
-            var accessToken = await _sankakuAuthManager.GetTokenAsync();
-            var delay = options.Value.PauseBetweenRequests;
-            
-            if (accessToken != null)
-                call.Request.WithHeader("Authorization", $"Bearer {accessToken}");
+        var accessToken = await _sankakuAuthManager.GetTokenAsync();
+        var delay = options.Value.PauseBetweenRequests;
 
-            if (delay > TimeSpan.Zero)
-                await Throttler.Get("Sankaku").UseAsync(delay);
-        };
+        if (accessToken != null)
+            call.Request.WithHeader("Authorization", $"Bearer {accessToken}");
+
+        if (delay > TimeSpan.Zero)
+            await Throttler.Get("Sankaku").UseAsync(delay);
     }
 
-    private void SetHtmlAuthParameters(FlurlHttpSettings settings, IOptions<SankakuSettings> options)
+    private async Task SetHtmlAuthParameters(FlurlCall call, IOptions<SankakuSettings> options)
     {
-        settings.BeforeCallAsync = async call =>
-        {
-            var sessionCookies = await _sankakuAuthManager.GetSankakuChannelSessionAsync();
+        var sessionCookies = await _sankakuAuthManager.GetSankakuChannelSessionAsync();
 
-            if (sessionCookies.Any())
-                call.Request.WithCookies(sessionCookies);
+        if (sessionCookies.Any())
+            call.Request.WithCookies(sessionCookies);
 
-            var delay = options.Value.PauseBetweenRequests;
-            if (delay > TimeSpan.Zero)
-                await Throttler.Get("Sankaku").UseAsync(delay);
-        };
+        var delay = options.Value.PauseBetweenRequests;
+        if (delay > TimeSpan.Zero)
+            await Throttler.Get("Sankaku").UseAsync(delay);
     }
 }
 

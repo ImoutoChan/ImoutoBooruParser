@@ -16,18 +16,18 @@ public class SankakuAuthManager : ISankakuAuthManager
 
     private readonly IMemoryCache _memoryCache;
     private readonly IOptions<SankakuSettings> _options;
-    private readonly IFlurlClientFactory _factory;
+    private readonly IFlurlClientCache _factory;
     private readonly IFlurlClient _flurlClient;
 
     public SankakuAuthManager(
         IMemoryCache memoryCache,
         IOptions<SankakuSettings> options,
-        IFlurlClientFactory factory)
+        IFlurlClientCache factory)
     {
         _memoryCache = memoryCache;
         _options = options;
         _factory = factory;
-        _flurlClient = factory.Get(new Url(BaseUrl));
+        _flurlClient = factory.GetOrAdd(new Url(BaseUrl), new Url(BaseUrl));
     }
 
     public async ValueTask<string?> GetTokenAsync()
@@ -64,7 +64,7 @@ public class SankakuAuthManager : ISankakuAuthManager
         
         var cookieJar = new CookieJar();
         
-        var loginClient = factory.Get("https://login.sankakucomplex.com")
+        var loginClient = factory.GetOrAdd("https://login.sankakucomplex.com", "https://login.sankakucomplex.com")
             .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
             .WithHeader("sec-ch-ua-mobile", "?0")
             .WithHeader("sec-ch-ua-platform", "\"Windows\"")
@@ -182,7 +182,7 @@ public class SankakuAuthManager : ISankakuAuthManager
         
         var cookieJar = new CookieJar();
         
-        var loginClient = factory.Get("https://login.sankakucomplex.com")
+        var loginClient = factory.GetOrAdd("https://login.sankakucomplex.com", "https://login.sankakucomplex.com")
             .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
             .WithHeader("sec-ch-ua-mobile", "?0")
             .WithHeader("sec-ch-ua-platform", "\"Windows\"")
@@ -196,7 +196,7 @@ public class SankakuAuthManager : ISankakuAuthManager
             .WithHeader("Sec-Fetch-Dest", "document")
             .WithHeader("Accept-Language", "en");
         
-        var capiClient = factory.Get("https://capi-v2.sankakucomplex.com")
+        var capiClient = factory.GetOrAdd("https://capi-v2.sankakucomplex.com", "https://capi-v2.sankakucomplex.com")
             .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
             .WithHeader("sec-ch-ua-mobile", "?0")
             .WithHeader("sec-ch-ua-platform", "\"Windows\"")

@@ -7,8 +7,8 @@ namespace Imouto.BooruParser.Implementations;
 
 public static class BooruApiLoaderTagHistoryExtensions
 {
-    public static async Task<IReadOnlyCollection<TagHistoryEntry>> GetTagHistoryFirstPageAsync(
-        this IBooruApiLoader loader,
+    public static async Task<IReadOnlyCollection<TagHistoryEntry<TId>>> GetTagHistoryFirstPageAsync<TId>(
+        this IBooruApiLoader<TId> loader,
         int limit = 100,
         CancellationToken ct = default)
     {
@@ -16,8 +16,8 @@ public static class BooruApiLoaderTagHistoryExtensions
         return page.Results;
     }
 
-    public static async IAsyncEnumerable<TagHistoryEntry> GetTagHistoryFromIdToPresentAsync(
-        this IBooruApiLoader loader, 
+    public static async IAsyncEnumerable<TagHistoryEntry<TId>> GetTagHistoryFromIdToPresentAsync<TId>(
+        this IBooruApiLoader<TId> loader,
         int afterHistoryId,
         int limit = 100,
         [EnumeratorCancellation] CancellationToken ct = default)
@@ -44,7 +44,7 @@ public static class BooruApiLoaderTagHistoryExtensions
             var predictedPage = (currentId - afterHistoryId) / 20 + 2;
             
             // validation
-            HistorySearchResult<TagHistoryEntry> page;
+            HistorySearchResult<TagHistoryEntry<TId>> page;
             var tries = 10;
             do
             {
@@ -70,7 +70,7 @@ public static class BooruApiLoaderTagHistoryExtensions
         else if (loader is SankakuApiLoader)
         {
             
-            HistorySearchResult<TagHistoryEntry> page;
+            HistorySearchResult<TagHistoryEntry<TId>> page;
             var cont = false;
             SearchToken? searchToken = null;
             do
@@ -86,14 +86,14 @@ public static class BooruApiLoaderTagHistoryExtensions
         }
     }
 
-    public static async IAsyncEnumerable<TagHistoryEntry> GetTagHistoryToDateTimeAsync(
-        this IBooruApiLoader loader, 
+    public static async IAsyncEnumerable<TagHistoryEntry<TId>> GetTagHistoryToDateTimeAsync<TId>(
+        this IBooruApiLoader<TId> loader,
         DateTimeOffset upToDateTime,
         int limit = 100,
         [EnumeratorCancellation] CancellationToken ct = default)
     {
         SearchToken? searchToken = null;
-        HistorySearchResult<TagHistoryEntry> page;
+        HistorySearchResult<TagHistoryEntry<TId>> page;
         do
         {
             page = await loader.GetTagHistoryPageAsync(searchToken, limit, ct);

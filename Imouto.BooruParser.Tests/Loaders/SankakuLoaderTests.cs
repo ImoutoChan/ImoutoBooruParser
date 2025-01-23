@@ -30,7 +30,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         {
             var loader = _loaderFixture.GetLoaderWithoutAuth();
 
-            var post = await loader.GetPostAsync(5735331);
+            var post = await loader.GetPostAsync("jXajkOWmor2");
 
             post.Should().NotBe(null);
             post.OriginalUrl.Should().NotBeNullOrWhiteSpace();
@@ -41,26 +41,26 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         {
             var loader = _loaderFixture.GetLoaderWithAuth();
 
-            var post = await loader.GetPostAsync(6541010);
+            var post = await loader.GetPostAsync("YoMBDZgQJrO");
 
             post.Should().NotBeNull();
             post.OriginalUrl.Should().StartWith("https://v.sankakucomplex.com/data/de/aa/deaac52a6b001b6953db90a09f7629f7.jpg");
-            post.Id.Id.Should().Be(6541010);
+            post.Id.Id.Should().Be("YoMBDZgQJrO");
             post.Id.Md5Hash.Should().Be("deaac52a6b001b6953db90a09f7629f7");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(121);
+            post.Tags.Should().HaveCount(122);
 
             foreach (var postTag in post.Tags)
             {
                 postTag.Name.Should().NotBeNullOrWhiteSpace();
                 postTag.Type.Should().NotBeNullOrWhiteSpace();
-                postTag.Type.Should().BeOneOf(new[] { "meta", "general", "copyright", "character", "circle", "artist", "medium", "genre" });
+                postTag.Type.Should().BeOneOf(SankakuTagTypes());
             }
             
             post.Parent.Should().NotBeNull();
-            post.Parent!.Id.Should().Be(6541009);
+            post.Parent!.Id.Should().Be("PVaD8oPQ7ab");
             post.Parent!.Md5Hash.Should().Be("8f37e824ec321d96f0e149d77ee5d21d");
-            post.Pools.Should().HaveCount(4);
+            post.Pools.Should().HaveCount(2);
             post.Rating.Should().Be(Rating.Explicit);
             post.RatingSafeLevel.Should().Be(RatingSafeLevel.None);
             post.Source.Should().Be(null);
@@ -69,8 +69,8 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.FileResolution.Width.Should().Be(756);
             post.FileResolution.Height.Should().Be(1052);
             post.PostedAt.Should().Be(new DateTimeOffset(2017, 12, 18, 21, 22, 21, 0, TimeSpan.Zero));
-            post.SampleUrl.Should().StartWith("https://v.sankakucomplex.com/data/sample/de/aa/sample-deaac52a6b001b6953db90a09f7629f7.jpg");
-            post.UploaderId.Id.Should().Be(231462);
+            post.SampleUrl.Should().StartWith("https://v.sankakucomplex.com/data/de/aa/deaac52a6b001b6953db90a09f7629f7.jpg");
+            post.UploaderId.Id.Should().Be("8yrx2mEgME6");
             post.UploaderId.Name.Should().Be("Domestikun");
             post.FileSizeInBytes.Should().Be(617163);
             post.UgoiraFrameDelays.Should().BeEmpty();
@@ -85,22 +85,22 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
 
             post.Should().NotBeNull();
             post!.OriginalUrl.Should().StartWith("https://v.sankakucomplex.com/data/de/aa/deaac52a6b001b6953db90a09f7629f7.jpg");
-            post.Id.Id.Should().Be(6541010);
+            post.Id.Id.Should().Be("YoMBDZgQJrO");
             post.Id.Md5Hash.Should().Be("deaac52a6b001b6953db90a09f7629f7");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(121);
+            post.Tags.Should().HaveCount(122);
 
             foreach (var postTag in post.Tags)
             {
                 postTag.Name.Should().NotBeNullOrWhiteSpace();
                 postTag.Type.Should().NotBeNullOrWhiteSpace();
-                postTag.Type.Should().BeOneOf(new[] { "meta", "general", "copyright", "character", "circle", "artist", "medium", "genre" });
+                postTag.Type.Should().BeOneOf(SankakuTagTypes());
             }
             
             post.Parent.Should().NotBeNull();
-            post.Parent!.Id.Should().Be(6541009);
+            post.Parent!.Id.Should().Be("PVaD8oPQ7ab");
             post.Parent!.Md5Hash.Should().Be("8f37e824ec321d96f0e149d77ee5d21d");
-            post.Pools.Should().HaveCount(4);
+            post.Pools.Should().HaveCount(2);
             post.Rating.Should().Be(Rating.Explicit);
             post.RatingSafeLevel.Should().Be(RatingSafeLevel.None);
             post.Source.Should().Be(null);
@@ -108,8 +108,8 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.ExistState.Should().Be(ExistState.Exist);
             post.FileResolution.Should().Be(new Size(756, 1052));
             post.PostedAt.Should().Be(new DateTimeOffset(2017, 12, 18, 21, 22, 21, 0, TimeSpan.Zero));
-            post.SampleUrl.Should().StartWith("https://v.sankakucomplex.com/data/sample/de/aa/sample-deaac52a6b001b6953db90a09f7629f7.jpg");
-            post.UploaderId.Id.Should().Be(231462);
+            post.SampleUrl.Should().StartWith("https://v.sankakucomplex.com/data/de/aa/deaac52a6b001b6953db90a09f7629f7.jpg");
+            post.UploaderId.Id.Should().Be("8yrx2mEgME6");
             post.UploaderId.Name.Should().Be("Domestikun");
             post.FileSizeInBytes.Should().Be(617163);
             post.UgoiraFrameDelays.Should().BeEmpty();
@@ -124,16 +124,16 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
 
             post.Should().NotBeNull();
             post!.OriginalUrl.Should().StartWith("https://v.sankakucomplex.com/data/dc/9d/dc9da74597ecd47b2848fb4d68fce77a.mp4");
-            post.Id.Id.Should().Be(34486935);
+            post.Id.Id.Should().Be("P7RLK8e90r6");
             post.Id.Md5Hash.Should().Be("dc9da74597ecd47b2848fb4d68fce77a");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(99);
+            post.Tags.Should().HaveCount(100);
 
             foreach (var postTag in post.Tags)
             {
                 postTag.Name.Should().NotBeNullOrWhiteSpace();
                 postTag.Type.Should().NotBeNullOrWhiteSpace();
-                postTag.Type.Should().BeOneOf(new[] { "meta", "general", "copyright", "character", "circle", "artist", "medium", "genre" });
+                postTag.Type.Should().BeOneOf(SankakuTagTypes());
             }
             
             post.Parent.Should().BeNull();
@@ -146,7 +146,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.FileResolution.Should().Be(new Size(1644, 1862));
             post.PostedAt.Should().Be(new DateTimeOffset(2023, 09, 29, 5, 54, 09, 0, TimeSpan.Zero));
             post.SampleUrl.Should().StartWith("https://v.sankakucomplex.com/data/dc/9d/dc9da74597ecd47b2848fb4d68fce77a.mp4");
-            post.UploaderId.Id.Should().Be(568254);
+            post.UploaderId.Id.Should().Be("YoMB0X4BrOv");
             post.UploaderId.Name.Should().Be("Just_some_guy");
             post.FileSizeInBytes.Should().Be(22152413);
             post.UgoiraFrameDelays.Should().BeEmpty();
@@ -160,14 +160,14 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             var post = await loader.GetPostByMd5Async("d62ed6aebd2b75aa9661795b54a957d7");
 
             post.Should().NotBeNull();
-            post!.Tags.Should().HaveCount(63);
+            post!.Tags.Should().HaveCount(64);
         }
 
         [Fact]
         public async Task ShouldContainLinkWithoutAmp()
         {
             var loader = _loaderFixture.GetLoaderWithoutAuth();
-            var post = await loader.GetPostAsync(5735331);
+            var post = await loader.GetPostAsync("qEMAek6EWMJ");
 
             post.OriginalUrl.Should().NotContain("&amp;");
         }
@@ -190,7 +190,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             result.Results.Should().HaveCountGreaterThan(1);
         }
 
-        [Fact]
+        [Fact(Skip = "Clown Sankaku only allow now 1 tag for free accounts")]
         public async Task ShouldFindWithMultipleTags()
         {
             var loader = _loaderFixture.GetLoaderWithoutAuth();
@@ -305,7 +305,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
                 .ToListAsync();
 
             tagsHistory.Should().NotBeEmpty();
-            tagsHistory.Count.Should().BeGreaterOrEqualTo(firstTagHistoryPage.Count + 100);
+            tagsHistory.Count.Should().BeGreaterThanOrEqualTo(firstTagHistoryPage.Count + 100);
             tagsHistory.Select(x => x.PostId).Should().Contain(firstTagHistoryPage.Select(x => x.PostId));
         }
     }
@@ -360,11 +360,11 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         {
             var loader = _loaderFixture.GetLoaderWithAuth();
 
-            var post = await loader.GetPostAsync(31143268);
+            var post = await loader.GetPostAsync("8JaGzJm6oML");
 
             post.Tags.Count.Should().BeGreaterThan(30);
             post.ChildrenIds.Count.Should().NotBe(0);
-            post.Parent!.Id.Should().BeGreaterThan(1);
+            post.Parent!.Id.Should().NotBeEmpty();
         }
 
         [Fact]
@@ -372,15 +372,15 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         {
             var loader = _loaderFixture.GetLoaderWithoutAuth();
 
-            var post = await loader.GetPostAsync(31729492);
+            var post = await loader.GetPostAsync("1QaEoeZobR9");
 
-            post.ChildrenIds.Should().HaveCount(10);
+            post.ChildrenIds.Should().HaveCount(11);
             post.ChildrenIds.Distinct().Should().HaveCount(post.ChildrenIds.Count);
-            post.ChildrenIds.First().Should().Be(new PostIdentity(32945185, "47e36f120f7ed20e2aaaba900310bb5b"));
+            post.ChildrenIds.First().Should().Be(new PostIdentity<string>("G8r63AvjYRq", "0f91fb08969e93042106a9f5ed233c3b"));
 
             foreach (var postChildrenId in post.ChildrenIds)
             {
-                postChildrenId.Id.Should().BeGreaterThan(1);
+                postChildrenId.Id.Should().NotBeEmpty();
                 postChildrenId.Md5Hash.Should().HaveLength(32);
             }
         }
@@ -404,26 +404,26 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         {
             var loader = _loaderFixture.GetLoaderWithoutAuth();
 
-            var post = await loader.GetPostAsync(30879033);
+            var post = await loader.GetPostAsync("6ea46lYb5R3");
 
             post.Notes.Count.Should().Be(4);
             
-            post.Notes.ElementAt(0).Id.Should().Be(1838620);
+            post.Notes.ElementAt(0).Id.Should().Be("9krZZB36rg8");
             post.Notes.ElementAt(0).Text.Should().Be("Wishes to be a slave");
             post.Notes.ElementAt(0).Size.Should().Be(new Size(620, 280));
             post.Notes.ElementAt(0).Point.Should().Be(new Position(646, 92));
             
-            post.Notes.ElementAt(1).Id.Should().Be(1838619);
+            post.Notes.ElementAt(1).Id.Should().Be("b8aJE5AlM2L");
             post.Notes.ElementAt(1).Text.Should().Be("H cup\nHuge breasts <3");
             post.Notes.ElementAt(1).Size.Should().Be(new Size(574, 434));
             post.Notes.ElementAt(1).Point.Should().Be(new Position(475, 2229));
             
-            post.Notes.ElementAt(2).Id.Should().Be(1838618);
+            post.Notes.ElementAt(2).Id.Should().Be("8yrxeXqvRE6");
             post.Notes.ElementAt(2).Text.Should().Be("Slutty voice <3");
             post.Notes.ElementAt(2).Size.Should().Be(new Size(550, 224));
             post.Notes.ElementAt(2).Point.Should().Be(new Position(84, 2171));
             
-            post.Notes.ElementAt(3).Id.Should().Be(1838617);
+            post.Notes.ElementAt(3).Id.Should().Be("6Qa8bwAjR9A");
             post.Notes.ElementAt(3).Text.Should().Be("Vulgar\nOrgasm face <3");
             post.Notes.ElementAt(3).Size.Should().Be(new Size(563, 311));
             post.Notes.ElementAt(3).Point.Should().Be(new Position(60, 118));
@@ -434,10 +434,14 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         {
             var loader = _loaderFixture.GetLoaderWithoutAuth();
 
-            var post = await loader.GetPostAsync(17649920);
+            var post = await loader.GetPostAsync("qXMOAG3y2rl");
 
             post.Should().NotBeNull();
-            post.SampleUrl.Should().Contain("sample");
+
+            // no longer true, sankaku just returns the usual url here
+            // post.SampleUrl.Should().Contain("sample");
+
+            post.PreviewUrl.Should().Contain("preview");
         }
     }
     
@@ -452,7 +456,15 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         public async Task ShouldFavoritePost()
         {
             var api = _loaderFixture.GetAccessorWithAuth();
-            await api.FavoritePostAsync(30879033);
+            await api.FavoritePostAsync("YoMBDZgQJrO");
         }
+    }
+
+    private static string[] SankakuTagTypes()
+    {
+        return new [] {"meta", "general", "copyright", "character", "circle", "artist", "medium", "genre",
+
+            // new
+            "activity", "anatomy", "fashion", "pose", "role", "object", "substance", "setting", "automatic" };
     }
 }

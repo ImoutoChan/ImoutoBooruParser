@@ -23,7 +23,7 @@ public record PageInfo(
 );
 
 public record SankakuTagHistoryDocumentPost(
-    [property: JsonPropertyName("id")] int Id
+    [property: JsonPropertyName("id")] string Id
 );
 
 public record PostTagHistoryConnection(

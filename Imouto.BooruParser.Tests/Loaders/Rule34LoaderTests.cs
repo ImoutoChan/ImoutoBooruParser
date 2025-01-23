@@ -26,7 +26,7 @@ public class Rule34LoaderTests : IClassFixture<Rule34ApiLoaderFixture>
             post.Id.Id.Should().Be(8548333);
             post.Id.Md5Hash.Should().Be("42936037bc650b4d38bc9f6df355b0f1");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(111);
+            post.Tags.Should().HaveCount(110);
 
             foreach (var postTag in post.Tags)
             {
@@ -43,7 +43,7 @@ public class Rule34LoaderTests : IClassFixture<Rule34ApiLoaderFixture>
             post.ChildrenIds.Should().BeEmpty();
             post.ExistState.Should().Be(ExistState.Exist);
             post.FileResolution.Should().Be(new Size(1920, 1440));
-            post.PostedAt.Should().Be(new DateTimeOffset(2024, 1, 10, 15, 04, 41, TimeSpan.Zero));
+            post.PostedAt.Should().Be(new DateTimeOffset(2025, 1, 4, 15, 32, 54, TimeSpan.Zero));
             post.SampleUrl.Should().Be("https://api-cdn.rule34.xxx/images/7492/42936037bc650b4d38bc9f6df355b0f1.jpg");
             post.UploaderId.Name.Should().Be("nebushad");
             
@@ -65,7 +65,7 @@ public class Rule34LoaderTests : IClassFixture<Rule34ApiLoaderFixture>
             post.Id.Id.Should().Be(8548333);
             post.Id.Md5Hash.Should().Be("42936037bc650b4d38bc9f6df355b0f1");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(111);
+            post.Tags.Should().HaveCount(110);
 
             foreach (var postTag in post.Tags)
             {
@@ -82,7 +82,7 @@ public class Rule34LoaderTests : IClassFixture<Rule34ApiLoaderFixture>
             post.ChildrenIds.Should().BeEmpty();
             post.ExistState.Should().Be(ExistState.Exist);
             post.FileResolution.Should().Be(new Size(1920, 1440));
-            post.PostedAt.Should().Be(new DateTimeOffset(2024, 1, 10, 15, 04, 41, TimeSpan.Zero));
+            post.PostedAt.Should().Be(new DateTimeOffset(2025, 1, 4, 15, 32, 54, TimeSpan.Zero));
             post.SampleUrl.Should().Be("https://api-cdn.rule34.xxx/images/7492/42936037bc650b4d38bc9f6df355b0f1.jpg");
             post.UploaderId.Name.Should().Be("nebushad");
             

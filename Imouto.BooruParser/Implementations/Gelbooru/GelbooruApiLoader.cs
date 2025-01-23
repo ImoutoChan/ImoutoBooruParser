@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 
 namespace Imouto.BooruParser.Implementations.Gelbooru;
 
-public class GelbooruApiLoader : IBooruApiLoader
+public class GelbooruApiLoader : IBooruApiLoader<int>
 {
     private static readonly Regex DateTimeRegex = new(
         ".*(?<month>\\w{3}).*(?<date>\\d{2}).*(?<hours>\\d{2})\\:(?<minutes>\\d{2})\\:(?<seconds>\\d{2}).*(?<tzhours>[+\\-]\\d{2})(?<tzminutes>\\d{2}).*(?<year>\\d{4})", RegexOptions.Compiled);
@@ -17,10 +17,12 @@ public class GelbooruApiLoader : IBooruApiLoader
     private const string BaseUrl = "https://gelbooru.com/";
     private readonly IFlurlClient _flurlClient;
 
-    public GelbooruApiLoader(IFlurlClientFactory factory, IOptions<GelbooruSettings> options) 
-        => _flurlClient = factory.Get(new Url(BaseUrl)).Configure(x => SetAuthParameters(x, options));
+    public GelbooruApiLoader(IFlurlClientCache factory, IOptions<GelbooruSettings> options)
+        => _flurlClient = factory
+            .GetOrAdd(new Url(BaseUrl), new Url(BaseUrl))
+            .BeforeCall(_ => DelayWithThrottler(options));
 
-    public async Task<Post> GetPostAsync(int postId)
+    public async Task<Post<int>> GetPostAsync(int postId)
     {
         // https://gelbooru.com/index.php?page=post&s=view&id=
         var postHtml = await _flurlClient.Request("index.php")
@@ -47,7 +49,7 @@ public class GelbooruApiLoader : IBooruApiLoader
             : CreatePost(postHtml)!;
     }
 
-    public async Task<Post?> GetPostByMd5Async(string md5)
+    public async Task<Post<int>?> GetPostByMd5Async(string md5)
     {
         // https://gelbooru.com/index.php?page=post&s=list&md5=
         var postHtml = await _flurlClient.Request("index.php")
@@ -75,7 +77,7 @@ public class GelbooruApiLoader : IBooruApiLoader
             : CreatePost(postHtml);
     }
 
-    public async Task<SearchResult> SearchAsync(string tags)
+    public async Task<SearchResult<int>> SearchAsync(string tags)
     {
         // https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=20&tags=1girl
         var postJson = await _flurlClient.Request("index.php")
@@ -85,21 +87,21 @@ public class GelbooruApiLoader : IBooruApiLoader
             })
             .GetJsonAsync<GelbooruPostPage>();
 
-        return new SearchResult(postJson.Posts?
-            .Select(x => new PostPreview(x.Id, x.Md5, x.Tags, false, false))
-            .ToArray() ?? Array.Empty<PostPreview>());
+        return new SearchResult<int>(postJson.Posts?
+            .Select(x => new PostPreview<int>(x.Id, x.Md5, x.Tags, false, false))
+            .ToArray() ?? Array.Empty<PostPreview<int>>());
     }
 
-    public Task<SearchResult> GetPopularPostsAsync(PopularType type)
+    public Task<SearchResult<int>> GetPopularPostsAsync(PopularType type)
         => throw new NotSupportedException("Gelbooru does not support popularity charts");
 
-    public Task<HistorySearchResult<TagHistoryEntry>> GetTagHistoryPageAsync(
+    public Task<HistorySearchResult<TagHistoryEntry<int>>> GetTagHistoryPageAsync(
         SearchToken? token,
         int limit = 100,
         CancellationToken ct = default)
         => throw new NotSupportedException("Gelbooru does not support history");
 
-    public Task<HistorySearchResult<NoteHistoryEntry>> GetNoteHistoryPageAsync(
+    public Task<HistorySearchResult<NoteHistoryEntry<int>>> GetNoteHistoryPageAsync(
         SearchToken? token,
         int limit = 100,
         CancellationToken ct = default)
@@ -108,18 +110,18 @@ public class GelbooruApiLoader : IBooruApiLoader
     /// <remarks>
     /// Parent is always 0.
     /// </remarks>
-    private static PostIdentity? GetParent(GelbooruPost post)
-        => post.ParentId != 0 ? new PostIdentity(post.ParentId, string.Empty) : null;
+    private static PostIdentity<int>? GetParent(GelbooruPost post)
+        => post.ParentId != 0 ? new PostIdentity<int>(post.ParentId, string.Empty) : null;
 
     /// <remarks>
     /// Haven't found any post with them
     /// </remarks>
-    private static IReadOnlyCollection<PostIdentity> GetChildren() => Array.Empty<PostIdentity>();
+    private static IReadOnlyCollection<PostIdentity<int>> GetChildren() => Array.Empty<PostIdentity<int>>();
 
-    private static IReadOnlyCollection<Note> GetNotes(GelbooruPost? post, HtmlDocument postHtml)
+    private static IReadOnlyCollection<Note<int>> GetNotes(GelbooruPost? post, HtmlDocument postHtml)
     {
         if (post?.HasNotes == "false")
-            return Array.Empty<Note>();
+            return Array.Empty<Note<int>>();
 
         var notes = postHtml.DocumentNode
             .SelectNodes(@"//*[@id='notes']/article")
@@ -136,8 +138,8 @@ public class GelbooruApiLoader : IBooruApiLoader
                 var id = Convert.ToInt32(note.Attributes["data-id"].Value);
                 var text = note.InnerText;
 
-                return new Note(id, text, point, size);
-            }) ?? Enumerable.Empty<Note>();
+                return new Note<int>(id, text, point, size);
+            }) ?? Enumerable.Empty<Note<int>>();
 
         return notes.ToList();
         
@@ -177,15 +179,12 @@ public class GelbooruApiLoader : IBooruApiLoader
     /// <summary>
     /// Auth isn't supported right now.
     /// </summary>
-    private static void SetAuthParameters(FlurlHttpSettings settings, IOptions<GelbooruSettings> options)
+    private static async Task DelayWithThrottler(IOptions<GelbooruSettings> options)
     {
         var delay = options.Value.PauseBetweenRequests;
-        
-        settings.BeforeCallAsync = async call =>
-        {
-            if (delay > TimeSpan.Zero)
-                await Throttler.Get("gelbooru").UseAsync(delay);
-        };
+
+        if (delay > TimeSpan.Zero)
+            await Throttler.Get("gelbooru").UseAsync(delay);
     }
 
     private static DateTimeOffset ExtractDate(GelbooruPost post)
@@ -208,13 +207,13 @@ public class GelbooruApiLoader : IBooruApiLoader
 
     private static Post CreatePost(GelbooruPost post, HtmlDocument postHtml) 
         => new(
-            new PostIdentity(post.Id, post.Md5),
+            new PostIdentity<int>(post.Id, post.Md5),
             post.FileUrl,
             !string.IsNullOrWhiteSpace(post.SampleUrl) ? post.SampleUrl : post.FileUrl,
             post.PreviewUrl,
             ExistState.Exist,
             ExtractDate(post),
-            new Uploader(post.CreatorId, post.Owner.Replace('_', ' ')),
+            new Uploader<int>(post.CreatorId, post.Owner.Replace('_', ' ')),
             post.Source,
             new Size(post.Width, post.Height),
             -1,
@@ -223,7 +222,7 @@ public class GelbooruApiLoader : IBooruApiLoader
             Array.Empty<int>(),
             GetParent(post),
             GetChildren(),
-            Array.Empty<Pool>(),
+            Array.Empty<Pool<int>>(),
             GetTags(postHtml),
             GetNotes(post, postHtml));
 
@@ -253,13 +252,13 @@ public class GelbooruApiLoader : IBooruApiLoader
         var rating = postHtml.DocumentNode.SelectSingleNode("//li[contains (., 'Rating: ')]/text()").InnerText.Split(' ').Last().ToLower();
         
         return new(
-            new PostIdentity(id, md5),
+            new PostIdentity<int>(id, md5),
             url,
             url,
             url,
             ExistState.MarkDeleted,
             date,
-            new Uploader(-1, uploader.Replace('_', ' ')),
+            new Uploader<int>(-1, uploader.Replace('_', ' ')),
             source,
             new Size(size[0], size[1]),
             -1,
@@ -268,7 +267,7 @@ public class GelbooruApiLoader : IBooruApiLoader
             Array.Empty<int>(),
             null,
             GetChildren(),
-            Array.Empty<Pool>(),
+            Array.Empty<Pool<int>>(),
             GetTags(postHtml),
             GetNotes(null, postHtml));
     }

@@ -8,13 +8,15 @@ namespace Imouto.BooruParser.Tests.Loaders.Fixtures;
 
 public class SankakuLoaderFixture
 {
-    private IBooruApiLoader? _withAuth;
-    private IBooruApiLoader? _withoutAuth;
-    private IBooruApiAccessor? _apiAccessor;
-    private readonly bool _enableCache = true;
+    private IBooruApiLoader<string>? _withAuth;
+    private IBooruApiLoader<string>? _withoutAuth;
+    private IBooruApiAccessor<string>? _apiAccessor;
+    private readonly bool _enableCache = false;
 
-    private IFlurlClientFactory Factory =>
-        _enableCache ? new HardCachePerBaseUrlFlurlClientFactory() : new PerBaseUrlFlurlClientFactory();
+    private IFlurlClientCache Factory =>
+        _enableCache
+            ? new FlurlClientCache().WithDefaults(x => x.AddMiddleware(() => new HardCachingHttpMessageHandler()))
+            : new FlurlClientCache();
     
     private readonly IOptions<SankakuSettings> _authorizedOptions = Options.Create(
         new SankakuSettings
@@ -27,19 +29,19 @@ public class SankakuLoaderFixture
     private readonly IOptions<SankakuSettings> _options 
         = Options.Create(new SankakuSettings { PauseBetweenRequestsInMs = 0 });
 
-    public IBooruApiLoader GetLoaderWithAuth()
+    public IBooruApiLoader<string> GetLoaderWithAuth()
         => _withAuth ??= new SankakuApiLoader(
             Factory, 
             _authorizedOptions,
             new SankakuAuthManager(new MemoryCache(new MemoryCacheOptions()), _authorizedOptions, Factory));
 
-    public IBooruApiAccessor GetAccessorWithAuth()
+    public IBooruApiAccessor<string> GetAccessorWithAuth()
         => _apiAccessor ??= new SankakuApiLoader(
             Factory, 
             _authorizedOptions,
             new SankakuAuthManager(new MemoryCache(new MemoryCacheOptions()), _authorizedOptions, Factory));
 
-    public IBooruApiLoader GetLoaderWithoutAuth()
+    public IBooruApiLoader<string> GetLoaderWithoutAuth()
         => _withoutAuth ??= new SankakuApiLoader(
             Factory, 
             _options,

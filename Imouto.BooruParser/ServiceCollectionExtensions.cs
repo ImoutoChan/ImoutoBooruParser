@@ -17,13 +17,13 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddBooruParsers(this IServiceCollection services)
     {
-        services.AddSingleton<IFlurlClientFactory, PerBaseUrlFlurlClientFactory>();
+        services.AddSingleton<IFlurlClientCache>(_ => new FlurlClientCache());
         
-        services.AddTransient<IBooruApiLoader, DanbooruApiLoader>();
-        services.AddTransient<IBooruApiLoader, YandereApiLoader>();
-        services.AddTransient<IBooruApiLoader, SankakuApiLoader>();
-        services.AddTransient<IBooruApiLoader, GelbooruApiLoader>();
-        services.AddTransient<IBooruApiLoader, Rule34ApiLoader>();
+        services.AddTransient<IBooruApiLoader<int>, DanbooruApiLoader>();
+        services.AddTransient<IBooruApiLoader<int>, YandereApiLoader>();
+        services.AddTransient<IBooruApiLoader<string>, SankakuApiLoader>();
+        services.AddTransient<IBooruApiLoader<int>, GelbooruApiLoader>();
+        services.AddTransient<IBooruApiLoader<int>, Rule34ApiLoader>();
         
         services.AddTransient<DanbooruApiLoader>();
         services.AddTransient<YandereApiLoader>();
@@ -31,9 +31,9 @@ public static class ServiceCollectionExtensions
         services.AddTransient<GelbooruApiLoader>();
         services.AddTransient<Rule34ApiLoader>();
         
-        services.AddTransient<IBooruApiAccessor, DanbooruApiLoader>();
-        services.AddTransient<IBooruApiAccessor, YandereApiLoader>();
-        services.AddTransient<IBooruApiAccessor, SankakuApiLoader>();
+        services.AddTransient<IBooruApiAccessor<int>, DanbooruApiLoader>();
+        services.AddTransient<IBooruApiAccessor<int>, YandereApiLoader>();
+        services.AddTransient<IBooruApiAccessor<string>, SankakuApiLoader>();
         
         services.AddTransient<ISankakuAuthManager, SankakuAuthManager>();
 

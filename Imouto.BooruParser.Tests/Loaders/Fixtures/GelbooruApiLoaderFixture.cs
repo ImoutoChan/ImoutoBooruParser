@@ -7,14 +7,16 @@ namespace Imouto.BooruParser.Tests.Loaders.Fixtures;
 
 public class GelbooruApiLoaderFixture
 {
-    private IBooruApiLoader? _loader;
+    private IBooruApiLoader<int>? _loader;
     private readonly bool _enableCache = true;
     
     private readonly IOptions<GelbooruSettings> _options 
         = Options.Create(new GelbooruSettings { PauseBetweenRequestsInMs = 0 });
 
-    private IFlurlClientFactory Factory =>
-        _enableCache ? new HardCachePerBaseUrlFlurlClientFactory() : new PerBaseUrlFlurlClientFactory();
+    private IFlurlClientCache Factory =>
+        _enableCache
+            ? new FlurlClientCache().WithDefaults(x => x.AddMiddleware(() => new HardCachingHttpMessageHandler()))
+            : new FlurlClientCache();
 
-    public IBooruApiLoader GetLoader() => _loader ??= new GelbooruApiLoader(Factory, _options);
+    public IBooruApiLoader<int> GetLoader() => _loader ??= new GelbooruApiLoader(Factory, _options);
 }

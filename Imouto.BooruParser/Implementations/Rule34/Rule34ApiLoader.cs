@@ -8,16 +8,16 @@ using Microsoft.Extensions.Options;
 
 namespace Imouto.BooruParser.Implementations.Rule34;
 
-public class Rule34ApiLoader : IBooruApiLoader
+public class Rule34ApiLoader : IBooruApiLoader<int>
 {
     private const string HtmlBaseUrl = "https://rule34.xxx";
     private const string JsonBaseUrl = "https://api.rule34.xxx";
     private readonly IFlurlClient _flurlHtmlClient;
     private readonly IFlurlClient _flurlJsonClient;
 
-    public Rule34ApiLoader(IFlurlClientFactory factory, IOptions<Rule34Settings> options)
+    public Rule34ApiLoader(IFlurlClientCache factory, IOptions<Rule34Settings> options)
     {
-        _flurlHtmlClient = factory.Get(new Url(HtmlBaseUrl))
+        _flurlHtmlClient = factory.GetOrAdd(new Url(HtmlBaseUrl), new Url(HtmlBaseUrl))
             .WithHeader("Connection", "keep-alive")
             .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
             .WithHeader("sec-ch-ua-mobile", "?0")
@@ -31,9 +31,9 @@ public class Rule34ApiLoader : IBooruApiLoader
             .WithHeader("Sec-Fetch-User", "?1")
             .WithHeader("Sec-Fetch-Dest", "document")
             .WithHeader("Accept-Language", "en")
-            .Configure(x => SetAuthParameters(x, options));
+            .BeforeCall(_ => DelayWithThrottler(options));
 
-        _flurlJsonClient = factory.Get(new Url(JsonBaseUrl))
+        _flurlJsonClient = factory.GetOrAdd(new Url(JsonBaseUrl), new Url(JsonBaseUrl))
             .WithHeader("Connection", "keep-alive")
             .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
             .WithHeader("sec-ch-ua-mobile", "?0")
@@ -47,10 +47,10 @@ public class Rule34ApiLoader : IBooruApiLoader
             .WithHeader("Sec-Fetch-User", "?1")
             .WithHeader("Sec-Fetch-Dest", "document")
             .WithHeader("Accept-Language", "en")
-            .Configure(x => SetAuthParameters(x, options));
+            .BeforeCall(_ => DelayWithThrottler(options));
     }
 
-    public async Task<Post> GetPostAsync(int postId)
+    public async Task<Post<int>> GetPostAsync(int postId)
     {
         // https://rule34.xxx/index.php?page=post&s=view&id=
         var postHtml = await _flurlHtmlClient.Request("index.php")
@@ -76,7 +76,7 @@ public class Rule34ApiLoader : IBooruApiLoader
             : null!;
     }
 
-    public async Task<Post?> GetPostByMd5Async(string md5)
+    public async Task<Post<int>?> GetPostByMd5Async(string md5)
     {
         // https://gelbooru.com/index.php?page=post&s=list&md5=
         var postHtml = await _flurlHtmlClient.Request("index.php")
@@ -104,7 +104,7 @@ public class Rule34ApiLoader : IBooruApiLoader
             : null;
     }
 
-    public async Task<SearchResult> SearchAsync(string tags)
+    public async Task<SearchResult<int>> SearchAsync(string tags)
     {
         // https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=1girl
         var postJson = await _flurlJsonClient.Request("index.php")
@@ -114,41 +114,41 @@ public class Rule34ApiLoader : IBooruApiLoader
             })
             .GetJsonAsync<Rule34Post[]>();
 
-        return new SearchResult(postJson?
-            .Select(x => new PostPreview(x.Id, x.Hash, x.Tags, false, false))
-            .ToArray() ?? Array.Empty<PostPreview>());
+        return new SearchResult<int>(postJson?
+            .Select(x => new PostPreview<int>(x.Id, x.Hash, x.Tags, false, false))
+            .ToArray() ?? Array.Empty<PostPreview<int>>());
     }
 
-    public Task<SearchResult> GetPopularPostsAsync(PopularType type)
+    public Task<SearchResult<int>> GetPopularPostsAsync(PopularType type)
         => throw new NotSupportedException("Rule34 does not support popularity charts");
 
-    public Task<HistorySearchResult<TagHistoryEntry>> GetTagHistoryPageAsync(
+    public Task<HistorySearchResult<TagHistoryEntry<int>>> GetTagHistoryPageAsync(
         SearchToken? token,
         int limit = 100,
         CancellationToken ct = default)
         => throw new NotSupportedException("Rule34 does not support history");
 
-    public Task<HistorySearchResult<NoteHistoryEntry>> GetNoteHistoryPageAsync(
+    public Task<HistorySearchResult<NoteHistoryEntry<int>>> GetNoteHistoryPageAsync(
         SearchToken? token,
         int limit = 100,
         CancellationToken ct = default)
         => throw new NotSupportedException("Rule34 does not support history");
 
-    private static PostIdentity? GetParent(Rule34Post post)
-        => post.ParentId != 0 ? new PostIdentity(post.ParentId, string.Empty) : null;
+    private static PostIdentity<int>? GetParent(Rule34Post post)
+        => post.ParentId != 0 ? new PostIdentity<int>(post.ParentId, string.Empty) : null;
 
     /// <remarks>
     /// Haven't found any post with them
     /// </remarks>
-    private static IReadOnlyCollection<PostIdentity> GetChildren() => Array.Empty<PostIdentity>();
+    private static IReadOnlyCollection<PostIdentity<int>> GetChildren() => Array.Empty<PostIdentity<int>>();
 
     /// <remarks>
     /// Sample: https://rule34.xxx/index.php?page=post&amp;s=view&amp;id=6204314
     /// </remarks>
-    private static IReadOnlyCollection<Note> GetNotes(Rule34Post? post, HtmlDocument postHtml)
+    private static IReadOnlyCollection<Note<int>> GetNotes(Rule34Post? post, HtmlDocument postHtml)
     {
         if (post?.HasNotes != true)
-            return Array.Empty<Note>();
+            return Array.Empty<Note<int>>();
 
         
         var boxes = postHtml.DocumentNode.SelectNodes(@"//*[@id='note-container']/*[@class='note-box']");
@@ -174,9 +174,9 @@ public class Rule34ApiLoader : IBooruApiLoader
                     var id = Convert.ToInt32(body.Attributes["id"].Value.Split('-').Last());
                     var text = body.InnerText;
 
-                    return new Note(id, text, point, size);
+                    return new Note<int>(id, text, point, size);
                 })
-            : Enumerable.Empty<Note>();
+            : Enumerable.Empty<Note<int>>();
 
         return notes.ToList();
         
@@ -216,26 +216,23 @@ public class Rule34ApiLoader : IBooruApiLoader
     /// <summary>
     /// Auth isn't supported right now.
     /// </summary>
-    private static void SetAuthParameters(FlurlHttpSettings settings, IOptions<Rule34Settings> options)
+    private static async Task DelayWithThrottler(IOptions<Rule34Settings> options)
     {
         var delay = options.Value.PauseBetweenRequests;
-        
-        settings.BeforeCallAsync = async call =>
-        {
-            if (delay > TimeSpan.Zero)
-                await Throttler.Get("rule34").UseAsync(delay);
-        };
+
+        if (delay > TimeSpan.Zero)
+            await Throttler.Get("rule34").UseAsync(delay);
     }
 
     private static Post CreatePost(Rule34Post post, HtmlDocument postHtml) 
         => new(
-            new PostIdentity(post.Id, post.Hash),
+            new PostIdentity<int>(post.Id, post.Hash),
             post.FileUrl,
             !string.IsNullOrWhiteSpace(post.SampleUrl) ? post.SampleUrl : post.FileUrl,
             post.PreviewUrl,
             ExistState.Exist,
             DateTimeOffset.FromUnixTimeSeconds(post.Change),
-            new Uploader(-1, post.Owner.Replace('_', ' ')),
+            new Uploader<int>(-1, post.Owner.Replace('_', ' ')),
             post.Source,
             new Size(post.Width, post.Height),
             -1,
@@ -244,7 +241,7 @@ public class Rule34ApiLoader : IBooruApiLoader
             Array.Empty<int>(),
             GetParent(post),
             GetChildren(),
-            Array.Empty<Pool>(),
+            Array.Empty<Pool<int>>(),
             GetTags(postHtml),
             GetNotes(post, postHtml));
 }
