@@ -41,7 +41,7 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
             GetUgoiraMetadata(post),
             GetParent(post),
             GetChildren(post),
-            await GetPoolsAsync(postId),
+            await GetPoolsAsync(post.Id),
             GetTags(post),
             GetNotes(post));
     }
@@ -74,7 +74,7 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
             GetUgoiraMetadata(post),
             GetParent(post),
             GetChildren(post),
-            await GetPoolsAsync(post.Id.ToString()),
+            await GetPoolsAsync(post.Id),
             GetTags(post),
             GetNotes(post));
     }
@@ -212,7 +212,7 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
         return post.MediaMetadata.Metadata.UgoiraFrameDelays ?? Array.Empty<int>();
     }
 
-    private async Task<IReadOnlyCollection<Pool>> GetPoolsAsync(string postId)
+    private async Task<IReadOnlyCollection<Pool>> GetPoolsAsync(int postId)
     {
         var pools = await _flurlClient.Request("pools.json")
             .SetQueryParam("search[post_tags_match]", $"id:{postId}")
