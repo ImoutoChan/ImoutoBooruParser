@@ -36,6 +36,8 @@ public interface IBooruApiLoader
     Task<Post?> GetPostByMd5Async(string md5);
 
     Task<SearchResult> SearchAsync(string tags);
+    Task<SearchResult> GetNextPageAsync(SearchResult results);
+    Task<SearchResult> GetPreviousPageAsync(SearchResult results);
 
     Task<SearchResult> GetPopularPostsAsync(PopularType type);
 
@@ -58,7 +60,7 @@ public interface IBooruApiAccessor
 /// <param name="Page">For danbooru: b{lowest-history-id-on-current-page}</param>
 public record SearchToken(string Page);
 
-public record SearchResult(IReadOnlyCollection<PostPreview> Results);
+public record SearchResult(IReadOnlyCollection<PostPreview> Results, string SearchTags, int PageNumber);
 
 public record HistorySearchResult<T>(
     IReadOnlyCollection<T> Results,

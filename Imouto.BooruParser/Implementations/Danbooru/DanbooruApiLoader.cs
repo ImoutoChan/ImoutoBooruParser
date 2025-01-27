@@ -83,13 +83,44 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
     {
         var posts = await _flurlClient.Request("posts.json")
             .SetQueryParam("tags", tags)
+            .SetQueryParam("page", 1)
             .SetQueryParam("only", "id,md5,tag_string,is_banned,is_deleted")
             .WithUserAgent(_botUserAgent)
             .GetJsonAsync<IReadOnlyCollection<DanbooruPostPreview>>();
 
         return new SearchResult(posts
             .Select(x => new PostPreview(x.Id.ToString(), x.Md5, x.TagString, x.IsBanned, x.IsDeleted))
-            .ToList());
+            .ToList(),tags, 1);
+    }
+    public async Task<SearchResult> GetNextPageAsync(SearchResult results)
+    {
+        var posts = await _flurlClient.Request("posts.json")
+            .SetQueryParam("tags", results.SearchTags)
+            .SetQueryParam("page", results.PageNumber + 1)
+            .SetQueryParam("only", "id,md5,tag_string,is_banned,is_deleted")
+            .WithUserAgent(_botUserAgent)
+            .GetJsonAsync<IReadOnlyCollection<DanbooruPostPreview>>();
+
+        return new SearchResult(posts
+            .Select(x => new PostPreview(x.Id.ToString(), x.Md5, x.TagString, x.IsBanned, x.IsDeleted))
+            .ToList(), results.SearchTags, results.PageNumber + 1);
+    }
+
+    public async Task<SearchResult> GetPreviousPageAsync(SearchResult results)
+    {
+        if (results.PageNumber <= 1)
+            throw new ArgumentOutOfRangeException("PageNumber", results.PageNumber, null);
+
+        var posts = await _flurlClient.Request("posts.json")
+            .SetQueryParam("tags", results.SearchTags)
+            .SetQueryParam("page", results.PageNumber - 1)
+            .SetQueryParam("only", "id,md5,tag_string,is_banned,is_deleted")
+            .WithUserAgent(_botUserAgent)
+            .GetJsonAsync<IReadOnlyCollection<DanbooruPostPreview>>();
+
+        return new SearchResult(posts
+            .Select(x => new PostPreview(x.Id.ToString(), x.Md5, x.TagString, x.IsBanned, x.IsDeleted))
+            .ToList(), results.SearchTags, results.PageNumber + 1);
     }
 
     public async Task<SearchResult> GetPopularPostsAsync(PopularType type)
@@ -111,7 +142,7 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
 
         return new SearchResult(posts
             .Select(x => new PostPreview(x.Id.ToString(), x.Md5, x.TagString, x.IsBanned, x.IsDeleted))
-            .ToList());
+            .ToList(),"popular",1);
     }
 
     public async Task<HistorySearchResult<TagHistoryEntry>> GetTagHistoryPageAsync(

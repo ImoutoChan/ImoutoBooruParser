@@ -5,6 +5,7 @@ using Flurl.Http;
 using Flurl.Http.Configuration;
 using HtmlAgilityPack;
 using Imouto.BooruParser.Extensions;
+using Imouto.BooruParser.Implementations.Rule34;
 using Microsoft.Extensions.Options;
 
 namespace Imouto.BooruParser.Implementations.Yandere;
@@ -75,8 +76,48 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
 
         return new SearchResult(posts
             .Select(x => new PostPreview(x.Id.ToString(), x.Md5, x.Tags, false, false))
-            .ToList());
+            .ToList(), tags, 1);
     }
+    public async Task<SearchResult> GetNextPageAsync(SearchResult results)
+    {
+
+        var posts = await _flurlClient.Request("post.json")
+            .SetQueryParam("tags", results.SearchTags)
+            .SetQueryParam("page", results.PageNumber + 1)
+            .GetJsonAsync<IReadOnlyCollection<YanderePost>>();
+
+        return new SearchResult(posts
+            .Select(x => new PostPreview(
+                x.Id.ToString(), 
+                x.Md5, 
+                x.Tags,
+                false,
+                false))
+            .ToList(), results.SearchTags, results.PageNumber + 1);
+
+    }
+    public async Task<SearchResult> GetPreviousPageAsync(SearchResult results)
+    {
+        if (results.PageNumber <= 1)
+            throw new ArgumentOutOfRangeException("PageNumber", results.PageNumber, null);
+
+
+        var posts = await _flurlClient.Request("post.json")
+            .SetQueryParam("tags", results.SearchTags)
+            .SetQueryParam("page", results.PageNumber - 1)
+            .GetJsonAsync<IReadOnlyCollection<YanderePost>>();
+
+        return new SearchResult(posts
+            .Select(x => new PostPreview(
+                x.Id.ToString(),
+                x.Md5,
+                x.Tags,
+                false,
+                false))
+            .ToList(), results.SearchTags, results.PageNumber - 1);
+
+    }
+
 
     public async Task<SearchResult> GetPopularPostsAsync(PopularType type)
     {
@@ -95,8 +136,9 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
 
         return new SearchResult(posts
             .Select(x => new PostPreview(x.Id.ToString(), x.Md5, x.Tags, false, false))
-            .ToList());
+            .ToList(), "popular", 1);
     }
+
 
     public async Task<HistorySearchResult<TagHistoryEntry>> GetTagHistoryPageAsync(
         SearchToken? token,

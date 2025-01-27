@@ -3,6 +3,7 @@ using Flurl.Http;
 using Flurl.Http.Configuration;
 using HtmlAgilityPack;
 using Imouto.BooruParser.Extensions;
+using Imouto.BooruParser.Implementations.Gelbooru;
 using Microsoft.Extensions.Options;
 
 namespace Imouto.BooruParser.Implementations.Rule34;
@@ -107,17 +108,66 @@ public class Rule34ApiLoader : IBooruApiLoader
     {
         // https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=1girl
         var postJson = await _flurlJsonClient.Request("index.php")
-            .SetQueryParams(new
-            {
-                page = "dapi", s = "post", q = "index", json = 1, limit = 20, tags = tags
-            })
+            .SetQueryParam("page", "dapi")
+            .SetQueryParam("s", "post")
+            .SetQueryParam("q", "index")
+            .SetQueryParam("json", 1)
+            .SetQueryParam("limit", 20)
+            .SetQueryParam("tags", tags)
+            .SetQueryParam("pid", 0)
             .GetJsonAsync<Rule34Post[]>();
 
         return new SearchResult(postJson?
             .Select(x => new PostPreview(x.Id.ToString(), x.Hash, x.Tags, false, false))
-            .ToArray() ?? Array.Empty<PostPreview>());
+            .ToArray() ?? Array.Empty<PostPreview>(), tags, 0);
     }
 
+    public async Task<SearchResult> GetNextPageAsync(SearchResult results)
+    {
+        var postJson = await _flurlJsonClient.Request("index.php")
+            .SetQueryParam("page", "dapi")
+            .SetQueryParam("s", "post")
+            .SetQueryParam("q", "index")
+            .SetQueryParam("json", 1)
+            .SetQueryParam("limit", 20)
+            .SetQueryParam("tags", results.SearchTags)
+            .SetQueryParam("pid", results.PageNumber + 1)
+            .GetJsonAsync<Rule34Post[]>();
+
+        return new SearchResult(postJson?
+            .Select(x => new PostPreview(
+                x.Id.ToString(),
+                x.Hash,
+                x.Tags,
+                false,
+                false))
+            .ToArray() ?? Array.Empty<PostPreview>(), results.SearchTags, results.PageNumber + 1);
+    }
+
+    public async Task<SearchResult> GetPreviousPageAsync(SearchResult results)
+    {
+        if (results.PageNumber <= 0)
+            throw new ArgumentOutOfRangeException("PageNumber", results.PageNumber, null);
+
+        var postJson = await _flurlJsonClient.Request("index.php")
+            .SetQueryParam("page", "dapi")
+            .SetQueryParam("s", "post")
+            .SetQueryParam("q", "index")
+            .SetQueryParam("json", 1)
+            .SetQueryParam("limit", 20)
+            .SetQueryParam("tags", results.SearchTags)
+            .SetQueryParam("pid", results.PageNumber - 1)
+            .GetJsonAsync<Rule34Post[]>();
+
+        return new SearchResult(postJson?
+            .Select(x => new PostPreview(
+                x.Id.ToString(),
+                x.Hash,
+                x.Tags,
+                false,
+                false))
+            .ToArray() ?? Array.Empty<PostPreview>(), results.SearchTags, results.PageNumber - 1);
+    }
     public Task<SearchResult> GetPopularPostsAsync(PopularType type)
         => throw new NotSupportedException("Rule34 does not support popularity charts");
 
