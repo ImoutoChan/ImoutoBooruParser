@@ -12,7 +12,7 @@ Install-Package Imouto.BooruParser
 <PackageReference Include="Imouto.BooruParser" Version="4.*" />
 ```
 # Version 4.1.0
-* Search now has basic navigation function (next / prev pages)
+* Search now has a basic navigation function (next/prev pages)
 
 # Version 4.0.0
 * I'm bumping the major version due to changes in the public API. Sankaku now uses string Ids for various entities, 
