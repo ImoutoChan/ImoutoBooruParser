@@ -93,11 +93,13 @@ public class GelbooruApiLoader : IBooruApiLoader
 
         return new SearchResult(postJson.Posts?
             .Select(x => new PostPreview(x.Id.ToString(), x.Md5, x.Tags, false, false))
-            .ToArray() ?? Array.Empty<PostPreview>(), tags, 0);
+            .ToArray() ?? [], tags, 0);
     }
 
     public async Task<SearchResult> GetNextPageAsync(SearchResult results)
     {
+        var nextPage = results.PageNumber + 1;
+
         var postJson = await _flurlClient.Request("index.php")
             .SetQueryParam("page", "dapi")
             .SetQueryParam("s", "post")
@@ -105,7 +107,7 @@ public class GelbooruApiLoader : IBooruApiLoader
             .SetQueryParam("json", 1)
             .SetQueryParam("limit", 20)
             .SetQueryParam("tags", results.SearchTags)
-            .SetQueryParam("pid", results.PageNumber + 1)
+            .SetQueryParam("pid", nextPage)
             .GetJsonAsync<GelbooruPostPage>();
 
         return new SearchResult(postJson.Posts?
@@ -115,7 +117,7 @@ public class GelbooruApiLoader : IBooruApiLoader
                 x.Tags,
                 false,
                 false))
-            .ToArray() ?? Array.Empty<PostPreview>(), results.SearchTags, results.PageNumber + 1);
+            .ToArray() ?? [], results.SearchTags, nextPage);
     }
 
     public async Task<SearchResult> GetPreviousPageAsync(SearchResult results)
@@ -123,6 +125,8 @@ public class GelbooruApiLoader : IBooruApiLoader
         if (results.PageNumber <= 0)
             throw new ArgumentOutOfRangeException("PageNumber", results.PageNumber, null);
 
+        var nextPage = results.PageNumber - 1;
+
         var postJson = await _flurlClient.Request("index.php")
             .SetQueryParam("page", "dapi")
             .SetQueryParam("s", "post")
@@ -130,7 +134,7 @@ public class GelbooruApiLoader : IBooruApiLoader
             .SetQueryParam("json", 1)
             .SetQueryParam("limit", 20)
             .SetQueryParam("tags", results.SearchTags)
-            .SetQueryParam("pid", results.PageNumber - 1)
+            .SetQueryParam("pid", nextPage)
             .GetJsonAsync<GelbooruPostPage>();
 
         return new SearchResult(postJson.Posts?
@@ -140,7 +144,7 @@ public class GelbooruApiLoader : IBooruApiLoader
                 x.Tags,
                 false,
                 false))
-            .ToArray() ?? Array.Empty<PostPreview>(), results.SearchTags, results.PageNumber - 1);
+            .ToArray() ?? [], results.SearchTags, nextPage);
     }
 
     public Task<SearchResult> GetPopularPostsAsync(PopularType type)
@@ -167,12 +171,12 @@ public class GelbooruApiLoader : IBooruApiLoader
     /// <remarks>
     /// Haven't found any post with them
     /// </remarks>
-    private static IReadOnlyCollection<PostIdentity> GetChildren() => Array.Empty<PostIdentity>();
+    private static IReadOnlyCollection<PostIdentity> GetChildren() => [];
 
     private static IReadOnlyCollection<Note> GetNotes(GelbooruPost? post, HtmlDocument postHtml)
     {
         if (post?.HasNotes == "false")
-            return Array.Empty<Note>();
+            return [];
 
         var notes = postHtml.DocumentNode
             .SelectNodes(@"//*[@id='notes']/article")
@@ -190,7 +194,7 @@ public class GelbooruApiLoader : IBooruApiLoader
                 var text = note.InnerText;
 
                 return new Note(id.ToString(), text, point, size);
-            }) ?? Enumerable.Empty<Note>();
+            }) ?? [];
 
         return notes.ToList();
         
@@ -269,10 +273,10 @@ public class GelbooruApiLoader : IBooruApiLoader
             -1,
             GetRating(post.Rating),
             GetRatingSafeLevel(post.Rating),
-            Array.Empty<int>(),
+            [],
             GetParent(post),
             GetChildren(),
-            Array.Empty<Pool>(),
+            [],
             GetTags(postHtml),
             GetNotes(post, postHtml));
 
@@ -314,10 +318,10 @@ public class GelbooruApiLoader : IBooruApiLoader
             -1,
             GetRating(rating),
             GetRatingSafeLevel(rating),
-            Array.Empty<int>(),
+            [],
             null,
             GetChildren(),
-            Array.Empty<Pool>(),
+            [],
             GetTags(postHtml),
             GetNotes(null, postHtml));
     }

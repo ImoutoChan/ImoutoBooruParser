@@ -136,9 +136,11 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
 
     public async Task<SearchResult> GetNextPageAsync(SearchResult results)
     {
+        var nextPage = results.PageNumber + 1;
+
         var posts = await _flurlClient.Request("posts")
             .SetQueryParam("tags", results.SearchTags)
-            .SetQueryParam("page", results.PageNumber+1)
+            .SetQueryParam("page", nextPage)
             .GetJsonAsync<IReadOnlyCollection<SankakuPost>>();
 
         return new SearchResult(posts
@@ -148,7 +150,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
                 string.Join(" ", x.Tags.Select(y => y.TagName)),
                 false,
                 false))
-            .ToList(), results.SearchTags, results.PageNumber+1);
+            .ToList(), results.SearchTags, nextPage);
     }
 
     public async Task<SearchResult> GetPreviousPageAsync(SearchResult results)
@@ -156,9 +158,11 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
         if (results.PageNumber <= 1)
             throw new ArgumentOutOfRangeException("PageNumber",results.PageNumber,null);
 
+        var nextPage = results.PageNumber - 1;
+
         var posts = await _flurlClient.Request("posts")
             .SetQueryParam("tags", results.SearchTags)
-            .SetQueryParam("page", results.PageNumber - 1)
+            .SetQueryParam("page", nextPage)
             .GetJsonAsync<IReadOnlyCollection<SankakuPost>>();
 
         return new SearchResult(posts
@@ -168,7 +172,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
                 string.Join(" ", x.Tags.Select(y => y.TagName)),
                 false,
                 false))
-            .ToList(), results.SearchTags, results.PageNumber - 1);
+            .ToList(), results.SearchTags, nextPage);
     }
 
     public Task<SearchResult> GetPopularPostsAsync(PopularType type)

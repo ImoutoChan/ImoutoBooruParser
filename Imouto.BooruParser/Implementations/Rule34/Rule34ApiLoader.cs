@@ -119,11 +119,13 @@ public class Rule34ApiLoader : IBooruApiLoader
 
         return new SearchResult(postJson?
             .Select(x => new PostPreview(x.Id.ToString(), x.Hash, x.Tags, false, false))
-            .ToArray() ?? Array.Empty<PostPreview>(), tags, 0);
+            .ToArray() ?? [], tags, 0);
     }
 
     public async Task<SearchResult> GetNextPageAsync(SearchResult results)
     {
+        var nextPage = results.PageNumber + 1;
+
         var postJson = await _flurlJsonClient.Request("index.php")
             .SetQueryParam("page", "dapi")
             .SetQueryParam("s", "post")
@@ -131,7 +133,7 @@ public class Rule34ApiLoader : IBooruApiLoader
             .SetQueryParam("json", 1)
             .SetQueryParam("limit", 20)
             .SetQueryParam("tags", results.SearchTags)
-            .SetQueryParam("pid", results.PageNumber + 1)
+            .SetQueryParam("pid", nextPage)
             .GetJsonAsync<Rule34Post[]>();
 
         return new SearchResult(postJson?
@@ -141,7 +143,7 @@ public class Rule34ApiLoader : IBooruApiLoader
                 x.Tags,
                 false,
                 false))
-            .ToArray() ?? Array.Empty<PostPreview>(), results.SearchTags, results.PageNumber + 1);
+            .ToArray() ?? [], results.SearchTags, nextPage);
     }
 
     public async Task<SearchResult> GetPreviousPageAsync(SearchResult results)
@@ -149,6 +151,8 @@ public class Rule34ApiLoader : IBooruApiLoader
         if (results.PageNumber <= 0)
             throw new ArgumentOutOfRangeException("PageNumber", results.PageNumber, null);
 
+        var nextPage = results.PageNumber - 1;
+
         var postJson = await _flurlJsonClient.Request("index.php")
             .SetQueryParam("page", "dapi")
             .SetQueryParam("s", "post")
@@ -156,7 +160,7 @@ public class Rule34ApiLoader : IBooruApiLoader
             .SetQueryParam("json", 1)
             .SetQueryParam("limit", 20)
             .SetQueryParam("tags", results.SearchTags)
-            .SetQueryParam("pid", results.PageNumber - 1)
+            .SetQueryParam("pid", nextPage)
             .GetJsonAsync<Rule34Post[]>();
 
         return new SearchResult(postJson?
@@ -166,8 +170,9 @@ public class Rule34ApiLoader : IBooruApiLoader
                 x.Tags,
                 false,
                 false))
-            .ToArray() ?? Array.Empty<PostPreview>(), results.SearchTags, results.PageNumber - 1);
+            .ToArray() ?? [], results.SearchTags, nextPage);
     }
+
     public Task<SearchResult> GetPopularPostsAsync(PopularType type)
         => throw new NotSupportedException("Rule34 does not support popularity charts");
 

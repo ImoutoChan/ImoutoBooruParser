@@ -32,11 +32,13 @@ public static class BooruApiLoaderExtensions
 public interface IBooruApiLoader
 {
     Task<Post> GetPostAsync(string postId);
-    
+
     Task<Post?> GetPostByMd5Async(string md5);
 
     Task<SearchResult> SearchAsync(string tags);
+
     Task<SearchResult> GetNextPageAsync(SearchResult results);
+
     Task<SearchResult> GetPreviousPageAsync(SearchResult results);
 
     Task<SearchResult> GetPopularPostsAsync(PopularType type);

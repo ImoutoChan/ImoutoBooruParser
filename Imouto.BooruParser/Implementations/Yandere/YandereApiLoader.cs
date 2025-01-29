@@ -78,12 +78,14 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             .Select(x => new PostPreview(x.Id.ToString(), x.Md5, x.Tags, false, false))
             .ToList(), tags, 1);
     }
+
     public async Task<SearchResult> GetNextPageAsync(SearchResult results)
     {
+        var nextPage = results.PageNumber + 1;
 
         var posts = await _flurlClient.Request("post.json")
             .SetQueryParam("tags", results.SearchTags)
-            .SetQueryParam("page", results.PageNumber + 1)
+            .SetQueryParam("page", nextPage)
             .GetJsonAsync<IReadOnlyCollection<YanderePost>>();
 
         return new SearchResult(posts
@@ -93,18 +95,19 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
                 x.Tags,
                 false,
                 false))
-            .ToList(), results.SearchTags, results.PageNumber + 1);
-
+            .ToList(), results.SearchTags, nextPage);
     }
+
     public async Task<SearchResult> GetPreviousPageAsync(SearchResult results)
     {
         if (results.PageNumber <= 1)
             throw new ArgumentOutOfRangeException("PageNumber", results.PageNumber, null);
 
+        var nextPage = results.PageNumber - 1;
 
         var posts = await _flurlClient.Request("post.json")
             .SetQueryParam("tags", results.SearchTags)
-            .SetQueryParam("page", results.PageNumber - 1)
+            .SetQueryParam("page", nextPage)
             .GetJsonAsync<IReadOnlyCollection<YanderePost>>();
 
         return new SearchResult(posts
@@ -114,10 +117,8 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
                 x.Tags,
                 false,
                 false))
-            .ToList(), results.SearchTags, results.PageNumber - 1);
-
+            .ToList(), results.SearchTags, nextPage);
     }
-
 
     public async Task<SearchResult> GetPopularPostsAsync(PopularType type)
     {
@@ -182,7 +183,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
                     postId.ToString(),
                     parentId == null ? null : parentId.ToString(),
                     parentChanged);
-            }) ?? Enumerable.Empty<TagHistoryEntry>();
+            }) ?? [];
 
         var nextPage = token?.Page switch
         {
@@ -261,10 +262,10 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             ?.FirstOrDefault(x => x.InnerHtml.Contains("child post"))
             ?.SelectNodes(@"a").Where(x => x.Attributes["href"]?.Value.Contains("/post/show/") ?? false)
             .Select(x => int.Parse(x.InnerHtml))
-            .ToArray() ?? Array.Empty<int>();
+            .ToArray() ?? [];
 
         if (!childrenIds.Any())
-            return Array.Empty<PostIdentity>();
+            return [];
 
         var childrenTasks = childrenIds.Select(GetPostIdentityAsync).ToList();
 
@@ -295,7 +296,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
                 var  name = poolNode.InnerHtml;
 
                 return (id, name);
-            }) ?? Enumerable.Empty<(int, string)>();
+            }) ?? [];
         
         var tasks = pools
             .Select(x => GetPoolForPostAsync(x.id, postId))
@@ -320,7 +321,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
     private static IReadOnlyCollection<Note> GetNotes(YanderePost post, HtmlDocument postHtml)
     {
         if (post.LastNotedAt == 0)
-            return Array.Empty<Note>();
+            return [];
 
         var notes = postHtml.DocumentNode
             .SelectSingleNode(@"//*[@id='note-container']")
@@ -342,7 +343,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
                 var text = textNode.InnerHtml;
 
                 return new Note(id.ToString(), text, point, size);
-            }) ?? Enumerable.Empty<Note>();
+            }) ?? [];
 
         return notes.ToList();
         
@@ -403,7 +404,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             post.FileSize,
             GetRatingFromChar(post.Rating),
             RatingSafeLevel.None,
-            Array.Empty<int>(),
+            [],
             await GetPostIdentityAsync(post.ParentId),
             await GetChildrenAsync(postHtml),
             await GetPoolsAsync(post.Id, postHtml),

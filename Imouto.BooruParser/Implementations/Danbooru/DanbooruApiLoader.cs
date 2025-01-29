@@ -92,18 +92,21 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
             .Select(x => new PostPreview(x.Id.ToString(), x.Md5, x.TagString, x.IsBanned, x.IsDeleted))
             .ToList(),tags, 1);
     }
+
     public async Task<SearchResult> GetNextPageAsync(SearchResult results)
     {
+        var nextPage = results.PageNumber + 1;
+
         var posts = await _flurlClient.Request("posts.json")
             .SetQueryParam("tags", results.SearchTags)
-            .SetQueryParam("page", results.PageNumber + 1)
+            .SetQueryParam("page", nextPage)
             .SetQueryParam("only", "id,md5,tag_string,is_banned,is_deleted")
             .WithUserAgent(_botUserAgent)
             .GetJsonAsync<IReadOnlyCollection<DanbooruPostPreview>>();
 
         return new SearchResult(posts
             .Select(x => new PostPreview(x.Id.ToString(), x.Md5, x.TagString, x.IsBanned, x.IsDeleted))
-            .ToList(), results.SearchTags, results.PageNumber + 1);
+            .ToList(), results.SearchTags, nextPage);
     }
 
     public async Task<SearchResult> GetPreviousPageAsync(SearchResult results)
@@ -111,16 +114,18 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
         if (results.PageNumber <= 1)
             throw new ArgumentOutOfRangeException("PageNumber", results.PageNumber, null);
 
+        var nextPage = results.PageNumber - 1;
+
         var posts = await _flurlClient.Request("posts.json")
             .SetQueryParam("tags", results.SearchTags)
-            .SetQueryParam("page", results.PageNumber - 1)
+            .SetQueryParam("page", nextPage)
             .SetQueryParam("only", "id,md5,tag_string,is_banned,is_deleted")
             .WithUserAgent(_botUserAgent)
             .GetJsonAsync<IReadOnlyCollection<DanbooruPostPreview>>();
 
         return new SearchResult(posts
             .Select(x => new PostPreview(x.Id.ToString(), x.Md5, x.TagString, x.IsBanned, x.IsDeleted))
-            .ToList(), results.SearchTags, results.PageNumber + 1);
+            .ToList(), results.SearchTags, nextPage);
     }
 
     public async Task<SearchResult> GetPopularPostsAsync(PopularType type)

@@ -117,6 +117,24 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
                 post.Tags.Select(x => x.Name).Should().Contain("no bra");
             }
         }
+
+        [Fact]
+        public async Task ShouldNavigateSearch()
+        {
+            var loader = _loaderFixture.GetLoader();
+
+            var searchResult = await loader.SearchAsync("no_bra");
+            searchResult.Results.Should().NotBeEmpty();
+            searchResult.PageNumber.Should().Be(1);
+
+            var searchResultNext = await loader.GetNextPageAsync(searchResult);
+            searchResultNext.Results.Should().NotBeEmpty();
+            searchResultNext.PageNumber.Should().Be(2);
+
+            var searchResultPrev = await loader.GetPreviousPageAsync(searchResultNext);
+            searchResultPrev.Results.Should().NotBeEmpty();
+            searchResultPrev.PageNumber.Should().Be(1);
+        }
     }
 
     public class LoadNotesHistoryAsyncMethod : YandereLoaderTests

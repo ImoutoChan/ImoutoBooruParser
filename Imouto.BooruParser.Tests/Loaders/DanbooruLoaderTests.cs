@@ -111,7 +111,25 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
             var searchResult = await loader.SearchAsync("1girl");
             searchResult.Results.Should().NotBeEmpty();
         }
-    
+
+        [Fact]
+        public async Task ShouldNavigateSearch()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+
+            var searchResult = await loader.SearchAsync("1girl");
+            searchResult.Results.Should().NotBeEmpty();
+            searchResult.PageNumber.Should().Be(1);
+
+            var searchResultNext = await loader.GetNextPageAsync(searchResult);
+            searchResultNext.Results.Should().NotBeEmpty();
+            searchResultNext.PageNumber.Should().Be(2);
+
+            var searchResultPrev = await loader.GetPreviousPageAsync(searchResultNext);
+            searchResultPrev.Results.Should().NotBeEmpty();
+            searchResultPrev.PageNumber.Should().Be(1);
+        }
+
         [Fact]
         public async Task ShouldFindMd5OfBannedPost()
         {
