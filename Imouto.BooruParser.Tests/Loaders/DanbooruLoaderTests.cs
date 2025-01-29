@@ -440,6 +440,21 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
             var post = await loader.GetPostAsync(5246157);
             
             post.Pools.Count.Should().BeGreaterThanOrEqualTo(1);
+            post.Pools.Should().OnlyContain(x => x.Position >= 0);
+        }
+
+        [Fact]
+        public async Task ShouldLoadPoolWithPosition()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+
+            var post = await loader.GetPostByMd5Async("7fb1c60a41e2f71684835e9c9bdaa2d9");
+
+            post.Should().NotBeNull();
+            post.Pools.Should().HaveCount(1);
+            post.Pools.First().Id.Should().Be("21964");
+            post.Pools.First().Name.Should().Be("Original_-_Honeypot_(cherry-gig)");
+            post.Pools.First().Position.Should().Be(93);
         }
             
         [Fact]
@@ -450,6 +465,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
             var post = await loader.GetPostAsync(599785);
             
             post.Pools.Count.Should().BeGreaterThanOrEqualTo(3);
+            post.Pools.Should().OnlyContain(x => x.Position >= 0);
         }
             
         [Fact]
