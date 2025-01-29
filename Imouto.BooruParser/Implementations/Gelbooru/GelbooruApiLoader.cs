@@ -5,6 +5,7 @@ using Flurl.Http;
 using Flurl.Http.Configuration;
 using HtmlAgilityPack;
 using Imouto.BooruParser.Extensions;
+using Imouto.BooruParser.Implementations.Danbooru;
 using Microsoft.Extensions.Options;
 
 namespace Imouto.BooruParser.Implementations.Gelbooru;
@@ -81,15 +82,65 @@ public class GelbooruApiLoader : IBooruApiLoader
     {
         // https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=20&tags=1girl
         var postJson = await _flurlClient.Request("index.php")
-            .SetQueryParams(new
-            {
-                page = "dapi", s = "post", q = "index", json = 1, limit = 20, tags = tags
-            })
+            .SetQueryParam("page", "dapi")
+            .SetQueryParam("s", "post")
+            .SetQueryParam("q", "index")
+            .SetQueryParam("json", 1)
+            .SetQueryParam("limit", 20)
+            .SetQueryParam("tags", tags)
+            .SetQueryParam("pid", 0)
             .GetJsonAsync<GelbooruPostPage>();
 
         return new SearchResult(postJson.Posts?
             .Select(x => new PostPreview(x.Id.ToString(), x.Md5, x.Tags, false, false))
-            .ToArray() ?? Array.Empty<PostPreview>());
+            .ToArray() ?? Array.Empty<PostPreview>(), tags, 0);
+    }
+
+    public async Task<SearchResult> GetNextPageAsync(SearchResult results)
+    {
+        var postJson = await _flurlClient.Request("index.php")
+            .SetQueryParam("page", "dapi")
+            .SetQueryParam("s", "post")
+            .SetQueryParam("q", "index")
+            .SetQueryParam("json", 1)
+            .SetQueryParam("limit", 20)
+            .SetQueryParam("tags", results.SearchTags)
+            .SetQueryParam("pid", results.PageNumber + 1)
+            .GetJsonAsync<GelbooruPostPage>();
+
+        return new SearchResult(postJson.Posts?
+            .Select(x => new PostPreview(
+                x.Id.ToString(),
+                x.Md5,
+                x.Tags,
+                false,
+                false))
+            .ToArray() ?? Array.Empty<PostPreview>(), results.SearchTags, results.PageNumber + 1);
+    }
+
+    public async Task<SearchResult> GetPreviousPageAsync(SearchResult results)
+    {
+        if (results.PageNumber <= 0)
+            throw new ArgumentOutOfRangeException("PageNumber", results.PageNumber, null);
+
+        var postJson = await _flurlClient.Request("index.php")
+            .SetQueryParam("page", "dapi")
+            .SetQueryParam("s", "post")
+            .SetQueryParam("q", "index")
+            .SetQueryParam("json", 1)
+            .SetQueryParam("limit", 20)
+            .SetQueryParam("tags", results.SearchTags)
+            .SetQueryParam("pid", results.PageNumber - 1)
+            .GetJsonAsync<GelbooruPostPage>();
+
+        return new SearchResult(postJson.Posts?
+            .Select(x => new PostPreview(
+                x.Id.ToString(),
+                x.Md5,
+                x.Tags,
+                false,
+                false))
+            .ToArray() ?? Array.Empty<PostPreview>(), results.SearchTags, results.PageNumber - 1);
     }
 
     public Task<SearchResult> GetPopularPostsAsync(PopularType type)

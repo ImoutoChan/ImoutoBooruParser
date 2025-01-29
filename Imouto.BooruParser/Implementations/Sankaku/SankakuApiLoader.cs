@@ -121,6 +121,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
     {
         var posts = await _flurlClient.Request("posts")
             .SetQueryParam("tags", tags)
+            .SetQueryParam("page", 1)
             .GetJsonAsync<IReadOnlyCollection<SankakuPost>>();
 
         return new SearchResult(posts
@@ -130,7 +131,44 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
                 string.Join(" ", x.Tags.Select(y => y.TagName)), 
                 false,
                 false))
-            .ToList());
+            .ToList(), tags, 1);
+    }
+
+    public async Task<SearchResult> GetNextPageAsync(SearchResult results)
+    {
+        var posts = await _flurlClient.Request("posts")
+            .SetQueryParam("tags", results.SearchTags)
+            .SetQueryParam("page", results.PageNumber+1)
+            .GetJsonAsync<IReadOnlyCollection<SankakuPost>>();
+
+        return new SearchResult(posts
+            .Select(x => new PostPreview(
+                x.Id,
+                x.Md5,
+                string.Join(" ", x.Tags.Select(y => y.TagName)),
+                false,
+                false))
+            .ToList(), results.SearchTags, results.PageNumber+1);
+    }
+
+    public async Task<SearchResult> GetPreviousPageAsync(SearchResult results)
+    {
+        if (results.PageNumber <= 1)
+            throw new ArgumentOutOfRangeException("PageNumber",results.PageNumber,null);
+
+        var posts = await _flurlClient.Request("posts")
+            .SetQueryParam("tags", results.SearchTags)
+            .SetQueryParam("page", results.PageNumber - 1)
+            .GetJsonAsync<IReadOnlyCollection<SankakuPost>>();
+
+        return new SearchResult(posts
+            .Select(x => new PostPreview(
+                x.Id,
+                x.Md5,
+                string.Join(" ", x.Tags.Select(y => y.TagName)),
+                false,
+                false))
+            .ToList(), results.SearchTags, results.PageNumber - 1);
     }
 
     public Task<SearchResult> GetPopularPostsAsync(PopularType type)
