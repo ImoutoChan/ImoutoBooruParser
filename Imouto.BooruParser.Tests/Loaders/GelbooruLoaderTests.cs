@@ -22,7 +22,7 @@ public class GelbooruLoaderTests : IClassFixture<GelbooruApiLoaderFixture>
             var post = await loader.GetPostAsync(7837194);
 
             post.Should().NotBeNull();
-            post.OriginalUrl.Should().Be("https://img3.gelbooru.com/images/89/e4/89e42789d4ef991e25dab050627c9ef2.jpeg");
+            post.OriginalUrl.Should().Be("https://img4.gelbooru.com/images/89/e4/89e42789d4ef991e25dab050627c9ef2.jpeg");
             post.Id.GetIntId().Should().Be(7837194);
             post.Id.Md5Hash.Should().Be("89e42789d4ef991e25dab050627c9ef2");
             post.Notes.Should().BeEmpty();
@@ -44,7 +44,7 @@ public class GelbooruLoaderTests : IClassFixture<GelbooruApiLoaderFixture>
             post.ExistState.Should().Be(ExistState.Exist);
             post.FileResolution.Should().Be(new Size(1003, 1416));
             post.PostedAt.Should().Be(new DateTimeOffset(2022, 10, 22, 7, 3, 36, TimeSpan.Zero));
-            post.SampleUrl.Should().Be("https://img3.gelbooru.com/images/89/e4/89e42789d4ef991e25dab050627c9ef2.jpeg");
+            post.SampleUrl.Should().Be("https://img4.gelbooru.com/images/89/e4/89e42789d4ef991e25dab050627c9ef2.jpeg");
             post.UploaderId.Id.Should().Be("44282");
             post.UploaderId.Name.Should().Be("jojosstand");
             
@@ -61,7 +61,7 @@ public class GelbooruLoaderTests : IClassFixture<GelbooruApiLoaderFixture>
             var post = await loader.GetPostByMd5Async("89e42789d4ef991e25dab050627c9ef2");
 
             post.Should().NotBeNull();
-            post!.OriginalUrl.Should().Be("https://img3.gelbooru.com/images/89/e4/89e42789d4ef991e25dab050627c9ef2.jpeg");
+            post!.OriginalUrl.Should().Be("https://img4.gelbooru.com/images/89/e4/89e42789d4ef991e25dab050627c9ef2.jpeg");
             post.Id.GetIntId().Should().Be(7837194);
             post.Id.Md5Hash.Should().Be("89e42789d4ef991e25dab050627c9ef2");
             post.Notes.Should().BeEmpty();
@@ -83,7 +83,7 @@ public class GelbooruLoaderTests : IClassFixture<GelbooruApiLoaderFixture>
             post.ExistState.Should().Be(ExistState.Exist);
             post.FileResolution.Should().Be(new Size(1003, 1416));
             post.PostedAt.Should().Be(new DateTimeOffset(2022, 10, 22, 7, 3, 36, TimeSpan.Zero));
-            post.SampleUrl.Should().Be("https://img3.gelbooru.com/images/89/e4/89e42789d4ef991e25dab050627c9ef2.jpeg");
+            post.SampleUrl.Should().Be("https://img4.gelbooru.com/images/89/e4/89e42789d4ef991e25dab050627c9ef2.jpeg");
             post.UploaderId.Id.Should().Be("44282");
             post.UploaderId.Name.Should().Be("jojosstand");
             

@@ -11,6 +11,9 @@ Install-Package Imouto.BooruParser
 ```xml
 <PackageReference Include="Imouto.BooruParser" Version="4.*" />
 ```
+# Version 4.1.1
+Fix sankaku api url, update dependencies
+
 # Version 4.1.0
 * Search now has a basic navigation function (next/prev pages)
 

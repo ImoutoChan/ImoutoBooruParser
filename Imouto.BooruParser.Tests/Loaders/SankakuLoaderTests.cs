@@ -47,7 +47,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Id.Id.Should().Be("YoMBDZgQJrO");
             post.Id.Md5Hash.Should().Be("deaac52a6b001b6953db90a09f7629f7");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(122);
+            post.Tags.Should().HaveCount(123);
 
             foreach (var postTag in post.Tags)
             {
@@ -87,7 +87,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Id.Id.Should().Be("YoMBDZgQJrO");
             post.Id.Md5Hash.Should().Be("deaac52a6b001b6953db90a09f7629f7");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(122);
+            post.Tags.Should().HaveCount(123);
 
             foreach (var postTag in post.Tags)
             {
@@ -126,7 +126,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Id.Id.Should().Be("P7RLK8e90r6");
             post.Id.Md5Hash.Should().Be("dc9da74597ecd47b2848fb4d68fce77a");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(100);
+            post.Tags.Should().HaveCount(101);
 
             foreach (var postTag in post.Tags)
             {
@@ -159,7 +159,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             var post = await loader.GetPostByMd5Async("d62ed6aebd2b75aa9661795b54a957d7");
 
             post.Should().NotBeNull();
-            post!.Tags.Should().HaveCount(64);
+            post!.Tags.Should().HaveCount(66);
         }
 
         [Fact]
@@ -389,17 +389,11 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         {
             var loader = _loaderFixture.GetLoaderWithoutAuth();
 
-            var post = await loader.GetPostAsync("1QaEoeZobR9");
+            var post = await loader.GetPostAsync("1QaE73DqNR9");
 
-            post.ChildrenIds.Should().HaveCount(11);
+            post.ChildrenIds.Should().HaveCount(1);
             post.ChildrenIds.Distinct().Should().HaveCount(post.ChildrenIds.Count);
-            post.ChildrenIds.First().Should().Be(new PostIdentity("G8r63AvjYRq", "0f91fb08969e93042106a9f5ed233c3b"));
-
-            foreach (var postChildrenId in post.ChildrenIds)
-            {
-                postChildrenId.Id.Should().NotBeEmpty();
-                postChildrenId.Md5Hash.Should().HaveLength(32);
-            }
+            post.ChildrenIds.First().Should().Be(new PostIdentity("1QaE73DqBR9", "25d539de97741a801d64f9158d3581a9"));
         }
 
         [Fact]

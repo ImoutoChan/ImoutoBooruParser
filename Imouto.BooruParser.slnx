@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/.github/" />
+  <Folder Name="/.github/workflows/">
+    <File Path=".github/workflows/deploy.yml" />
+    <File Path=".github/workflows/test.yml" />
+  </Folder>
+  <Project Path="Imouto.BooruParser.Tests/Imouto.BooruParser.Tests.csproj" />
+  <Project Path="Imouto.BooruParser/Imouto.BooruParser.csproj" />
+</Solution>

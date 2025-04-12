@@ -43,7 +43,7 @@ public class Rule34LoaderTests : IClassFixture<Rule34ApiLoaderFixture>
             post.ChildrenIds.Should().BeEmpty();
             post.ExistState.Should().Be(ExistState.Exist);
             post.FileResolution.Should().Be(new Size(1920, 1440));
-            post.PostedAt.Should().Be(new DateTimeOffset(2025, 1, 4, 15, 32, 54, TimeSpan.Zero));
+            post.PostedAt.Should().Be(new DateTimeOffset(2025, 4, 8, 16, 34, 42, TimeSpan.Zero));
             post.SampleUrl.Should().Be("https://api-cdn.rule34.xxx/images/7492/42936037bc650b4d38bc9f6df355b0f1.jpg");
             post.UploaderId.Name.Should().Be("nebushad");
             
@@ -82,7 +82,7 @@ public class Rule34LoaderTests : IClassFixture<Rule34ApiLoaderFixture>
             post.ChildrenIds.Should().BeEmpty();
             post.ExistState.Should().Be(ExistState.Exist);
             post.FileResolution.Should().Be(new Size(1920, 1440));
-            post.PostedAt.Should().Be(new DateTimeOffset(2025, 1, 4, 15, 32, 54, TimeSpan.Zero));
+            post.PostedAt.Should().Be(new DateTimeOffset(2025, 4, 8, 16, 34, 42, TimeSpan.Zero));
             post.SampleUrl.Should().Be("https://api-cdn.rule34.xxx/images/7492/42936037bc650b4d38bc9f6df355b0f1.jpg");
             post.UploaderId.Name.Should().Be("nebushad");
             

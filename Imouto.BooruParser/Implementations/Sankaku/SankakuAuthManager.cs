@@ -13,7 +13,8 @@ public class SankakuAuthManager : ISankakuAuthManager
 {
     private const string TokensKey = "sankaku_complex_tokens";
     private const string SessionKey = "sankaku_complex_session";
-    private const string BaseUrl = "https://capi-v2.sankakucomplex.com/";
+    private const string BaseUrl = "https://sankakuapi.com/";
+    private static readonly SemaphoreSlim Locker = new(1);
 
     private readonly IMemoryCache _memoryCache;
     private readonly IOptions<SankakuSettings> _options;
@@ -33,24 +34,47 @@ public class SankakuAuthManager : ISankakuAuthManager
 
     public async ValueTask<string?> GetTokenAsync()
     {
-        var tokens = await GetTokensAsync();
+        await Locker.WaitAsync();
 
-        if (tokens?.AccessToken is null)
-            return null;
-        
-        if (!IsExpired(tokens.AccessToken))
-            return tokens.AccessToken;
+        try
+        {
+            var tokens = await GetTokensAsync();
 
-        if (tokens.RefreshToken == null)
-            return null;
-        
-        var (accessToken, refreshToken) = await RefreshTokenAsync(tokens.RefreshToken);
-        _memoryCache.Set(TokensKey, new Tokens(accessToken, refreshToken));
+            if (tokens?.AccessToken is null)
+                return null;
 
-        return accessToken;
+            if (!IsExpired(tokens.AccessToken))
+                return tokens.AccessToken;
+
+            if (tokens.RefreshToken == null)
+                return null;
+
+            var (accessToken, refreshToken) = await RefreshTokenAsync(tokens.RefreshToken);
+            _memoryCache.Set(TokensKey, new Tokens(accessToken, refreshToken));
+
+            return accessToken;
+        }
+        finally
+        {
+            Locker.Release();
+        }
     }
 
     public async Task<IReadOnlyCollection<FlurlCookie>> GetSankakuChannelSessionAsync()
+    {
+        await Locker.WaitAsync();
+
+        try
+        {
+            return await GetSankakuChannelSessionInternalAsync();
+        }
+        finally
+        {
+            Locker.Release();
+        }
+    }
+
+    private async Task<IReadOnlyCollection<FlurlCookie>> GetSankakuChannelSessionInternalAsync()
     {
         if (_options.Value.Login is null || _options.Value.Password is null)
             return Array.Empty<FlurlCookie>();
@@ -197,7 +221,7 @@ public class SankakuAuthManager : ISankakuAuthManager
             .WithHeader("Sec-Fetch-Dest", "document")
             .WithHeader("Accept-Language", "en");
         
-        var capiClient = factory.GetForDomain("https://capi-v2.sankakucomplex.com")
+        var capiClient = factory.GetForDomain("https://sankakuapi.com")
             .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
             .WithHeader("sec-ch-ua-mobile", "?0")
             .WithHeader("sec-ch-ua-platform", "\"Windows\"")

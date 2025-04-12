@@ -8,6 +8,8 @@ namespace Imouto.BooruParser.Tests.Loaders.Fixtures;
 
 public class SankakuLoaderFixture
 {
+    private static readonly MemoryCache MemoryCache = new(new MemoryCacheOptions());
+
     private IBooruApiLoader? _withAuth;
     private IBooruApiLoader? _withoutAuth;
     private IBooruApiAccessor? _apiAccessor;
@@ -33,17 +35,17 @@ public class SankakuLoaderFixture
         => _withAuth ??= new SankakuApiLoader(
             Factory, 
             _authorizedOptions,
-            new SankakuAuthManager(new MemoryCache(new MemoryCacheOptions()), _authorizedOptions, Factory));
+            new SankakuAuthManager(MemoryCache, _authorizedOptions, Factory));
 
     public IBooruApiAccessor GetAccessorWithAuth()
         => _apiAccessor ??= new SankakuApiLoader(
             Factory, 
             _authorizedOptions,
-            new SankakuAuthManager(new MemoryCache(new MemoryCacheOptions()), _authorizedOptions, Factory));
+            new SankakuAuthManager(MemoryCache, _authorizedOptions, Factory));
 
     public IBooruApiLoader GetLoaderWithoutAuth()
         => _withoutAuth ??= new SankakuApiLoader(
             Factory, 
             _options,
-            new SankakuAuthManager(new MemoryCache(new MemoryCacheOptions()), _options, Factory));
+            new SankakuAuthManager(MemoryCache, _options, Factory));
 }

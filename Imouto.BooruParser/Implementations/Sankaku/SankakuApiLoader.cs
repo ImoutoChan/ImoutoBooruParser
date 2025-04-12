@@ -8,7 +8,7 @@ namespace Imouto.BooruParser.Implementations.Sankaku;
 
 public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
 {
-    private const string ApiBaseUrl = "https://capi-v2.sankakucomplex.com/";
+    private const string ApiBaseUrl = "https://sankakuapi.com/";
     private const string HtmlBaseUrl = "https://chan.sankakucomplex.com/";
 
     private readonly IFlurlClient _flurlClient;
