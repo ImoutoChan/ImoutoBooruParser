@@ -170,6 +170,17 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
 
             post.OriginalUrl.Should().NotContain("&amp;");
         }
+
+        [Fact]
+        public async Task ShouldContainTagsWithoutAmp()
+        {
+            var loader = _loaderFixture.GetLoaderWithAuth();
+            var post = await loader.GetPostAsync("1QaE6NQQyr9");
+
+            post.Tags.Should().AllSatisfy(x => (x.Name + x.Type)
+                .Should()
+                .NotContain("&#"));
+        }
     }
         
     public class SearchAsyncMethod : SankakuLoaderTests

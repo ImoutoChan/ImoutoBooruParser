@@ -1,3 +1,4 @@
+using System.Net;
 using Flurl;
 using Flurl.Http;
 using Flurl.Http.Configuration;
@@ -301,7 +302,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
 
             var poolPosts = pool.Posts.Select(x => x.Id).ToArray();
 
-            yield return new Pool(poolInfo.Id, poolInfo.Name, Array.IndexOf(poolPosts, postId));
+            yield return new Pool(poolInfo.Id, WebUtility.HtmlDecode(poolInfo.Name), Array.IndexOf(poolPosts, postId));
         }
     }
 
@@ -313,9 +314,10 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
         //https://capi-v2.sankakucomplex.com/posts/31930965/notes
         var notes = await _flurlClient.Request("posts", post.Id, "notes")
             .GetJsonAsync<IReadOnlyCollection<SankakuNote>>();
-        
+
         return notes
-            .Select(x => new Note(x.Id, x.Body, new Position(x.Y, x.X), new Size(x.Width, x.Height)))
+            .Select(x => new Note(x.Id, WebUtility.HtmlDecode(x.Body), new Position(x.Y, x.X),
+                new Size(x.Width, x.Height)))
             .ToList();
     }
 
@@ -345,12 +347,16 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             });
 
             return tags
-                .Select(x => new Tag(x.type, x.tag.Replace('_', ' ').ToLowerInvariant()))
+                .Select(x => new Tag(
+                    WebUtility.HtmlDecode(x.type),
+                    WebUtility.HtmlDecode(x.tag).Replace('_', ' ').ToLowerInvariant()))
                 .ToList();
         }
-        
+
         return post.Tags
-            .Select(x => new Tag(GetTagType(x.Type), x.TagName.Replace('_', ' ').ToLowerInvariant()))
+            .Select(x => new Tag(
+                GetTagType(x.Type),
+                WebUtility.HtmlDecode(x.TagName).Replace('_', ' ').ToLowerInvariant()))
             .ToList();
     }
 
