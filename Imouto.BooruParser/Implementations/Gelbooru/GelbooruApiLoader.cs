@@ -16,17 +16,22 @@ public class GelbooruApiLoader : IBooruApiLoader
         ".*(?<month>\\w{3}).*(?<date>\\d{2}).*(?<hours>\\d{2})\\:(?<minutes>\\d{2})\\:(?<seconds>\\d{2}).*(?<tzhours>[+\\-]\\d{2})(?<tzminutes>\\d{2}).*(?<year>\\d{4})", RegexOptions.Compiled);
     
     private const string BaseUrl = "https://gelbooru.com/";
+
     private readonly IFlurlClient _flurlClient;
+    private readonly IOptions<GelbooruSettings> _options;
 
     public GelbooruApiLoader(IFlurlClientCache factory, IOptions<GelbooruSettings> options)
-        => _flurlClient = factory
+    {
+        _options = options;
+        _flurlClient = factory
             .GetForDomain(new Url(BaseUrl))
             .BeforeCall(_ => DelayWithThrottler(options));
+    }
 
     public async Task<Post> GetPostAsync(string postId)
     {
         // https://gelbooru.com/index.php?page=post&s=view&id=
-        var postHtml = await _flurlClient.Request("index.php")
+        var postHtml = await Request()
             .SetQueryParams(new
             {
                 page = "post",
@@ -36,7 +41,7 @@ public class GelbooruApiLoader : IBooruApiLoader
             .GetHtmlDocumentAsync();
         
         // https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=1&id=
-        var postJson = await _flurlClient.Request("index.php")
+        var postJson = await Request()
             .SetQueryParams(new
             {
                 page = "dapi", s = "post", q = "index", json = 1, limit = 1, id = postId
@@ -53,7 +58,7 @@ public class GelbooruApiLoader : IBooruApiLoader
     public async Task<Post?> GetPostByMd5Async(string md5)
     {
         // https://gelbooru.com/index.php?page=post&s=list&md5=
-        var postHtml = await _flurlClient.Request("index.php")
+        var postHtml = await Request()
             .SetQueryParams(new
             {
                 page = "post",
@@ -64,7 +69,7 @@ public class GelbooruApiLoader : IBooruApiLoader
             .GetHtmlDocumentAsync();
         
         // https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=1&md5=
-        var postJson = await _flurlClient.Request("index.php")
+        var postJson = await Request()
             .SetQueryParams(new
             {
                 page = "dapi", s = "post", q = "index", json = 1, limit = 1, tags = $"md5:{md5}"
@@ -81,7 +86,7 @@ public class GelbooruApiLoader : IBooruApiLoader
     public async Task<SearchResult> SearchAsync(string tags)
     {
         // https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&limit=20&tags=1girl
-        var postJson = await _flurlClient.Request("index.php")
+        var postJson = await Request()
             .SetQueryParam("page", "dapi")
             .SetQueryParam("s", "post")
             .SetQueryParam("q", "index")
@@ -100,7 +105,7 @@ public class GelbooruApiLoader : IBooruApiLoader
     {
         var nextPage = results.PageNumber + 1;
 
-        var postJson = await _flurlClient.Request("index.php")
+        var postJson = await Request()
             .SetQueryParam("page", "dapi")
             .SetQueryParam("s", "post")
             .SetQueryParam("q", "index")
@@ -127,7 +132,7 @@ public class GelbooruApiLoader : IBooruApiLoader
 
         var nextPage = results.PageNumber - 1;
 
-        var postJson = await _flurlClient.Request("index.php")
+        var postJson = await Request()
             .SetQueryParam("page", "dapi")
             .SetQueryParam("s", "post")
             .SetQueryParam("q", "index")
@@ -146,6 +151,11 @@ public class GelbooruApiLoader : IBooruApiLoader
                 false))
             .ToArray() ?? [], results.SearchTags, nextPage);
     }
+
+    private IFlurlRequest Request()
+        => _flurlClient.Request("index.php")
+            .AppendQueryParam("api_key", _options.Value.ApiKey)
+            .AppendQueryParam("user_id", _options.Value.UserId);
 
     public Task<SearchResult> GetPopularPostsAsync(PopularType type)
         => throw new NotSupportedException("Gelbooru does not support popularity charts");
