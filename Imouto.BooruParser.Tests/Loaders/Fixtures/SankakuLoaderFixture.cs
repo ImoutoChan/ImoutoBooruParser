@@ -24,8 +24,8 @@ public class SankakuLoaderFixture
         new SankakuSettings
         {
             PauseBetweenRequestsInMs = 1,
-            Login = "testuser159",
-            Password = "testuser159"
+            Login = "testuser1823y76",
+            Password = "testuser1823y76"
         });
     
     private readonly IOptions<SankakuSettings> _options 
