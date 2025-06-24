@@ -255,13 +255,13 @@ public class Rule34ApiLoader : IBooruApiLoader
 
     private static IReadOnlyCollection<Tag> GetTags(HtmlDocument post) 
         => post.DocumentNode
-            .SelectSingleNode(@"//*[@id='tag-sidebar']")
-            .SelectNodes(@"li")
+            .SelectSingleNode(@"//*[@id='tag-sidebar']")!
+            .SelectNodes(@"li")!
             .Where(x => x.Attributes["class"]?.Value.StartsWith("tag-type-") == true)
             .Select(x =>
             {
                 var type = x.Attributes["class"].Value.Split(' ').First().Split('-').Last();
-                var name = x.SelectNodes("a")[1].InnerText;
+                var name = x.SelectNodes("a")![1].InnerText;
 
                 return new Tag(type, name);
             })

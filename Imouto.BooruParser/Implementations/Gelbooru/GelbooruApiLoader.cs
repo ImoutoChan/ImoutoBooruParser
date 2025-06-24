@@ -229,13 +229,13 @@ public class GelbooruApiLoader : IBooruApiLoader
 
     private static IReadOnlyCollection<Tag> GetTags(HtmlDocument post) 
         => post.DocumentNode
-            .SelectSingleNode(@"//*[@id='tag-list']")
-            .SelectNodes(@"li")
+            .SelectSingleNode(@"//*[@id='tag-list']")!
+            .SelectNodes(@"li")!
             .Where(x => x.Attributes["class"]?.Value.StartsWith("tag-type-") == true)
             .Select(x =>
             {
                 var type = x.Attributes["class"].Value.Split('-').Last();
-                var name = x.SelectSingleNode(@"a").InnerHtml;
+                var name = x.SelectSingleNode(@"a")!.InnerHtml;
 
                 return new Tag(type, name);
             })
@@ -300,20 +300,20 @@ public class GelbooruApiLoader : IBooruApiLoader
         
         var id = int.Parse(idString);
         
-        var url = postHtml.DocumentNode.SelectSingleNode("//head/meta[@property='og:image']").Attributes["content"].Value;
+        var url = postHtml.DocumentNode.SelectSingleNode("//head/meta[@property='og:image']")!.Attributes["content"].Value;
         var md5 = url.Split('/').Last().Split('.').First();
         
-        var dateString = postHtml.DocumentNode.SelectSingleNode("//li[contains (., 'Posted: ')]/text()[1]").InnerText[8..];
+        var dateString = postHtml.DocumentNode.SelectSingleNode("//li[contains (., 'Posted: ')]/text()[1]")!.InnerText[8..];
         var date = new DateTimeOffset(DateTime.ParseExact(dateString, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), TimeSpan.FromHours(-5));
         
         var uploader = postHtml.DocumentNode.SelectSingleNode("//li[contains (., 'Posted: ')]/a/text()")?.InnerText ?? "Anonymous";
         
         var source = postHtml.DocumentNode.SelectSingleNode("//li[contains (., 'Source: ')]/a[1]")?.Attributes["href"].Value;
         
-        var sizeString = postHtml.DocumentNode.SelectSingleNode("//li[contains (., 'Size: ')]/text()").InnerText;
+        var sizeString = postHtml.DocumentNode.SelectSingleNode("//li[contains (., 'Size: ')]/text()")!.InnerText;
         var size = sizeString.Split(':').Last().Trim().Split('x').Select(int.Parse).ToList();
         
-        var rating = postHtml.DocumentNode.SelectSingleNode("//li[contains (., 'Rating: ')]/text()").InnerText.Split(' ').Last().ToLower();
+        var rating = postHtml.DocumentNode.SelectSingleNode("//li[contains (., 'Rating: ')]/text()")!.InnerText.Split(' ').Last().ToLower();
         
         return new(
             new PostIdentity(id.ToString(), md5),

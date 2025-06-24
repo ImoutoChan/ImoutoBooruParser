@@ -158,7 +158,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             ?.Select(x =>
             {
                 var id = int.Parse(x.Attributes["id"].Value[1..]);
-                var data = x.SelectNodes("td");
+                var data = x.SelectNodes("td")!;
                 return (id, data);
             })
             .Where(x => x.data[0].InnerHtml == "Post")
@@ -207,11 +207,11 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
         var pageHtml = await request.GetHtmlDocumentAsync(cancellationToken: ct);
 
         var entries = pageHtml.DocumentNode
-            .SelectNodes("//*[@id='content']/table/tbody/tr")
+            .SelectNodes("//*[@id='content']/table/tbody/tr")!
             .Select(x =>
             {
-                var postId = int.Parse(x.SelectNodes("td")[1].SelectSingleNode("a").InnerHtml);
-                var dateString = x.SelectNodes("td")[5].InnerHtml;
+                var postId = int.Parse(x.SelectNodes("td")![1].SelectSingleNode("a")!.InnerHtml);
+                var dateString = x.SelectNodes("td")![5].InnerHtml;
                 var date = DateTime.ParseExact(dateString, "MM/dd/yy", CultureInfo.InvariantCulture);
 
                 return new NoteHistoryEntry(-1, postId.ToString(), date);
@@ -260,7 +260,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
         var childrenIds = postHtml.DocumentNode
             .SelectNodes(@"//*[@id='post-view']/div[@class='status-notice']")
             ?.FirstOrDefault(x => x.InnerHtml.Contains("child post"))
-            ?.SelectNodes(@"a").Where(x => x.Attributes["href"]?.Value.Contains("/post/show/") ?? false)
+            ?.SelectNodes(@"a")!.Where(x => x.Attributes["href"]?.Value.Contains("/post/show/") ?? false)
             .Select(x => int.Parse(x.InnerHtml))
             .ToArray() ?? [];
 
@@ -292,7 +292,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             {
                 var id = int.Parse(x.Attributes["id"].Value[4..]);
                 var aNodes = x.SelectNodes("div/p/a");
-                var poolNode = aNodes.Last(y => y.Attributes["href"].Value[..5] == "/pool");
+                var poolNode = aNodes!.Last(y => y.Attributes["href"].Value[..5] == "/pool");
                 var  name = poolNode.InnerHtml;
 
                 return (id, name);
@@ -364,12 +364,12 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
     private static IReadOnlyCollection<Tag> GetTags(HtmlDocument postHtml)
     {
         return postHtml.DocumentNode
-            .SelectSingleNode(@"//*[@id='tag-sidebar']")
-            .SelectNodes(@"li")
+            .SelectSingleNode(@"//*[@id='tag-sidebar']")!
+            .SelectNodes(@"li")!
             .Select(x =>
             {
                 var type = x.Attributes["class"].Value.Split('-').Last();
-                var aNode = x.SelectSingleNode(@"a[2]");
+                var aNode = x.SelectSingleNode(@"a[2]")!;
                 var name = aNode.InnerHtml;
 
                 return new Tag(type, name);

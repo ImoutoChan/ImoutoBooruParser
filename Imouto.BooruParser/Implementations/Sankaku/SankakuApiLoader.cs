@@ -235,11 +235,11 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
 
         var document = await request.GetHtmlDocumentAsync(cancellationToken: ct);
 
-        var entries = document.DocumentNode.SelectNodes("//*[@id='content']/table/tbody/tr")
+        var entries = document.DocumentNode.SelectNodes("//*[@id='content']/table/tbody/tr")!
             .Select(x =>
             {
-                var postId = x.SelectNodes("td")[1].SelectSingleNode("a").InnerHtml;
-                var dateString = x.SelectNodes("td")[5].Attributes["time_value"].Value;
+                var postId = x.SelectNodes("td")![1].SelectSingleNode("a")!.InnerHtml;
+                var dateString = x.SelectNodes("td")![5].Attributes["time_value"].Value;
                 var date = DateTime.Parse(dateString);
 
                 return new NoteHistoryEntry(-1, postId, new DateTimeOffset(date, TimeSpan.FromHours(-4)));
@@ -341,7 +341,7 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             var tags = tagNodes.Select(x =>
             {
                 var type = x.GetClasses().First().Split('-').Last();
-                var tag = x.SelectSingleNode("a").InnerText;
+                var tag = x.SelectSingleNode("a")!.InnerText;
 
                 return (type, tag);
             });
