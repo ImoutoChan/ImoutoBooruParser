@@ -11,6 +11,9 @@ Install-Package Imouto.BooruParser
 ```xml
 <PackageReference Include="Imouto.BooruParser" Version="4.*" />
 ```
+# Version 4.2.2
+Gelbooru now requires user id and api key, you can get them in settings in your profile page
+
 # Version 4.1.1
 Fix sankaku api url, update dependencies
 
