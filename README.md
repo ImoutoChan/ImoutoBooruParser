@@ -93,7 +93,7 @@ Console.WriteLine(post.Md5);
 ## Simplest usage
 
 ```C#
-var username = "user";~~~~
+var username = "user";
 var apiKey = "HBArbAk4WcKTSeAfsyBO";
 var delayBetweenRequestsInMs = 1240;
 
