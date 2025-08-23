@@ -10,6 +10,7 @@ namespace Imouto.BooruParser.Implementations.Rule34;
 
 public class Rule34ApiLoader : IBooruApiLoader
 {
+    private readonly IOptions<Rule34Settings> _options;
     private const string HtmlBaseUrl = "https://rule34.xxx";
     private const string JsonBaseUrl = "https://api.rule34.xxx";
     private readonly IFlurlClient _flurlHtmlClient;
@@ -17,6 +18,7 @@ public class Rule34ApiLoader : IBooruApiLoader
 
     public Rule34ApiLoader(IFlurlClientCache factory, IOptions<Rule34Settings> options)
     {
+        _options = options;
         _flurlHtmlClient = factory.GetForDomain(new Url(HtmlBaseUrl))
             .WithHeader("Connection", "keep-alive")
             .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
@@ -63,7 +65,7 @@ public class Rule34ApiLoader : IBooruApiLoader
             .GetHtmlDocumentAsync();
         
         // https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&id=
-        var postJson = await _flurlJsonClient.Request("index.php")
+        var postJson = await Request()
             .SetQueryParams(new
             {
                 page = "dapi", s = "post", q = "index", json = 1, limit = 1, id = postId
@@ -90,7 +92,7 @@ public class Rule34ApiLoader : IBooruApiLoader
             .GetHtmlDocumentAsync();
         
         // https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=md5:
-        var postJson = await _flurlJsonClient.Request("index.php")
+        var postJson = await Request()
             .SetQueryParams(new
             {
                 page = "dapi", s = "post", q = "index", json = 1, limit = 1, tags = $"md5:{md5}"
@@ -107,7 +109,7 @@ public class Rule34ApiLoader : IBooruApiLoader
     public async Task<SearchResult> SearchAsync(string tags)
     {
         // https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=1girl
-        var postJson = await _flurlJsonClient.Request("index.php")
+        var postJson = await Request()
             .SetQueryParam("page", "dapi")
             .SetQueryParam("s", "post")
             .SetQueryParam("q", "index")
@@ -126,7 +128,7 @@ public class Rule34ApiLoader : IBooruApiLoader
     {
         var nextPage = results.PageNumber + 1;
 
-        var postJson = await _flurlJsonClient.Request("index.php")
+        var postJson = await Request()
             .SetQueryParam("page", "dapi")
             .SetQueryParam("s", "post")
             .SetQueryParam("q", "index")
@@ -153,7 +155,7 @@ public class Rule34ApiLoader : IBooruApiLoader
 
         var nextPage = results.PageNumber - 1;
 
-        var postJson = await _flurlJsonClient.Request("index.php")
+        var postJson = await Request()
             .SetQueryParam("page", "dapi")
             .SetQueryParam("s", "post")
             .SetQueryParam("q", "index")
@@ -190,6 +192,11 @@ public class Rule34ApiLoader : IBooruApiLoader
 
     private static PostIdentity? GetParent(Rule34Post post)
         => post.ParentId != 0 ? new PostIdentity(post.ParentId.ToString(), string.Empty) : null;
+
+    private IFlurlRequest Request()
+        => _flurlJsonClient.Request("index.php")
+            .AppendQueryParam("api_key", _options.Value.ApiKey)
+            .AppendQueryParam("user_id", _options.Value.UserId);
 
     /// <remarks>
     /// Haven't found any post with them

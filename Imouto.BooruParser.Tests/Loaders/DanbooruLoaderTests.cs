@@ -68,7 +68,7 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
             post.Id.GetIntId().Should().Be(5773061);
             post.Id.Md5Hash.Should().Be("543f49b2d9fd4e31d8cb10ceaff6cad7");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(36);
+            post.Tags.Should().HaveCount(37);
 
             foreach (var postTag in post.Tags)
             {
