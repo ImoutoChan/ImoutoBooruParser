@@ -1,0 +1,59 @@
+﻿{
+  Id: {
+    Id: 408517,
+    Md5Hash: 5569d245d4c85921a0da173d87391862
+  },
+  OriginalUrl: https://files.yande.re/image/5569d245d4c85921a0da173d87391862/yande.re%20408517%20cleavage%20dakimakura%20fate_grand_order%20kimono%20mash_kyrielight%20no_bra%20nopan%20open_shirt%20yuran.png,
+  SampleUrl: https://files.yande.re/sample/5569d245d4c85921a0da173d87391862/yande.re%20408517%20sample%20cleavage%20dakimakura%20fate_grand_order%20kimono%20mash_kyrielight%20no_bra%20nopan%20open_shirt%20yuran.jpg,
+  PreviewUrl: https://files.yande.re/jpeg/5569d245d4c85921a0da173d87391862/yande.re%20408517%20cleavage%20dakimakura%20fate_grand_order%20kimono%20mash_kyrielight%20no_bra%20nopan%20open_shirt%20yuran.jpg,
+  PostedAt: 2017-09-06 05:38:17 +0,
+  UploaderId: {
+    Id: 25882,
+    Name: Mr_GT
+  },
+  Source: https://yurang92.booth.pm/items/621246,
+  FileResolution: {
+    Width: 1383,
+    Height: 4393
+  },
+  FileSizeInBytes: 5455985,
+  Rating: Questionable,
+  Tags: [
+    {
+      Type: artist,
+      Name: yuran
+    },
+    {
+      Type: copyright,
+      Name: fate/grand order
+    },
+    {
+      Type: character,
+      Name: mash kyrielight
+    },
+    {
+      Type: general,
+      Name: cleavage
+    },
+    {
+      Type: general,
+      Name: dakimakura
+    },
+    {
+      Type: general,
+      Name: kimono
+    },
+    {
+      Type: general,
+      Name: no bra
+    },
+    {
+      Type: general,
+      Name: nopan
+    },
+    {
+      Type: general,
+      Name: open shirt
+    }
+  ]
+}

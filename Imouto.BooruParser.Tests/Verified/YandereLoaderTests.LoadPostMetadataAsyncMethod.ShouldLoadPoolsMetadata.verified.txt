@@ -1,0 +1,96 @@
+﻿{
+  Id: {
+    Id: 1032020,
+    Md5Hash: da8792041184e6ba6b6584871b9ccfdc
+  },
+  OriginalUrl: https://files.yande.re/image/da8792041184e6ba6b6584871b9ccfdc/yande.re%201032020%20bra%20mizusawa_suzuka%20nipples%20pantsu%20school_swimsuit%20see_through%20seifuku%20senji%20swimsuits%20tegone_spike%20wet%20wet_clothes.png,
+  SampleUrl: https://files.yande.re/sample/da8792041184e6ba6b6584871b9ccfdc/yande.re%201032020%20sample%20bra%20mizusawa_suzuka%20nipples%20pantsu%20school_swimsuit%20see_through%20seifuku%20senji%20swimsuits%20tegone_spike%20wet%20wet_clothes.jpg,
+  PreviewUrl: https://files.yande.re/jpeg/da8792041184e6ba6b6584871b9ccfdc/yande.re%201032020%20bra%20mizusawa_suzuka%20nipples%20pantsu%20school_swimsuit%20see_through%20seifuku%20senji%20swimsuits%20tegone_spike%20wet%20wet_clothes.jpg,
+  PostedAt: 2022-10-25 11:25:03 +0,
+  UploaderId: {
+    Id: 225185,
+    Name: hiroimo2
+  },
+  Source: (C100) [Tegone Spike (Senji)] kaimin shojo,
+  FileResolution: {
+    Width: 2512,
+    Height: 3536
+  },
+  FileSizeInBytes: 5048827,
+  Rating: Questionable,
+  ChildrenIds: [
+    {
+      Id: 1032025,
+      Md5Hash: 99f163812e84ef2fa0e0ea2911f112fc
+    },
+    {
+      Id: 1032036,
+      Md5Hash: 776ea7ba2468ff63b3b64d134583c3e1
+    },
+    {
+      Id: 1032037,
+      Md5Hash: 16e92be91ead3e4e7dfd52b5d5288ba9
+    },
+    {
+      Id: 1052139,
+      Md5Hash: 319d35b29ab990883e283387aaff96b1
+    }
+  ],
+  Pools: [
+    {
+      Id: 98410,
+      Name: (C100) [Tegone Spike (Senji)] kaimin shojo,
+      Position: 1
+    }
+  ],
+  Tags: [
+    {
+      Type: circle,
+      Name: tegone spike
+    },
+    {
+      Type: artist,
+      Name: senji
+    },
+    {
+      Type: character,
+      Name: mizusawa suzuka
+    },
+    {
+      Type: general,
+      Name: bra
+    },
+    {
+      Type: general,
+      Name: nipples
+    },
+    {
+      Type: general,
+      Name: pantsu
+    },
+    {
+      Type: general,
+      Name: school swimsuit
+    },
+    {
+      Type: general,
+      Name: see through
+    },
+    {
+      Type: general,
+      Name: seifuku
+    },
+    {
+      Type: general,
+      Name: swimsuits
+    },
+    {
+      Type: general,
+      Name: wet
+    },
+    {
+      Type: general,
+      Name: wet clothes
+    }
+  ]
+}

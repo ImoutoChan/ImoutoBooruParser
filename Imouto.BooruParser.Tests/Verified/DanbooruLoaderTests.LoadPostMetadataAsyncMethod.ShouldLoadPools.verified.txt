@@ -1,0 +1,202 @@
+﻿{
+  Id: {
+    Id: 5246157,
+    Md5Hash: 37493f99a0e45a35f5b69f2c90b2ad39
+  },
+  OriginalUrl: https://cdn.donmai.us/original/37/49/37493f99a0e45a35f5b69f2c90b2ad39.png,
+  SampleUrl: https://cdn.donmai.us/sample/37/49/sample-37493f99a0e45a35f5b69f2c90b2ad39.jpg,
+  PreviewUrl: https://cdn.donmai.us/180x180/37/49/37493f99a0e45a35f5b69f2c90b2ad39.jpg,
+  PostedAt: 2022-04-04 03:20:03.665 +0,
+  UploaderId: {
+    Id: 367032,
+    Name: rpgman1
+  },
+  Source: https://twitter.com/Strangestone/status/1510818766778605569,
+  FileResolution: {
+    Width: 1287,
+    Height: 1800
+  },
+  FileSizeInBytes: 425485,
+  RatingSafeLevel: Sensitive,
+  Pools: [
+    {
+      Id: 10374,
+      Name: Getsuyoubi_no_Tawawa_-_Monday_Morning_Offerings_(Himura_Kiseki),
+      Position: 383
+    }
+  ],
+  Tags: [
+    {
+      Type: artist,
+      Name: himura kiseki
+    },
+    {
+      Type: character,
+      Name: ai-chan (tawawa)
+    },
+    {
+      Type: character,
+      Name: volley-bu-chan (tawawa)
+    },
+    {
+      Type: copyright,
+      Name: getsuyoubi no tawawa
+    },
+    {
+      Type: general,
+      Name: 2girls
+    },
+    {
+      Type: general,
+      Name: blue theme
+    },
+    {
+      Type: general,
+      Name: blush
+    },
+    {
+      Type: general,
+      Name: braid
+    },
+    {
+      Type: general,
+      Name: breast rest
+    },
+    {
+      Type: general,
+      Name: breasts
+    },
+    {
+      Type: general,
+      Name: breasts on head
+    },
+    {
+      Type: general,
+      Name: cellphone
+    },
+    {
+      Type: general,
+      Name: classroom
+    },
+    {
+      Type: general,
+      Name: crossed legs
+    },
+    {
+      Type: general,
+      Name: curtains
+    },
+    {
+      Type: general,
+      Name: desk
+    },
+    {
+      Type: general,
+      Name: drinking straw
+    },
+    {
+      Type: general,
+      Name: drooling
+    },
+    {
+      Type: general,
+      Name: female pervert
+    },
+    {
+      Type: general,
+      Name: indoors
+    },
+    {
+      Type: general,
+      Name: lap pillow
+    },
+    {
+      Type: general,
+      Name: large breasts
+    },
+    {
+      Type: general,
+      Name: milk carton
+    },
+    {
+      Type: general,
+      Name: monochrome
+    },
+    {
+      Type: general,
+      Name: mouth drool
+    },
+    {
+      Type: general,
+      Name: multiple girls
+    },
+    {
+      Type: general,
+      Name: pantyhose
+    },
+    {
+      Type: general,
+      Name: pervert
+    },
+    {
+      Type: general,
+      Name: phone
+    },
+    {
+      Type: general,
+      Name: pleated skirt
+    },
+    {
+      Type: general,
+      Name: school uniform
+    },
+    {
+      Type: general,
+      Name: short hair
+    },
+    {
+      Type: general,
+      Name: skirt
+    },
+    {
+      Type: general,
+      Name: smartphone
+    },
+    {
+      Type: general,
+      Name: window
+    },
+    {
+      Type: general,
+      Name: yuri
+    },
+    {
+      Type: meta,
+      Name: commentary
+    },
+    {
+      Type: meta,
+      Name: highres
+    },
+    {
+      Type: meta,
+      Name: translated
+    }
+  ],
+  Notes: [
+    {
+      Id: 3192386,
+      Text:
+Wish you another wonderful week.
+<tn><a href="https://natalie.mu/comic/gallery/news/472548/1796029">A full-page ad</a> was placed in the Nikkei, Japan's leading financial newspaper.</tn>,
+      Point: {
+        Top: 1571,
+        Left: 1140
+      },
+      Size: {
+        Width: 135,
+        Height: 79
+      }
+    }
+  ]
+}

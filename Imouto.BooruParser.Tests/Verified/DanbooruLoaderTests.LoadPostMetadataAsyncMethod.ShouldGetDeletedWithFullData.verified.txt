@@ -1,0 +1,258 @@
+﻿{
+  Id: {
+    Id: 5707498,
+    Md5Hash: 048ada39ac99ff0b1b23ddc0c428b02b
+  },
+  OriginalUrl: https://cdn.donmai.us/original/04/8a/048ada39ac99ff0b1b23ddc0c428b02b.jpg,
+  SampleUrl: https://cdn.donmai.us/sample/04/8a/sample-048ada39ac99ff0b1b23ddc0c428b02b.jpg,
+  PreviewUrl: https://cdn.donmai.us/180x180/04/8a/048ada39ac99ff0b1b23ddc0c428b02b.jpg,
+  ExistState: MarkDeleted,
+  PostedAt: 2022-09-28 14:56:47.5 +0,
+  UploaderId: {
+    Id: 770088,
+    Name: AliceNote
+  },
+  Source: https://twitter.com/denki_sanda/status/1575099603036565504,
+  FileResolution: {
+    Width: 1152,
+    Height: 2048
+  },
+  FileSizeInBytes: 237290,
+  Rating: Questionable,
+  Tags: [
+    {
+      Type: artist,
+      Name: denki sanda
+    },
+    {
+      Type: character,
+      Name: raiden shogun
+    },
+    {
+      Type: copyright,
+      Name: genshin impact
+    },
+    {
+      Type: general,
+      Name: 1girl
+    },
+    {
+      Type: general,
+      Name: alternate costume
+    },
+    {
+      Type: general,
+      Name: animal ears
+    },
+    {
+      Type: general,
+      Name: animal hands
+    },
+    {
+      Type: general,
+      Name: bed
+    },
+    {
+      Type: general,
+      Name: blush
+    },
+    {
+      Type: general,
+      Name: bra
+    },
+    {
+      Type: general,
+      Name: breasts
+    },
+    {
+      Type: general,
+      Name: cat ears
+    },
+    {
+      Type: general,
+      Name: cat girl
+    },
+    {
+      Type: general,
+      Name: cat tail
+    },
+    {
+      Type: general,
+      Name: choker
+    },
+    {
+      Type: general,
+      Name: gloves
+    },
+    {
+      Type: general,
+      Name: hair ornament
+    },
+    {
+      Type: general,
+      Name: highleg
+    },
+    {
+      Type: general,
+      Name: highleg panties
+    },
+    {
+      Type: general,
+      Name: kemonomimi mode
+    },
+    {
+      Type: general,
+      Name: large breasts
+    },
+    {
+      Type: general,
+      Name: lingerie
+    },
+    {
+      Type: general,
+      Name: long hair
+    },
+    {
+      Type: general,
+      Name: looking at viewer
+    },
+    {
+      Type: general,
+      Name: mole
+    },
+    {
+      Type: general,
+      Name: mole under eye
+    },
+    {
+      Type: general,
+      Name: navel
+    },
+    {
+      Type: general,
+      Name: on bed
+    },
+    {
+      Type: general,
+      Name: open clothes
+    },
+    {
+      Type: general,
+      Name: open mouth
+    },
+    {
+      Type: general,
+      Name: panties
+    },
+    {
+      Type: general,
+      Name: paw gloves
+    },
+    {
+      Type: general,
+      Name: paw pose
+    },
+    {
+      Type: general,
+      Name: purple eyes
+    },
+    {
+      Type: general,
+      Name: purple hair
+    },
+    {
+      Type: general,
+      Name: ribbon
+    },
+    {
+      Type: general,
+      Name: solo
+    },
+    {
+      Type: general,
+      Name: speech bubble
+    },
+    {
+      Type: general,
+      Name: stomach
+    },
+    {
+      Type: general,
+      Name: string panties
+    },
+    {
+      Type: general,
+      Name: tail
+    },
+    {
+      Type: general,
+      Name: thighhighs
+    },
+    {
+      Type: general,
+      Name: thong
+    },
+    {
+      Type: general,
+      Name: underwear
+    },
+    {
+      Type: general,
+      Name: very long hair
+    },
+    {
+      Type: general,
+      Name: wet
+    },
+    {
+      Type: general,
+      Name: wet clothes
+    },
+    {
+      Type: general,
+      Name: wet panties
+    },
+    {
+      Type: general,
+      Name: white bra
+    },
+    {
+      Type: general,
+      Name: white panties
+    },
+    {
+      Type: general,
+      Name: white thighhighs
+    },
+    {
+      Type: meta,
+      Name: ai-assisted
+    },
+    {
+      Type: meta,
+      Name: commentary
+    },
+    {
+      Type: meta,
+      Name: highres
+    },
+    {
+      Type: meta,
+      Name: translated
+    }
+  ],
+  Notes: [
+    {
+      Id: 3304396,
+      Text: Nyaa...,
+      Point: {
+        Top: 1219,
+        Left: 932
+      },
+      Size: {
+        Width: 53,
+        Height: 228
+      }
+    }
+  ]
+}

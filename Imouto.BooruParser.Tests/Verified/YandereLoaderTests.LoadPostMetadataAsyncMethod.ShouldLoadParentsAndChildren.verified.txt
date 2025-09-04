@@ -1,0 +1,105 @@
+﻿{
+  Id: {
+    Id: 507625,
+    Md5Hash: 17a281b47c5baf18e4c9f6d85cc83285
+  },
+  OriginalUrl: https://files.yande.re/image/17a281b47c5baf18e4c9f6d85cc83285/yande.re%20507625%20bra%20cameltoe%20garter_belt%20hashima_izumi%20hyoudou_michiru%20katou_megumi%20lingerie%20misaki_kurehito%20pantsu%20shimapan%20stockings%20string_panties%20thighhighs%20thong.png,
+  SampleUrl: https://files.yande.re/sample/17a281b47c5baf18e4c9f6d85cc83285/yande.re%20507625%20sample%20bra%20cameltoe%20garter_belt%20hashima_izumi%20hyoudou_michiru%20katou_megumi%20lingerie%20misaki_kurehito%20pantsu%20shimapan%20stockings%20string_panties%20thighhighs%20thong.jpg,
+  PreviewUrl: https://files.yande.re/jpeg/17a281b47c5baf18e4c9f6d85cc83285/yande.re%20507625%20bra%20cameltoe%20garter_belt%20hashima_izumi%20hyoudou_michiru%20katou_megumi%20lingerie%20misaki_kurehito%20pantsu%20shimapan%20stockings%20string_panties%20thighhighs%20thong.jpg,
+  PostedAt: 2019-01-09 17:14:18 +0,
+  UploaderId: {
+    Id: 162747,
+    Name: Twinsenzw
+  },
+  Source: aniplexplus 全巻購入特典 深崎暮人描き下ろしおめくりタペストリー,
+  FileResolution: {
+    Width: 8887,
+    Height: 6287
+  },
+  FileSizeInBytes: 33451252,
+  Rating: Questionable,
+  Parent: {
+    Id: 507843,
+    Md5Hash: 6d951445ccc66bd525a9e8ec386f9b03
+  },
+  ChildrenIds: [
+    {
+      Id: 536313,
+      Md5Hash: 9c40357dc4818f82f5d9a16a29f20b2b
+    },
+    {
+      Id: 962046,
+      Md5Hash: ee0578d4eba0419b2a60d934ddc7a7ac
+    }
+  ],
+  Tags: [
+    {
+      Type: artist,
+      Name: misaki kurehito
+    },
+    {
+      Type: copyright,
+      Name: saenai heroine no sodatekata
+    },
+    {
+      Type: character,
+      Name: hashima izumi
+    },
+    {
+      Type: character,
+      Name: hyoudou michiru
+    },
+    {
+      Type: character,
+      Name: kasumigaoka utaha
+    },
+    {
+      Type: character,
+      Name: katou megumi
+    },
+    {
+      Type: character,
+      Name: sawamura spencer eriri
+    },
+    {
+      Type: general,
+      Name: bra
+    },
+    {
+      Type: general,
+      Name: cameltoe
+    },
+    {
+      Type: general,
+      Name: garter belt
+    },
+    {
+      Type: general,
+      Name: lingerie
+    },
+    {
+      Type: general,
+      Name: pantsu
+    },
+    {
+      Type: general,
+      Name: shimapan
+    },
+    {
+      Type: general,
+      Name: stockings
+    },
+    {
+      Type: general,
+      Name: string panties
+    },
+    {
+      Type: general,
+      Name: thighhighs
+    },
+    {
+      Type: general,
+      Name: thong
+    }
+  ]
+}

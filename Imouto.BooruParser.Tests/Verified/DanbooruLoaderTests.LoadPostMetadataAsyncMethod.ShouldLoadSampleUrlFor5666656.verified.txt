@@ -1,0 +1,712 @@
+﻿{
+  Id: {
+    Id: 5666656,
+    Md5Hash: 4a8b6ecee31d9e66e5532f22b19ab736
+  },
+  OriginalUrl: https://cdn.donmai.us/original/4a/8b/4a8b6ecee31d9e66e5532f22b19ab736.zip,
+  SampleUrl: https://cdn.donmai.us/sample/4a/8b/sample-4a8b6ecee31d9e66e5532f22b19ab736.webm,
+  PreviewUrl: https://cdn.donmai.us/180x180/4a/8b/4a8b6ecee31d9e66e5532f22b19ab736.jpg,
+  PostedAt: 2022-09-12 21:08:45.991 +0,
+  UploaderId: {
+    Id: 842165,
+    Name: 123kid
+  },
+  Source: https://i.pximg.net/img-zip-ugoira/img/2022/06/23/22/26/47/99252191_ugoira1920x1080.zip,
+  FileResolution: {
+    Width: 1000,
+    Height: 706
+  },
+  FileSizeInBytes: 5617397,
+  Rating: Explicit,
+  UgoiraFrameDelays: [
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100
+  ],
+  ChildrenIds: [
+    {
+      Id: 5668417,
+      Md5Hash: b7a85c2073a3996bd6a7c53ddbd0f232
+    }
+  ],
+  Tags: [
+    {
+      Type: artist,
+      Name: dosukebe kojiki maru
+    },
+    {
+      Type: artist,
+      Name: ewan 1212
+    },
+    {
+      Type: copyright,
+      Name: original
+    },
+    {
+      Type: general,
+      Name: 6+boys
+    },
+    {
+      Type: general,
+      Name: 6+girls
+    },
+    {
+      Type: general,
+      Name: :d
+    },
+    {
+      Type: general,
+      Name: arm support
+    },
+    {
+      Type: general,
+      Name: asymmetrical bangs
+    },
+    {
+      Type: general,
+      Name: bent over
+    },
+    {
+      Type: general,
+      Name: bent over furniture
+    },
+    {
+      Type: general,
+      Name: black hair
+    },
+    {
+      Type: general,
+      Name: black pants
+    },
+    {
+      Type: general,
+      Name: black skirt
+    },
+    {
+      Type: general,
+      Name: black socks
+    },
+    {
+      Type: general,
+      Name: blazer
+    },
+    {
+      Type: general,
+      Name: blue bra
+    },
+    {
+      Type: general,
+      Name: blue eyes
+    },
+    {
+      Type: general,
+      Name: blue jacket
+    },
+    {
+      Type: general,
+      Name: blush
+    },
+    {
+      Type: general,
+      Name: bouncing breasts
+    },
+    {
+      Type: general,
+      Name: bow
+    },
+    {
+      Type: general,
+      Name: bow bra
+    },
+    {
+      Type: general,
+      Name: bow panties
+    },
+    {
+      Type: general,
+      Name: bowtie
+    },
+    {
+      Type: general,
+      Name: bra
+    },
+    {
+      Type: general,
+      Name: breasts
+    },
+    {
+      Type: general,
+      Name: breasts apart
+    },
+    {
+      Type: general,
+      Name: brown cardigan
+    },
+    {
+      Type: general,
+      Name: brown eyes
+    },
+    {
+      Type: general,
+      Name: brown hair
+    },
+    {
+      Type: general,
+      Name: brown jacket
+    },
+    {
+      Type: general,
+      Name: cardigan
+    },
+    {
+      Type: general,
+      Name: cardigan vest
+    },
+    {
+      Type: general,
+      Name: censored
+    },
+    {
+      Type: general,
+      Name: censored nipples
+    },
+    {
+      Type: general,
+      Name: chair
+    },
+    {
+      Type: general,
+      Name: classroom
+    },
+    {
+      Type: general,
+      Name: cleavage
+    },
+    {
+      Type: general,
+      Name: closed eyes
+    },
+    {
+      Type: general,
+      Name: clothed sex
+    },
+    {
+      Type: general,
+      Name: clothes pull
+    },
+    {
+      Type: general,
+      Name: collared shirt
+    },
+    {
+      Type: general,
+      Name: completely nude
+    },
+    {
+      Type: general,
+      Name: condom
+    },
+    {
+      Type: general,
+      Name: condom packet strip
+    },
+    {
+      Type: general,
+      Name: condom wrapper
+    },
+    {
+      Type: general,
+      Name: cum
+    },
+    {
+      Type: general,
+      Name: cum on clothes
+    },
+    {
+      Type: general,
+      Name: curtains
+    },
+    {
+      Type: general,
+      Name: desk
+    },
+    {
+      Type: general,
+      Name: dildo
+    },
+    {
+      Type: general,
+      Name: diploma
+    },
+    {
+      Type: general,
+      Name: diploma tube
+    },
+    {
+      Type: general,
+      Name: dithering
+    },
+    {
+      Type: general,
+      Name: doggystyle
+    },
+    {
+      Type: general,
+      Name: double bun
+    },
+    {
+      Type: general,
+      Name: embarrassed
+    },
+    {
+      Type: general,
+      Name: fellatio
+    },
+    {
+      Type: general,
+      Name: female masturbation
+    },
+    {
+      Type: general,
+      Name: fingering
+    },
+    {
+      Type: general,
+      Name: french kiss
+    },
+    {
+      Type: general,
+      Name: from above
+    },
+    {
+      Type: general,
+      Name: grabbing another's breast
+    },
+    {
+      Type: general,
+      Name: grabbing from behind
+    },
+    {
+      Type: general,
+      Name: green panties
+    },
+    {
+      Type: general,
+      Name: groping
+    },
+    {
+      Type: general,
+      Name: group sex
+    },
+    {
+      Type: general,
+      Name: hair bun
+    },
+    {
+      Type: general,
+      Name: hair ornament
+    },
+    {
+      Type: general,
+      Name: hairclip
+    },
+    {
+      Type: general,
+      Name: hand to own mouth
+    },
+    {
+      Type: general,
+      Name: handjob
+    },
+    {
+      Type: general,
+      Name: heart
+    },
+    {
+      Type: general,
+      Name: heart-shaped pupils
+    },
+    {
+      Type: general,
+      Name: heart censor
+    },
+    {
+      Type: general,
+      Name: hetero
+    },
+    {
+      Type: general,
+      Name: hitachi magic wand
+    },
+    {
+      Type: general,
+      Name: hug
+    },
+    {
+      Type: general,
+      Name: indoors
+    },
+    {
+      Type: general,
+      Name: jacket
+    },
+    {
+      Type: general,
+      Name: kiss
+    },
+    {
+      Type: general,
+      Name: large breasts
+    },
+    {
+      Type: general,
+      Name: licking lips
+    },
+    {
+      Type: general,
+      Name: long hair
+    },
+    {
+      Type: general,
+      Name: lying
+    },
+    {
+      Type: general,
+      Name: male masturbation
+    },
+    {
+      Type: general,
+      Name: masturbation
+    },
+    {
+      Type: general,
+      Name: missionary
+    },
+    {
+      Type: general,
+      Name: multiple boys
+    },
+    {
+      Type: general,
+      Name: multiple condoms
+    },
+    {
+      Type: general,
+      Name: multiple girls
+    },
+    {
+      Type: general,
+      Name: multiple penises
+    },
+    {
+      Type: general,
+      Name: naked school attendance
+    },
+    {
+      Type: general,
+      Name: navel
+    },
+    {
+      Type: general,
+      Name: nude
+    },
+    {
+      Type: general,
+      Name: on back
+    },
+    {
+      Type: general,
+      Name: on chair
+    },
+    {
+      Type: general,
+      Name: on table
+    },
+    {
+      Type: general,
+      Name: open clothes
+    },
+    {
+      Type: general,
+      Name: open shirt
+    },
+    {
+      Type: general,
+      Name: oral
+    },
+    {
+      Type: general,
+      Name: orgy
+    },
+    {
+      Type: general,
+      Name: panties
+    },
+    {
+      Type: general,
+      Name: panties around one leg
+    },
+    {
+      Type: general,
+      Name: pants
+    },
+    {
+      Type: general,
+      Name: pants pull
+    },
+    {
+      Type: general,
+      Name: panty pull
+    },
+    {
+      Type: general,
+      Name: parted bangs
+    },
+    {
+      Type: general,
+      Name: penis
+    },
+    {
+      Type: general,
+      Name: pink bra
+    },
+    {
+      Type: general,
+      Name: pink panties
+    },
+    {
+      Type: general,
+      Name: ponytail
+    },
+    {
+      Type: general,
+      Name: pussy juice
+    },
+    {
+      Type: general,
+      Name: red bow
+    },
+    {
+      Type: general,
+      Name: red bowtie
+    },
+    {
+      Type: general,
+      Name: removing bra
+    },
+    {
+      Type: general,
+      Name: reverse cowgirl position
+    },
+    {
+      Type: general,
+      Name: school
+    },
+    {
+      Type: general,
+      Name: school desk
+    },
+    {
+      Type: general,
+      Name: school uniform
+    },
+    {
+      Type: general,
+      Name: sex
+    },
+    {
+      Type: general,
+      Name: sex from behind
+    },
+    {
+      Type: general,
+      Name: sex toy
+    },
+    {
+      Type: general,
+      Name: shirt
+    },
+    {
+      Type: general,
+      Name: short hair
+    },
+    {
+      Type: general,
+      Name: short ponytail
+    },
+    {
+      Type: general,
+      Name: sitting
+    },
+    {
+      Type: general,
+      Name: skirt
+    },
+    {
+      Type: general,
+      Name: smile
+    },
+    {
+      Type: general,
+      Name: socks
+    },
+    {
+      Type: general,
+      Name: standing
+    },
+    {
+      Type: general,
+      Name: standing sex
+    },
+    {
+      Type: general,
+      Name: straddling
+    },
+    {
+      Type: general,
+      Name: strap slip
+    },
+    {
+      Type: general,
+      Name: surprised
+    },
+    {
+      Type: general,
+      Name: symbol-shaped pupils
+    },
+    {
+      Type: general,
+      Name: table
+    },
+    {
+      Type: general,
+      Name: tan
+    },
+    {
+      Type: general,
+      Name: tanlines
+    },
+    {
+      Type: general,
+      Name: tongue
+    },
+    {
+      Type: general,
+      Name: tongue out
+    },
+    {
+      Type: general,
+      Name: underwear
+    },
+    {
+      Type: general,
+      Name: undressing
+    },
+    {
+      Type: general,
+      Name: unworn bowtie
+    },
+    {
+      Type: general,
+      Name: unworn bra
+    },
+    {
+      Type: general,
+      Name: unworn clothes
+    },
+    {
+      Type: general,
+      Name: unworn panties
+    },
+    {
+      Type: general,
+      Name: unworn shirt
+    },
+    {
+      Type: general,
+      Name: unworn skirt
+    },
+    {
+      Type: general,
+      Name: used condom
+    },
+    {
+      Type: general,
+      Name: used tissue
+    },
+    {
+      Type: general,
+      Name: vaginal
+    },
+    {
+      Type: general,
+      Name: vibrator
+    },
+    {
+      Type: general,
+      Name: white panties
+    },
+    {
+      Type: general,
+      Name: white shirt
+    },
+    {
+      Type: general,
+      Name: white socks
+    },
+    {
+      Type: general,
+      Name: wide-eyed
+    },
+    {
+      Type: general,
+      Name: window
+    },
+    {
+      Type: general,
+      Name: wooden floor
+    },
+    {
+      Type: general,
+      Name: yellow panties
+    },
+    {
+      Type: meta,
+      Name: animated
+    },
+    {
+      Type: meta,
+      Name: commentary request
+    },
+    {
+      Type: meta,
+      Name: looping animation
+    },
+    {
+      Type: meta,
+      Name: low bitrate
+    },
+    {
+      Type: meta,
+      Name: paid reward available
+    },
+    {
+      Type: meta,
+      Name: ugoira
+    }
+  ]
+}

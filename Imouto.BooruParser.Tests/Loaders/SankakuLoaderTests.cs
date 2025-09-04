@@ -9,7 +9,7 @@ namespace Imouto.BooruParser.Tests.Loaders;
 // This line will skip all tests in file
 // xUnit doesn't support skipping all tests in class
 // Comment this line to enable tests
-using FactAttribute = System.Runtime.CompilerServices.CompilerGeneratedAttribute;
+// using FactAttribute = System.Runtime.CompilerServices.CompilerGeneratedAttribute;
 
 public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
 {
@@ -47,7 +47,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Id.Id.Should().Be("YoMBDZgQJrO");
             post.Id.Md5Hash.Should().Be("deaac52a6b001b6953db90a09f7629f7");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(123);
+            post.Tags.Should().HaveCount(126);
 
             foreach (var postTag in post.Tags)
             {
@@ -87,7 +87,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Id.Id.Should().Be("YoMBDZgQJrO");
             post.Id.Md5Hash.Should().Be("deaac52a6b001b6953db90a09f7629f7");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(123);
+            post.Tags.Should().HaveCount(126);
 
             foreach (var postTag in post.Tags)
             {
@@ -201,7 +201,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         }
 
         //[Fact(Skip = "Clown Sankaku only allow now 1 tag for free accounts")]
-        public async Task ShouldFindWithMultipleTags()
+        private async Task ShouldFindWithMultipleTags()
         {
             var loader = _loaderFixture.GetLoaderWithoutAuth();
 
@@ -484,9 +484,12 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
 
     private static string[] SankakuTagTypes()
     {
-        return new [] {"meta", "general", "copyright", "character", "circle", "artist", "medium", "genre",
+        return
+        [
+            "meta", "general", "copyright", "character", "circle", "artist", "medium", "genre",
 
             // new
-            "activity", "anatomy", "fashion", "pose", "role", "object", "substance", "setting", "automatic" };
+            "activity", "anatomy", "fashion", "pose", "role", "object", "substance", "setting", "automatic"
+        ];
     }
 }

@@ -1,0 +1,73 @@
+﻿{
+  Id: {
+    Id: 801490,
+    Md5Hash: 67da0e3e0466397a72a714f895cd1024
+  },
+  OriginalUrl: https://files.yande.re/image/67da0e3e0466397a72a714f895cd1024/yande.re%20801490%20eyepatch%20fischl%20fishnets%20genshin_impact%20leotard%20no_bra%20ogre_craft%20stockings%20thighhighs.png,
+  SampleUrl: https://files.yande.re/sample/67da0e3e0466397a72a714f895cd1024/yande.re%20801490%20sample%20eyepatch%20fischl%20fishnets%20genshin_impact%20leotard%20no_bra%20ogre_craft%20stockings%20thighhighs.jpg,
+  PreviewUrl: https://files.yande.re/jpeg/67da0e3e0466397a72a714f895cd1024/yande.re%20801490%20eyepatch%20fischl%20fishnets%20genshin_impact%20leotard%20no_bra%20ogre_craft%20stockings%20thighhighs.jpg,
+  PostedAt: 2021-06-15 17:39:06 +0,
+  UploaderId: {
+    Id: 323282,
+    Name: BattlequeenYume
+  },
+  Source: ,
+  FileResolution: {
+    Width: 2894,
+    Height: 4093
+  },
+  FileSizeInBytes: 7872180,
+  Rating: Questionable,
+  ChildrenIds: [
+    {
+      Id: 709435,
+      Md5Hash: c1c4a14d4e058fe164482e86b8ea9b6b
+    },
+    {
+      Id: 753883,
+      Md5Hash: 6a0e99ff9d228e0155ee5fd80f5217cb
+    },
+    {
+      Id: 801669,
+      Md5Hash: e038ea4fb55807d03f89e81df062409c
+    }
+  ],
+  Tags: [
+    {
+      Type: artist,
+      Name: ogre craft
+    },
+    {
+      Type: copyright,
+      Name: genshin impact
+    },
+    {
+      Type: character,
+      Name: fischl
+    },
+    {
+      Type: general,
+      Name: eyepatch
+    },
+    {
+      Type: general,
+      Name: fishnets
+    },
+    {
+      Type: general,
+      Name: leotard
+    },
+    {
+      Type: general,
+      Name: no bra
+    },
+    {
+      Type: general,
+      Name: stockings
+    },
+    {
+      Type: general,
+      Name: thighhighs
+    }
+  ]
+}

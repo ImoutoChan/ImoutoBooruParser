@@ -1,0 +1,61 @@
+﻿{
+  Id: {
+    Id: 572039,
+    Md5Hash: 2bb1833a5a12852d186d4fcf86bf9020
+  },
+  OriginalUrl: https://files.yande.re/image/2bb1833a5a12852d186d4fcf86bf9020/yande.re%20572039%20aquastar_inc.%20cardinal%20dress%20megane%20quinella%20sword_art_online%20sword_art_online_alicization.jpg,
+  SampleUrl: https://files.yande.re/sample/2bb1833a5a12852d186d4fcf86bf9020/yande.re%20572039%20sample%20aquastar_inc.%20cardinal%20dress%20megane%20quinella%20sword_art_online%20sword_art_online_alicization.jpg,
+  PreviewUrl: https://files.yande.re/image/2bb1833a5a12852d186d4fcf86bf9020/yande.re%20572039%20aquastar_inc.%20cardinal%20dress%20megane%20quinella%20sword_art_online%20sword_art_online_alicization.jpg,
+  PostedAt: 2019-09-21 07:46:25 +0,
+  UploaderId: {
+    Id: 188377,
+    Name: drop
+  },
+  Source: ,
+  FileResolution: {
+    Width: 4070,
+    Height: 2890
+  },
+  FileSizeInBytes: 1304936,
+  Parent: {
+    Id: 507680,
+    Md5Hash: 88c25db418060d983d6eb9504b3eb119
+  },
+  Pools: [
+    {
+      Id: 96746,
+      Name: Sword Art Online Alicization Animation Artworks,
+      Position: 22
+    }
+  ],
+  Tags: [
+    {
+      Type: circle,
+      Name: aquastar inc.
+    },
+    {
+      Type: copyright,
+      Name: sword art online
+    },
+    {
+      Type: copyright,
+      Name: sword art online alicization
+    },
+    {
+      Type: character,
+      Name: cardinal
+    },
+    {
+      Type: character,
+      Name: quinella
+    },
+    {
+      Type: general,
+      Name: dress
+    },
+    {
+      Type: general,
+      Name: megane
+    }
+  ]
+}
