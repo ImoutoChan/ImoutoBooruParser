@@ -9,7 +9,7 @@ public class YandereApiLoaderFixture
 {
     private IBooruApiLoader? _loader;
     private IBooruApiAccessor? _apiAccessor;
-    private readonly bool _enableCache = true;
+    private readonly bool _enableCache = false;
 
     private readonly IOptions<YandereSettings> _authorizedOptions = Options.Create(
         new YandereSettings()
@@ -33,6 +33,8 @@ public class YandereApiLoaderFixture
             : new FlurlClientCache();
 
     public IBooruApiLoader GetLoader() => _loader ??= new YandereApiLoader(Factory, _options);
+
+    public IBooruApiLoader GetLoaderWithAuth() => _loader ??= new YandereApiLoader(Factory, _options);
 
     public IBooruApiAccessor GetApiAccessorWithAuth()
         => _apiAccessor ??= new YandereApiLoader(Factory, _authorizedOptions);

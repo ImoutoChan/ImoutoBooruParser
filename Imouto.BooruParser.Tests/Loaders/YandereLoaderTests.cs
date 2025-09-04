@@ -29,6 +29,16 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
         }
 
         [Fact]
+        public async Task ShouldReturnPostWithAuth()
+        {
+            var loader = _loaderFixture.GetLoaderWithAuth();
+
+            var post = await loader.GetPostAsync(408517);
+
+            await Verify(post);
+        }
+
+        [Fact]
         public async Task ShouldReturnPostByMd5()
         {
             var loader = _loaderFixture.GetLoader();

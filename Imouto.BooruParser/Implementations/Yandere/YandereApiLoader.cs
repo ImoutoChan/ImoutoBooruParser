@@ -386,7 +386,7 @@ public class YandereApiLoader : IBooruApiLoader, IBooruApiAccessor
             .Select(x =>
             {
                 var type = x.Attributes["class"].Value.Split('-').Last();
-                var aNode = x.SelectSingleNode(@"a[2]")!;
+                var aNode = x.SelectSingleNode(@"a[last()]")!;
                 var name = aNode.InnerHtml;
 
                 return new Tag(type, name);
