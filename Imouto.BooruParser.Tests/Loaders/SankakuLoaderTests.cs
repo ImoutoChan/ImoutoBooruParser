@@ -9,7 +9,7 @@ namespace Imouto.BooruParser.Tests.Loaders;
 // This line will skip all tests in file
 // xUnit doesn't support skipping all tests in class
 // Comment this line to enable tests
-// using FactAttribute = System.Runtime.CompilerServices.CompilerGeneratedAttribute;
+using FactAttribute = System.Runtime.CompilerServices.CompilerGeneratedAttribute;
 
 public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
 {
