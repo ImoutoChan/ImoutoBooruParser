@@ -8,5 +8,5 @@ public record Rule34Settings
 
     public required string ApiKey { get; set; }
 
-    public int UserId { get; set; }
+    public required int UserId { get; set; }
 }

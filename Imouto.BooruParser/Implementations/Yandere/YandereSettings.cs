@@ -10,5 +10,5 @@ public record YandereSettings
 
     public TimeSpan PauseBetweenRequests => TimeSpan.FromMilliseconds(PauseBetweenRequestsInMs);
 
-    public string? BotUserAgent { get; set; }
+    public required string? BotUserAgent { get; set; }
 }
