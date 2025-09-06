@@ -69,6 +69,8 @@ services.Configure<YandereSettings>(Configuration.GetSection("Yandere"));
 services.Configure<Rule34Settings>(Configuration.GetSection("Rule34"));
 ```
 
+After that, you can inject individual parsers (e.g., Rule34ApiLoader, DanbooruApiLoader) or all loaders using IEnumerable<IBooruApiLoader>.
+
 ### Settings overview
 
 - DanbooruSettings: 
