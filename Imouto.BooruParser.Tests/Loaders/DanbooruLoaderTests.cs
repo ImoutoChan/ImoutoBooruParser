@@ -229,7 +229,9 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
     
             var page = await loader.GetTagHistoryPageAsync(new SearchToken("a43125946"));
 
-            await Verify(page);
+            var settings = new VerifySettings();
+            settings.ScrubMember<TagHistoryEntry>(x => x.UpdatedAt);
+            await Verify(page, settings);
         }
         
         [Fact]
