@@ -1,7 +1,9 @@
 # Imouto.BooruParser
 
-[![NuGet](https://img.shields.io/nuget/v/Imouto.BooruParser.svg?style=flat-square)](https://www.nuget.org/packages/Imouto.BooruParser/)
-[![license](https://img.shields.io/github/license/ImoutoChan/ImoutoBooruParser.svg?style=flat-square)](https://github.com/ImoutoChan/Imouto.BooruParser)
+[![NuGet](https://img.shields.io/nuget/v/Imouto.BooruParser.svg?style=for-the-badge)](https://www.nuget.org/packages/Imouto.BooruParser/)
+[![license](https://img.shields.io/github/license/ImoutoChan/ImoutoBooruParser.svg?style=for-the-badge)](https://github.com/ImoutoChan/ImoutoBooruParser)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/ImoutoChan/ImoutoBooruParser/test.yml?style=for-the-badge)
+
 
 The dotnet library for retrieving info from booru sites ([chan.sankakucomplex.com](https://chan.sankakucomplex.com), [danbooru.donmai.us](https://danbooru.donmai.us), [yande.re](https://yande.re), [gelbooru.com](https://gelbooru.com), [rule34.xxx](https://rule34.xxx)). You can get individual posts, tags/notes history, and search by tags. Install as [NuGet package](https://www.nuget.org/packages/Imouto.BooruParser/):
 
