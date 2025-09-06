@@ -96,7 +96,7 @@ services.Configure<Rule34Settings>(Configuration.GetSection("Rule34"));
 
 `PauseBetweenRequestsInMs`: 
   - 0 — requests can run in parallel; 
-  - >0 — adds a delay between requests to help avoid bans/rate limits.
+  - `>0` — adds a delay between requests to help avoid bans/rate limits.
 
 ### Public API surface
 
