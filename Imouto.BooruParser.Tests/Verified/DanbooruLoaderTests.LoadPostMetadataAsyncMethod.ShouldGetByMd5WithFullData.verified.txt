@@ -120,6 +120,14 @@
     },
     {
       Type: meta,
+      Name: commentary
+    },
+    {
+      Type: meta,
+      Name: english commentary
+    },
+    {
+      Type: meta,
       Name: highres
     }
   ]

@@ -281,6 +281,10 @@
       },
       {
         Type: meta,
+        Name: commentary request
+      },
+      {
+        Type: meta,
         Name: highres
       }
     ]

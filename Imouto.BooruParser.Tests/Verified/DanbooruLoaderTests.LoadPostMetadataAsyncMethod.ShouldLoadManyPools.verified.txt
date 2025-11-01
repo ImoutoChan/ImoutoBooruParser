@@ -46,10 +46,6 @@
     },
     {
       Type: general,
-      Name: areolae
-    },
-    {
-      Type: general,
       Name: breasts
     },
     {
@@ -99,6 +95,10 @@
     {
       Type: general,
       Name: pubic hair
+    },
+    {
+      Type: general,
+      Name: puffy nipples
     },
     {
       Type: general,
