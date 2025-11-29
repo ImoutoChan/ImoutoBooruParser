@@ -77,6 +77,10 @@
     },
     {
       Type: general,
+      Name: clothed sex
+    },
+    {
+      Type: general,
       Name: cum
     },
     {

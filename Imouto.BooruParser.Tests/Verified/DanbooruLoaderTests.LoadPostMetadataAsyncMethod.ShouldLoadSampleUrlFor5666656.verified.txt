@@ -122,6 +122,10 @@
     },
     {
       Type: general,
+      Name: bottomless
+    },
+    {
+      Type: general,
       Name: bouncing breasts
     },
     {
@@ -182,6 +186,10 @@
     },
     {
       Type: general,
+      Name: censored kiss
+    },
+    {
+      Type: general,
       Name: censored nipples
     },
     {
@@ -199,6 +207,10 @@
     {
       Type: general,
       Name: closed eyes
+    },
+    {
+      Type: general,
+      Name: clothed male nude female
     },
     {
       Type: general,
@@ -227,6 +239,10 @@
     {
       Type: general,
       Name: condom wrapper
+    },
+    {
+      Type: general,
+      Name: covering own mouth
     },
     {
       Type: general,
@@ -302,6 +318,10 @@
     },
     {
       Type: general,
+      Name: grabbing own breast
+    },
+    {
+      Type: general,
       Name: green panties
     },
     {
@@ -374,6 +394,10 @@
     },
     {
       Type: general,
+      Name: leg lock
+    },
+    {
+      Type: general,
       Name: licking lips
     },
     {
@@ -407,10 +431,6 @@
     {
       Type: general,
       Name: multiple girls
-    },
-    {
-      Type: general,
-      Name: multiple penises
     },
     {
       Type: general,
@@ -551,6 +571,14 @@
     {
       Type: general,
       Name: sitting
+    },
+    {
+      Type: general,
+      Name: sitting on lap
+    },
+    {
+      Type: general,
+      Name: sitting on person
     },
     {
       Type: general,
