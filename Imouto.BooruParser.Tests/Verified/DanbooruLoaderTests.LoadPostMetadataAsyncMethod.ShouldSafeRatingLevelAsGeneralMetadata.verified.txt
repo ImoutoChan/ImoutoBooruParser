@@ -613,7 +613,11 @@
       },
       {
         Type: meta,
-        Name: game cg
+        Name: game asset
+      },
+      {
+        Type: meta,
+        Name: visual novel cg
       }
     ]
   }

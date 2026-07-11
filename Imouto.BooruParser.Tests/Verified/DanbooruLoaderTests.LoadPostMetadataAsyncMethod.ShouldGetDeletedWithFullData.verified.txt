@@ -194,6 +194,10 @@
     },
     {
       Type: general,
+      Name: thong panties
+    },
+    {
+      Type: general,
       Name: underwear
     },
     {

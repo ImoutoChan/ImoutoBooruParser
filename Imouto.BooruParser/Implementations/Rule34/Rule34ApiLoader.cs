@@ -1,9 +1,8 @@
+using System.Xml.Linq;
 using Flurl;
 using Flurl.Http;
 using Flurl.Http.Configuration;
-using HtmlAgilityPack;
 using Imouto.BooruParser.Extensions;
-using Imouto.BooruParser.Implementations.Gelbooru;
 using Microsoft.Extensions.Options;
 
 namespace Imouto.BooruParser.Implementations.Rule34;
@@ -11,30 +10,12 @@ namespace Imouto.BooruParser.Implementations.Rule34;
 public class Rule34ApiLoader : IBooruApiLoader
 {
     private readonly IOptions<Rule34Settings> _options;
-    private const string HtmlBaseUrl = "https://rule34.xxx";
     private const string JsonBaseUrl = "https://api.rule34.xxx";
-    private readonly IFlurlClient _flurlHtmlClient;
     private readonly IFlurlClient _flurlJsonClient;
 
     public Rule34ApiLoader(IFlurlClientCache factory, IOptions<Rule34Settings> options)
     {
         _options = options;
-        _flurlHtmlClient = factory.GetForDomain(new Url(HtmlBaseUrl))
-            .WithHeader("Connection", "keep-alive")
-            .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
-            .WithHeader("sec-ch-ua-mobile", "?0")
-            .WithHeader("sec-ch-ua-platform", "\"Windows\"")
-            .WithHeader("DNT", "1")
-            .WithHeader("Upgrade-Insecure-Requests", "1")
-            .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36")
-            .WithHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
-            .WithHeader("Sec-Fetch-Site", "none")
-            .WithHeader("Sec-Fetch-Mode", "navigate")
-            .WithHeader("Sec-Fetch-User", "?1")
-            .WithHeader("Sec-Fetch-Dest", "document")
-            .WithHeader("Accept-Language", "en")
-            .BeforeCall(_ => DelayWithThrottler(options));
-
         _flurlJsonClient = factory.GetForDomain(new Url(JsonBaseUrl))
             .WithHeader("Connection", "keep-alive")
             .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
@@ -54,55 +35,36 @@ public class Rule34ApiLoader : IBooruApiLoader
 
     public async Task<Post> GetPostAsync(string postId)
     {
-        // https://rule34.xxx/index.php?page=post&s=view&id=
-        var postHtml = await _flurlHtmlClient.Request("index.php")
-            .SetQueryParams(new
-            {
-                page = "post",
-                s = "view",
-                id = postId
-            })
-            .GetHtmlDocumentAsync();
-        
         // https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&id=
         var postJson = await Request()
             .SetQueryParams(new
             {
-                page = "dapi", s = "post", q = "index", json = 1, limit = 1, id = postId
+                page = "dapi", s = "post", q = "index", json = 1, limit = 1, id = postId,
+                fields = "tag_info"
             })
             .GetJsonAsync<Rule34Post[]>();
         var post = postJson?.FirstOrDefault();
         
-        return post != null 
-            ? CreatePost(post, postHtml) 
+        return post != null
+            ? CreatePost(post, await GetNotesAsync(post))
             : null!;
     }
 
     public async Task<Post?> GetPostByMd5Async(string md5)
     {
-        // https://gelbooru.com/index.php?page=post&s=list&md5=
-        var postHtml = await _flurlHtmlClient.Request("index.php")
-            .SetQueryParams(new
-            {
-                page = "post",
-                s = "list",
-                md5 = md5
-            })
-            .WithAutoRedirect(true)
-            .GetHtmlDocumentAsync();
-        
         // https://api.rule34.xxx/index.php?page=dapi&s=post&q=index&json=1&tags=md5:
         var postJson = await Request()
             .SetQueryParams(new
             {
-                page = "dapi", s = "post", q = "index", json = 1, limit = 1, tags = $"md5:{md5}"
+                page = "dapi", s = "post", q = "index", json = 1, limit = 1, tags = $"md5:{md5}",
+                fields = "tag_info"
             })
             .GetJsonAsync<Rule34Post[]>();
         
         var post = postJson?.FirstOrDefault();
         
         return post != null
-            ? CreatePost(post, postHtml)
+            ? CreatePost(post, await GetNotesAsync(post))
             : null;
     }
 
@@ -203,47 +165,40 @@ public class Rule34ApiLoader : IBooruApiLoader
     /// </remarks>
     private static IReadOnlyCollection<PostIdentity> GetChildren() => Array.Empty<PostIdentity>();
 
-    /// <remarks>
-    /// Sample: https://rule34.xxx/index.php?page=post&amp;s=view&amp;id=6204314
-    /// </remarks>
-    private static IReadOnlyCollection<Note> GetNotes(Rule34Post? post, HtmlDocument postHtml)
+    private async Task<IReadOnlyCollection<Note>> GetNotesAsync(Rule34Post post)
     {
-        if (post?.HasNotes != true)
-            return Array.Empty<Note>();
+        if (post.HasNotes != true)
+            return [];
 
-        
-        var boxes = postHtml.DocumentNode.SelectNodes(@"//*[@id='note-container']/*[@class='note-box']");
-        var bodies = postHtml.DocumentNode.SelectNodes(@"//*[@id='note-container']/*[@class='note-body']");
-        var notes = boxes != null && bodies != null
-            ? boxes.Zip(bodies)
-                .Select(x =>
-                {
-                    var box = x.First;
-                    var body = x.Second;
+        var notesXml = await Request()
+            .SetQueryParams(new
+            {
+                page = "dapi", s = "note", q = "index", post_id = post.Id
+            })
+            .GetStringAsync();
 
-                    var boxData = box.Attributes["style"].Value.Split(';')
-                        .ToDictionary(x => x.Split(':').First().Trim(), x => x.Split(':').Last().Trim());
-
-                    var height = boxData["height"].Trim('p', 'x');
-                    var width = boxData["width"].Trim('p', 'x');
-                    var top = boxData["top"].Trim('p', 'x');
-                    var left = boxData["left"].Trim('p', 'x');
-
-                    var size = new Size(GetSizeInt(width), GetSizeInt(height));
-                    var point = new Position(GetPositionInt(top), GetPositionInt(left));
-
-                    var id = Convert.ToInt32(body.Attributes["id"].Value.Split('-').Last());
-                    var text = body.InnerText;
-
-                    return new Note(id.ToString(), text, point, size);
-                })
-            : Enumerable.Empty<Note>();
-
-        return notes.ToList();
-        
-        static int GetSizeInt(string number) => (int)(Convert.ToDouble(number) + 0.5);
-        
-        static int GetPositionInt(string number) => (int)Math.Ceiling(Convert.ToDouble(number) - 0.5);
+        return XDocument.Parse(notesXml).Root?
+            .Elements("note")
+            .Where(x => !string.Equals(
+                (string?)x.Attribute("is_active"),
+                "false",
+                StringComparison.OrdinalIgnoreCase))
+            .Select(x => new
+            {
+                Id = (int)x.Attribute("id")!,
+                Text = (string?)x.Attribute("body") ?? string.Empty,
+                X = (int)x.Attribute("x")!,
+                Y = (int)x.Attribute("y")!,
+                Width = (int)x.Attribute("width")!,
+                Height = (int)x.Attribute("height")!
+            })
+            .OrderBy(x => x.Id)
+            .Select(x => new Note(
+                x.Id.ToString(),
+                x.Text,
+                new Position(x.Y, x.X),
+                new Size(x.Width, x.Height)))
+            .ToArray() ?? [];
     }
 
     private static Rating GetRating(string postRating) => GetRatingFromChar(postRating).Item1;
@@ -260,23 +215,17 @@ public class Rule34ApiLoader : IBooruApiLoader
             _ => (Rating.Questionable, RatingSafeLevel.None)
         };
 
-    private static IReadOnlyCollection<Tag> GetTags(HtmlDocument post) 
-        => post.DocumentNode
-            .SelectSingleNode(@"//*[@id='tag-sidebar']")!
-            .SelectNodes(@"li")!
-            .Where(x => x.Attributes["class"]?.Value.StartsWith("tag-type-") == true)
-            .Select(x =>
-            {
-                var type = x.Attributes["class"].Value.Split(' ').First().Split('-').Last();
-                var name = x.SelectNodes("a")![1].InnerText;
+    private static IReadOnlyCollection<Tag> GetTags(Rule34Post post)
+        => post.TagInfo?
+            .Select(x => new Tag(
+                x.Type == "tag" ? "general" : x.Type,
+                x.Name.Replace('_', ' ')))
+            .ToArray()
+            ?? post.Tags
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => new Tag("general", x.Replace('_', ' ')))
+                .ToArray();
 
-                return new Tag(type, name);
-            })
-            .ToList();
-
-    /// <summary>
-    /// Auth isn't supported right now.
-    /// </summary>
     private static async Task DelayWithThrottler(IOptions<Rule34Settings> options)
     {
         var delay = options.Value.PauseBetweenRequests;
@@ -285,7 +234,7 @@ public class Rule34ApiLoader : IBooruApiLoader
     }
 
 
-    private static Post CreatePost(Rule34Post post, HtmlDocument postHtml) 
+    private static Post CreatePost(Rule34Post post, IReadOnlyCollection<Note> notes)
         => new(
             new PostIdentity(post.Id.ToString(), post.Hash),
             post.FileUrl,
@@ -303,6 +252,6 @@ public class Rule34ApiLoader : IBooruApiLoader
             GetParent(post),
             GetChildren(),
             Array.Empty<Pool>(),
-            GetTags(postHtml),
-            GetNotes(post, postHtml));
+            GetTags(post),
+            notes);
 }

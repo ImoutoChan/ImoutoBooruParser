@@ -47,7 +47,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Id.Id.Should().Be("YoMBDZgQJrO");
             post.Id.Md5Hash.Should().Be("deaac52a6b001b6953db90a09f7629f7");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(126);
+            post.Tags.Should().HaveCount(128);
 
             foreach (var postTag in post.Tags)
             {
@@ -87,7 +87,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Id.Id.Should().Be("YoMBDZgQJrO");
             post.Id.Md5Hash.Should().Be("deaac52a6b001b6953db90a09f7629f7");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(126);
+            post.Tags.Should().HaveCount(128);
 
             foreach (var postTag in post.Tags)
             {
@@ -126,7 +126,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             post.Id.Id.Should().Be("P7RLK8e90r6");
             post.Id.Md5Hash.Should().Be("dc9da74597ecd47b2848fb4d68fce77a");
             post.Notes.Should().BeEmpty();
-            post.Tags.Should().HaveCount(101);
+            post.Tags.Should().HaveCount(141);
 
             foreach (var postTag in post.Tags)
             {
@@ -489,7 +489,10 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
             "meta", "general", "copyright", "character", "circle", "artist", "medium", "genre",
 
             // new
-            "activity", "anatomy", "fashion", "pose", "role", "object", "substance", "setting", "automatic"
+            "activity", "anatomy", "fashion", "pose", "role", "object", "substance", "setting", "automatic",
+
+            // new new
+            "entity"
         ];
     }
 }

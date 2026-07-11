@@ -135,10 +135,6 @@
     },
     {
       Type: general,
-      Name: french braid
-    },
-    {
-      Type: general,
       Name: from above
     },
     {
@@ -152,6 +148,10 @@
     {
       Type: general,
       Name: half-closed eyes
+    },
+    {
+      Type: general,
+      Name: half up braid
     },
     {
       Type: general,

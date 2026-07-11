@@ -91,6 +91,10 @@
     },
     {
       Type: general,
+      Name: braid
+    },
+    {
+      Type: general,
       Name: bridal gauntlets
     },
     {
@@ -143,10 +147,6 @@
     },
     {
       Type: general,
-      Name: long braid
-    },
-    {
-      Type: general,
       Name: long hair
     },
     {
@@ -180,6 +180,10 @@
     {
       Type: general,
       Name: thighs
+    },
+    {
+      Type: general,
+      Name: very long braid
     },
     {
       Type: meta,

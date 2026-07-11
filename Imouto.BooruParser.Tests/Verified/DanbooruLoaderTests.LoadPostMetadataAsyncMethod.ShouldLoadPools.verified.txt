@@ -92,6 +92,10 @@
     },
     {
       Type: general,
+      Name: drink carton
+    },
+    {
+      Type: general,
       Name: drinking straw
     },
     {

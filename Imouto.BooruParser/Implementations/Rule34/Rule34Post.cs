@@ -24,5 +24,11 @@ public record Rule34Post(
     [property: JsonPropertyName("source")] string Source,
     [property: JsonPropertyName("status")] string Status,
     [property: JsonPropertyName("has_notes")] bool? HasNotes,
-    [property: JsonPropertyName("comment_count")] int CommentCount
+    [property: JsonPropertyName("comment_count")] int CommentCount,
+    [property: JsonPropertyName("tag_info")] IReadOnlyCollection<Rule34TagInfo>? TagInfo
+);
+
+public record Rule34TagInfo(
+    [property: JsonPropertyName("type")] string Type,
+    [property: JsonPropertyName("tag")] string Name
 );
