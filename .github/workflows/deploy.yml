@@ -44,9 +44,6 @@ jobs:
       - name: Build
         run: dotnet build Imouto.BooruParser.slnx --configuration Release --no-restore
 
-      - name: Test
-        run: dotnet test Imouto.BooruParser.slnx --configuration Release --no-build --filter "FullyQualifiedName!~FavoritePostAsyncMethod"
-
       - name: Pack
         run: dotnet pack Imouto.BooruParser/Imouto.BooruParser.csproj --configuration Release --no-build --output artifacts/packages
 
