@@ -127,6 +127,9 @@ Note: Sankaku uses string post identifiers; int helpers are provided as extensio
 
 ## Changelog
 
+### Version 5.0.0
+Rule34 settings now require your own bot user agent. Set `Rule34Settings.BotUserAgent`; requests without it are rejected because Rule34 may return HTTP 403 for the default HTTP client user agent.
+
 ### Version 4.2.4
 Yandere settings now require your own user agent for your bot
 
