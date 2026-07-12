@@ -16,9 +16,21 @@ public record YanderePost(
     [property: JsonPropertyName("jpeg_url")] string JpegUrl,
     [property: JsonPropertyName("rating")] string Rating,
     [property: JsonPropertyName("parent_id")] int? ParentId,
+    [property: JsonPropertyName("has_children")] bool HasChildren,
+    [property: JsonPropertyName("status")] string Status,
     [property: JsonPropertyName("width")] int Width,
     [property: JsonPropertyName("height")] int Height,
     [property: JsonPropertyName("last_noted_at")] int LastNotedAt
+);
+
+public record YandereNote(
+    [property: JsonPropertyName("id")] int Id,
+    [property: JsonPropertyName("x")] int X,
+    [property: JsonPropertyName("y")] int Y,
+    [property: JsonPropertyName("width")] int Width,
+    [property: JsonPropertyName("height")] int Height,
+    [property: JsonPropertyName("is_active")] bool IsActive,
+    [property: JsonPropertyName("body")] string Body
 );
 
 public record YanderePool(

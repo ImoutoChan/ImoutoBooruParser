@@ -8,6 +8,7 @@ namespace Imouto.BooruParser.Tests.Loaders.Fixtures;
 public class YandereApiLoaderFixture
 {
     private IBooruApiLoader? _loader;
+    private IBooruApiLoader? _authorizedLoader;
     private IBooruApiAccessor? _apiAccessor;
     private readonly bool _enableCache = false;
 
@@ -34,7 +35,8 @@ public class YandereApiLoaderFixture
 
     public IBooruApiLoader GetLoader() => _loader ??= new YandereApiLoader(Factory, _options);
 
-    public IBooruApiLoader GetLoaderWithAuth() => _loader ??= new YandereApiLoader(Factory, _options);
+    public IBooruApiLoader GetLoaderWithAuth()
+        => _authorizedLoader ??= new YandereApiLoader(Factory, _authorizedOptions);
 
     public IBooruApiAccessor GetApiAccessorWithAuth()
         => _apiAccessor ??= new YandereApiLoader(Factory, _authorizedOptions);

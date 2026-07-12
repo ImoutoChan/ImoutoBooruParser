@@ -66,7 +66,10 @@ public record SearchResult(IReadOnlyCollection<PostPreview> Results, string Sear
 
 public record HistorySearchResult<T>(
     IReadOnlyCollection<T> Results,
-    SearchToken? NextToken);
+    SearchToken? NextToken)
+{
+    public int? OldestHistoryId { get; init; }
+}
 
 public record PostPreview(string Id, string? Md5Hash, string Title, bool IsBanned, bool IsDeleted);
 

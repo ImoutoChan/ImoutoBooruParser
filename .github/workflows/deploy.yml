@@ -1,4 +1,4 @@
-name: Publish nuget
+name: Publish NuGet
 
 on:
   push:
@@ -6,49 +6,49 @@ on:
       - '*'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
-  Deploy:
-    runs-on: ubuntu-22.04
+  deploy:
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Install GitVersion
-        uses: GitTools/actions/gitversion/setup@a41619580c25efb59dfc062e92990914141abcad # v0.10.2
-        with:
-          versionSpec: '5.5.0'
-          
       - name: Checkout
-        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
 
-      - name: Run GitVersion
-        id:   gitversion
-        uses: GitTools/actions/gitversion/execute@a41619580c25efb59dfc062e92990914141abcad # v0.10.2
-        env:
-          DOTNET_ROLL_FORWARD: Major
-
-      - name: Echo version
-        run: echo ${{ steps.gitversion.outputs.majorMinorPatch }}
-      
-      - name: Setup .NET Core SDK '9.x.x'
-        uses: actions/setup-dotnet@3447fd6a9f9e57506b15f895c5b76d3b197dc7c2 # v3.2.0
+      - name: Install GitVersion
+        uses: GitTools/actions/gitversion/setup@7417b1089e2c7de93510f1901d656ddf60bb024f # v4.7.0
         with:
-          dotnet-version: '9.x.x'
-          include-prerelease: true
+          versionSpec: '6.8.2'
 
-      - name: Update project version
+      - name: Determine version
+        id: gitversion
+        uses: GitTools/actions/gitversion/execute@7417b1089e2c7de93510f1901d656ddf60bb024f # v4.7.0
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Set project version
         uses: roryprimrose/set-vs-sdk-project-version@a3f300b86a779fcdeea2c5d586ee9415c64cc42a # v1.0.6
         with:
           version: ${{ steps.gitversion.outputs.majorMinorPatch }}
-  
-      - name: Display dotnet version
-        run: dotnet --version
-          
-      - name: Install Dependencies
-        run: dotnet restore
+
+      - name: Restore
+        run: dotnet restore Imouto.BooruParser.slnx
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build Imouto.BooruParser.slnx --configuration Release --no-restore
 
-      - name: Publish the package
-        run: dotnet nuget push **/*.nupkg -k ${{ secrets.NUGET_ORG_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: Test
+        run: dotnet test Imouto.BooruParser.slnx --configuration Release --no-build --filter "FullyQualifiedName!~FavoritePostAsyncMethod"
+
+      - name: Pack
+        run: dotnet pack Imouto.BooruParser/Imouto.BooruParser.csproj --configuration Release --no-build --output artifacts/packages
+
+      - name: Publish package
+        run: dotnet nuget push artifacts/packages/*.nupkg --api-key "${{ secrets.NUGET_ORG_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate

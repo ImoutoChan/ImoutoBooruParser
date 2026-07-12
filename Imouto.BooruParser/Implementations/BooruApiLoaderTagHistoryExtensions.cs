@@ -37,52 +37,73 @@ public static class BooruApiLoaderTagHistoryExtensions
         }
         else if (loader is YandereApiLoader)
         {
-            var firstPage = await loader.GetTagHistoryFirstPageAsync(ct: ct);
+            var pages = new Dictionary<int, HistorySearchResult<TagHistoryEntry>>();
 
-            // prediction
-            var currentId = firstPage.Max(x => x.HistoryId);
-            var predictedPage = (currentId - afterHistoryId) / 20 + 2;
-            
-            // validation
-            HistorySearchResult<TagHistoryEntry> page;
-            var tries = 10;
-            do
+            async Task<HistorySearchResult<TagHistoryEntry>> LoadPage(int pageNumber)
             {
-                page = await loader.GetTagHistoryPageAsync(new SearchToken($"{predictedPage++}"), limit, ct);
-                tries--;
-            } while (!page.Results.Any() && tries > 0);
-            
-            if (page.Results.All(x => x.HistoryId > afterHistoryId))
-                throw new Exception("Prediction failed");
+                if (pages.TryGetValue(pageNumber, out var cached))
+                    return cached;
 
-            // execution
-            var searchToken = new SearchToken($"{predictedPage--}");
-            do
+                var token = pageNumber == 1 ? null : new SearchToken(pageNumber.ToString());
+                var page = await loader.GetTagHistoryPageAsync(token, limit, ct);
+                pages[pageNumber] = page;
+                return page;
+            }
+
+            static bool IsAtOrPastBoundary(
+                HistorySearchResult<TagHistoryEntry> page,
+                int historyId)
+                => page.OldestHistoryId == null || page.OldestHistoryId <= historyId;
+
+            var low = 1;
+            var high = 1;
+            var highPage = await LoadPage(high);
+            while (!IsAtOrPastBoundary(highPage, afterHistoryId) && high < int.MaxValue)
             {
-                page = await loader.GetTagHistoryPageAsync(searchToken, limit, ct);
-                searchToken = new SearchToken($"{predictedPage--}");
+                low = high + 1;
+                high = high > int.MaxValue / 2 ? int.MaxValue : high * 2;
+                highPage = await LoadPage(high);
+            }
 
-                foreach (var tagsHistoryEntry in page.Results)
+            while (low < high)
+            {
+                var middle = low + (high - low) / 2;
+                var middlePage = await LoadPage(middle);
+                if (IsAtOrPastBoundary(middlePage, afterHistoryId))
+                    high = middle;
+                else
+                    low = middle + 1;
+            }
+
+            var boundaryPage = low;
+            if ((await LoadPage(boundaryPage)).OldestHistoryId == null && boundaryPage > 1)
+                boundaryPage--;
+
+            for (var pageNumber = boundaryPage; pageNumber >= 1; pageNumber--)
+            {
+                var page = await LoadPage(pageNumber);
+                foreach (var tagsHistoryEntry in page.Results
+                             .Where(x => x.HistoryId > afterHistoryId)
+                             .Reverse())
                     yield return tagsHistoryEntry;
-
-            } while (searchToken.Page != "0");
+            }
         }
         else if (loader is SankakuApiLoader)
         {
             
-            HistorySearchResult<TagHistoryEntry> page;
-            var cont = false;
             SearchToken? searchToken = null;
-            do
+            while (true)
             {
-                page = await loader.GetTagHistoryPageAsync(searchToken, limit, ct);
-                searchToken = page.NextToken;
+                var page = await loader.GetTagHistoryPageAsync(searchToken, limit, ct);
 
-                foreach (var tagsHistoryEntry in page.Results)
+                foreach (var tagsHistoryEntry in page.Results.Where(x => x.HistoryId > afterHistoryId))
                     yield return tagsHistoryEntry;
 
-                cont = !page.Results.Any(x => x.HistoryId < afterHistoryId);
-            } while (cont);
+                if (page.Results.Any(x => x.HistoryId <= afterHistoryId) || page.NextToken == null)
+                    break;
+
+                searchToken = page.NextToken;
+            }
         }
     }
 
@@ -93,18 +114,19 @@ public static class BooruApiLoaderTagHistoryExtensions
         [EnumeratorCancellation] CancellationToken ct = default)
     {
         SearchToken? searchToken = null;
-        HistorySearchResult<TagHistoryEntry> page;
-        do
+        while (true)
         {
-            page = await loader.GetTagHistoryPageAsync(searchToken, limit, ct);
+            var page = await loader.GetTagHistoryPageAsync(searchToken, limit, ct);
             searchToken = page.NextToken;
+
+            if (!page.Results.Any())
+                yield break;
 
             foreach (var tagsHistoryEntry in page.Results)
                 yield return tagsHistoryEntry;
 
-            if (!page.Results.Any())
-                break;
-
-        } while (page.Results.Last().UpdatedAt >= upToDateTime);
+            if (searchToken == null || page.Results.Min(x => x.UpdatedAt) < upToDateTime)
+                yield break;
+        }
     }
 }

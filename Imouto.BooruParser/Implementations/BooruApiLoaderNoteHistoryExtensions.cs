@@ -36,7 +36,7 @@ public static class BooruApiLoaderNoteHistoryExtensions
         }
         else if (loader is YandereApiLoader)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException("Yande.re note history does not expose stable history ids");
         }
     }
 
@@ -47,15 +47,19 @@ public static class BooruApiLoaderNoteHistoryExtensions
         [EnumeratorCancellation] CancellationToken ct = default)
     {
         SearchToken? searchToken = null;
-        HistorySearchResult<NoteHistoryEntry> page;
-        do
+        while (true)
         {
-            page = await loader.GetNoteHistoryPageAsync(searchToken, limit, ct);
+            var page = await loader.GetNoteHistoryPageAsync(searchToken, limit, ct);
             searchToken = page.NextToken;
+
+            if (!page.Results.Any())
+                yield break;
 
             foreach (var historyEntry in page.Results)
                 yield return historyEntry;
 
-        } while (page.Results.Last().UpdatedAt >= upToDateTime);
+            if (searchToken == null || page.Results.Min(x => x.UpdatedAt) < upToDateTime)
+                yield break;
+        }
     }
 }

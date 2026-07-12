@@ -91,6 +91,18 @@ public class Rule34LoaderTests : IClassFixture<Rule34ApiLoaderFixture>
             post.UploaderId.Id.Should().Be("-1");
             post.UgoiraFrameDelays.Should().BeEmpty();
         }
+
+        [Fact]
+        public async Task ShouldThrowPostNotFoundException()
+        {
+            var loader = _loaderFixture.GetLoader();
+
+            Func<Task> action = () => loader.GetPostAsync("999999999");
+
+            var exception = await action.Should().ThrowAsync<PostNotFoundException>();
+            exception.Which.PostId.Should().Be("999999999");
+            exception.Which.Booru.Should().Be("Rule34");
+        }
     }
 
     public class SearchAsyncMethod : Rule34LoaderTests

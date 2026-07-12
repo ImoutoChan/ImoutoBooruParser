@@ -20,10 +20,18 @@ public class DanbooruApiLoader : IBooruApiLoader, IBooruApiAccessor
 
     public async Task<Post> GetPostAsync(string postId)
     {
-        var post = await _flurlClient.Request("posts", $"{postId}.json")
-            .SetQueryParam("only", "id,tag_string_artist,tag_string_character,tag_string_copyright,pools,tag_string_general,tag_string_meta,parent_id,md5,file_url,large_file_url,preview_file_url,file_ext,last_noted_at,is_banned,is_deleted,created_at,uploader_id,source,image_width,image_height,file_size,rating,media_metadata[metadata],parent[id,md5],children[id,md5],notes[id,x,y,width,height,body],uploader[id,name]")
-            .WithUserAgent(_botUserAgent)
-            .GetJsonAsync<DanbooruPost>();
+        DanbooruPost post;
+        try
+        {
+            post = await _flurlClient.Request("posts", $"{postId}.json")
+                .SetQueryParam("only", "id,tag_string_artist,tag_string_character,tag_string_copyright,pools,tag_string_general,tag_string_meta,parent_id,md5,file_url,large_file_url,preview_file_url,file_ext,last_noted_at,is_banned,is_deleted,created_at,uploader_id,source,image_width,image_height,file_size,rating,media_metadata[metadata],parent[id,md5],children[id,md5],notes[id,x,y,width,height,body],uploader[id,name]")
+                .WithUserAgent(_botUserAgent)
+                .GetJsonAsync<DanbooruPost>();
+        }
+        catch (FlurlHttpException exception) when (exception.Call.Response?.StatusCode == 404)
+        {
+            throw new PostNotFoundException("Danbooru", postId, exception);
+        }
 
         return new Post(
             new PostIdentity(postId, post.Md5),

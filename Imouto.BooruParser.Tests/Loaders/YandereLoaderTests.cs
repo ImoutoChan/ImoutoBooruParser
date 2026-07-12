@@ -47,6 +47,18 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
 
             await Verify(post);
         }
+
+        [Fact]
+        public async Task ShouldThrowPostNotFoundException()
+        {
+            var loader = _loaderFixture.GetLoader();
+
+            Func<Task> action = () => loader.GetPostAsync("999999999");
+
+            var exception = await action.Should().ThrowAsync<PostNotFoundException>();
+            exception.Which.PostId.Should().Be("999999999");
+            exception.Which.Booru.Should().Be("Yande.re");
+        }
     }
 
     public class SearchAsyncMethod : YandereLoaderTests
@@ -193,6 +205,8 @@ public class YandereLoaderTests : IClassFixture<YandereApiLoaderFixture>
 
             result.Should().NotBeEmpty();
             result.DistinctBy(x => x.HistoryId).Should().HaveCount(result.Count);
+            result.Select(x => x.HistoryId).Should().BeInAscendingOrder();
+            result.Should().OnlyContain(x => x.HistoryId > firstTagHistoryPage.Last().HistoryId);
         }
 
         /// <summary>

@@ -23,3 +23,12 @@ public record GelbooruPost(
 public record GelbooruPostPage(
     [property: JsonPropertyName("post")] IReadOnlyCollection<GelbooruPost>? Posts
 );
+
+public record GelbooruTagPage(
+    [property: JsonPropertyName("tag")] IReadOnlyCollection<GelbooruTag>? Tags
+);
+
+public record GelbooruTag(
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("type")] int Type
+);

@@ -65,6 +65,18 @@ public class DanbooruLoaderTests : IClassFixture<DanbooruApiLoaderFixture>, ICla
 
             await Verify(post);
         }
+
+        [Fact]
+        public async Task ShouldThrowPostNotFoundException()
+        {
+            var loader = _loaderFixture.GetLoaderWithoutAuth();
+
+            Func<Task> action = () => loader.GetPostAsync("999999999");
+
+            var exception = await action.Should().ThrowAsync<PostNotFoundException>();
+            exception.Which.PostId.Should().Be("999999999");
+            exception.Which.Booru.Should().Be("Danbooru");
+        }
     }
     
     public class LoadSearchResultAsyncMethod : DanbooruLoaderTests

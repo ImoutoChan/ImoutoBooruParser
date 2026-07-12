@@ -11,19 +11,18 @@ public class Throttler
     private readonly SemaphoreSlim _locker = new(1);
     private DateTimeOffset _lastAccess = DateTimeOffset.MinValue;
     
-    public async ValueTask UseAsync(TimeSpan delay)
+    public async ValueTask UseAsync(TimeSpan delay, CancellationToken ct = default)
     {
-        await _locker.WaitAsync();
+        await _locker.WaitAsync(ct);
         try
         {
             var now = DateTimeOffset.UtcNow;
-        
             var timePassedSinceLastCall = now - _lastAccess;
-        
-            if (timePassedSinceLastCall < delay)
-                await Task.Delay(delay - timePassedSinceLastCall);
 
-            _lastAccess = now;
+            if (timePassedSinceLastCall < delay)
+                await Task.Delay(delay - timePassedSinceLastCall, ct);
+
+            _lastAccess = DateTimeOffset.UtcNow;
         }
         finally
         {

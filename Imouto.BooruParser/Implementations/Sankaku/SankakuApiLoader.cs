@@ -1,4 +1,5 @@
 using System.Net;
+using System.Globalization;
 using Flurl;
 using Flurl.Http;
 using Flurl.Http.Configuration;
@@ -62,7 +63,15 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
 
     public async Task<Post> GetPostAsync(string postId)
     {
-        var post = await _flurlClient.Request("posts", postId).GetJsonAsync<SankakuPost>();
+        SankakuPost post;
+        try
+        {
+            post = await _flurlClient.Request("posts", postId).GetJsonAsync<SankakuPost>();
+        }
+        catch (FlurlHttpException exception) when (exception.Call.Response?.StatusCode == 404)
+        {
+            throw new PostNotFoundException("Sankaku", postId, exception);
+        }
         
         return new Post(
             new PostIdentity(postId, post.Md5),
@@ -240,7 +249,10 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             {
                 var postId = x.SelectNodes("td")![1].SelectSingleNode("a")!.InnerHtml;
                 var dateString = x.SelectNodes("td")![5].Attributes["time_value"].Value;
-                var date = DateTime.Parse(dateString);
+                var date = DateTime.Parse(
+                    dateString,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.AllowWhiteSpaces);
 
                 return new NoteHistoryEntry(-1, postId, new DateTimeOffset(date, TimeSpan.FromHours(-4)));
             })
@@ -398,4 +410,3 @@ public class SankakuApiLoader : IBooruApiLoader, IBooruApiAccessor
             await Throttler.Get("Sankaku").UseAsync(delay);
     }
 }
-

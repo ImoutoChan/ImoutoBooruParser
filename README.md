@@ -39,7 +39,13 @@ var gPost = await gelbooru.GetPostAsync(7837194);
 // Rule34 requires UserId + ApiKey
 var rule34 = new Rule34ApiLoader(
     new FlurlClientCache(),
-    Options.Create(new Rule34Settings { UserId = 123456, ApiKey = "<your_api_key>", PauseBetweenRequestsInMs = 1000 }));
+    Options.Create(new Rule34Settings
+    {
+        UserId = 123456,
+        ApiKey = "<your_api_key>",
+        BotUserAgent = "SampleUserAgent/v1",
+        PauseBetweenRequestsInMs = 1000
+    }));
 var rPost = await rule34.GetPostAsync(8548333);
 
 // Sankaku supports string post ids; auth is optional but recommended
@@ -60,8 +66,6 @@ var tagHistory = await danbooru.GetTagHistoryPageAsync(null, limit: 100);
 
 ```csharp
 services.AddBooruParsers();
-// For Sankaku auth management add IMemoryCache
-services.AddMemoryCache();
 
 // Optional: bind settings from configuration
 services.Configure<DanbooruSettings>(Configuration.GetSection("Danbooru"));
@@ -72,6 +76,7 @@ services.Configure<Rule34Settings>(Configuration.GetSection("Rule34"));
 ```
 
 After that, you can inject individual parsers (e.g., Rule34ApiLoader, DanbooruApiLoader) or all loaders using IEnumerable<IBooruApiLoader>.
+The registered loaders are singletons, so every interface resolves to the same loader instance and reuses its HTTP client safely.
 
 ### Settings overview
 
@@ -92,6 +97,7 @@ After that, you can inject individual parsers (e.g., Rule34ApiLoader, DanbooruAp
 - Rule34Settings: 
   - UserId (required), 
   - ApiKey (required), 
+  - BotUserAgent (required),
   - PauseBetweenRequestsInMs
 - SankakuSettings: 
   - Login, 
@@ -117,6 +123,7 @@ Additionally, `IBooruApiAccessor` (where supported):
 - FavoritePostAsync
 
 Note: Sankaku uses string post identifiers; int helpers are provided as extensions in `Api.cs`.
+`GetPostAsync` throws `PostNotFoundException` when the requested post does not exist; `GetPostByMd5Async` returns `null` when no post matches.
 
 ## Changelog
 

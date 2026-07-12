@@ -16,20 +16,13 @@ public class Rule34ApiLoader : IBooruApiLoader
     public Rule34ApiLoader(IFlurlClientCache factory, IOptions<Rule34Settings> options)
     {
         _options = options;
+        var botUserAgent = options.Value.BotUserAgent;
+        if (string.IsNullOrWhiteSpace(botUserAgent))
+            throw new InvalidOperationException("BotUserAgent is required to make Rule34 API calls");
+
         _flurlJsonClient = factory.GetForDomain(new Url(JsonBaseUrl))
-            .WithHeader("Connection", "keep-alive")
-            .WithHeader("sec-ch-ua", "\"Chromium\";v=\"106\", \"Google Chrome\";v=\"106\", \"Not;A=Brand\";v=\"99\"")
-            .WithHeader("sec-ch-ua-mobile", "?0")
-            .WithHeader("sec-ch-ua-platform", "\"Windows\"")
-            .WithHeader("DNT", "1")
-            .WithHeader("Upgrade-Insecure-Requests", "1")
-            .WithHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36")
-            .WithHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
-            .WithHeader("Sec-Fetch-Site", "none")
-            .WithHeader("Sec-Fetch-Mode", "navigate")
-            .WithHeader("Sec-Fetch-User", "?1")
-            .WithHeader("Sec-Fetch-Dest", "document")
-            .WithHeader("Accept-Language", "en")
+            .WithHeader("User-Agent", botUserAgent)
+            .WithHeader("Accept", "application/json, application/xml;q=0.9")
             .BeforeCall(_ => DelayWithThrottler(options));
     }
 
@@ -45,9 +38,10 @@ public class Rule34ApiLoader : IBooruApiLoader
             .GetJsonAsync<Rule34Post[]>();
         var post = postJson?.FirstOrDefault();
         
-        return post != null
-            ? CreatePost(post, await GetNotesAsync(post))
-            : null!;
+        if (post == null)
+            throw new PostNotFoundException("Rule34", postId);
+
+        return CreatePost(post, await GetNotesAsync(post));
     }
 
     public async Task<Post?> GetPostByMd5Async(string md5)
