@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   deploy:
@@ -47,5 +48,11 @@ jobs:
       - name: Pack
         run: dotnet pack Imouto.BooruParser/Imouto.BooruParser.csproj --configuration Release --no-build --output artifacts/packages
 
+      - name: NuGet login
+        id: nuget-login
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: ImoutoChan
+
       - name: Publish package
-        run: dotnet nuget push artifacts/packages/*.nupkg --api-key "${{ secrets.NUGET_ORG_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+        run: dotnet nuget push artifacts/packages/*.nupkg --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
