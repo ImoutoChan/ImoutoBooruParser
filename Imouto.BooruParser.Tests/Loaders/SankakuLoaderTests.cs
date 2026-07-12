@@ -236,7 +236,7 @@ public class SankakuLoaderTests : IClassFixture<SankakuLoaderFixture>
         {
         }
 
-        [Fact(Skip = "Sankaku Channel redirects note history to login")]
+        [Fact]
         public async Task ShouldLoadNotesHistory()
         {
             var loader = _loaderFixture.GetLoaderWithAuth();
